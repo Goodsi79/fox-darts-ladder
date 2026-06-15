@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Fox at Peasemore – Darts Ladder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #05070a;
+  --bg-alt: #0b0f16;
+  --panel: #0f141d;
+  --panel-soft: #151b26;
+  --border: #1f2933;
+  --text: #e5e7eb;
+  --muted: #6b7280;
+  --accent: #ff8a1f;
+  --accent-soft: rgba(255,138,31,0.18);
+  --accent-strong: #ffb347;
+  --danger: #ff4b5c;
+  --danger-soft: rgba(255,75,92,0.18);
+  --success: #22c55e;
+  --success-soft: rgba(34,197,94,0.18);
+  --cyan: #00e5ff;
+  --radius: 12px;
+  --shadow: 0 18px 45px rgba(0,0,0,0.65);
+  --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: radial-gradient(circle at top, #141b2a 0, #05070a 55%);
+  color: var(--text);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+header img {
+  height: 70px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.header-sub {
+  font-size: .85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  background: rgba(220,38,38,0.12);
+  color: #fecaca;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #f97373;
+  box-shadow: 0 0 10px #f97373;
+}
+
+/* Nav */
+.nav-card {
+  background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.85));
+  border-radius: var(--radius);
+  border: 1px solid rgba(148,163,184,0.25);
+  box-shadow: var(--shadow);
+  padding: .6rem .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  margin-bottom: 1rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+.nav-buttons {
+  display: flex;
+  gap: .4rem;
+}
+
+/* Buttons */
+button {
+  padding: .55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .85rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: all .16s ease-out;
+}
+
+.btn-primary {
+  background: radial-gradient(circle at top, var(--accent-strong), var(--accent));
+  color: #111827;
+  box-shadow: 0 0 18px rgba(255,138,31,0.55);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 26px rgba(255,138,31,0.75);
+}
+
+.btn-secondary {
+  background: rgba(15,23,42,0.9);
+  color: var(--text);
+  border-color: rgba(148,163,184,0.4);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(148,163,184,0.35);
+}
+
+.btn-danger {
+  background: rgba(127,29,29,0.9);
+  color: #fecaca;
+  border-color: rgba(248,113,113,0.6);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 0 18px rgba(248,113,113,0.7);
+}
+
+/* Cards */
+.card {
+  background: radial-gradient(circle at top left, rgba(148,163,184,0.12), transparent 55%),
+              linear-gradient(145deg, var(--panel), var(--panel-soft));
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(148,163,184,0.25);
+  box-shadow: var(--shadow);
+  margin-top: 1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .6rem;
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.card-sub {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* Layout grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Table / Ladder */
+.table-wrapper {
+  margin-top: .6rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(55,65,81,0.8);
+  background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+th, td {
+  padding: .45rem .55rem;
+  border-bottom: 1px solid rgba(31,41,55,0.9);
+}
+
+th {
+  text-align: left;
+  color: #9ca3af;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.8));
+}
+
+tbody tr {
+  transition: background .12s ease-out, box-shadow .12s ease-out;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(15,23,42,0.9);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(15,23,42,0.96);
+}
+
+tbody tr:hover {
+  background: rgba(30,64,175,0.55);
+  box-shadow: inset 0 0 0 1px rgba(191,219,254,0.4);
+}
+
+td.position {
+  color: var(--cyan);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.player-name {
+  font-weight: 500;
+}
+
+td.record {
+  font-variant-numeric: tabular-nums;
+}
+
+td.last {
+  font-size: .75rem;
+  color: #9ca3af;
+}
+
+/* Position arrows */
+.pos-arrow {
+  margin-left: 6px;
+  font-size: .75rem;
+  opacity: 1;
+  transition: all .6s ease;
+}
+
+.pos-up {
+  color: #22c55e;
+  text-shadow: 0 0 8px rgba(34,197,94,0.8);
+  animation: slideUp .6s ease;
+}
+
+.pos-down {
+  color: #ff4b5c;
+  text-shadow: 0 0 8px rgba(255,75,92,0.8);
+  animation: slideDown .6s ease;
+}
+
+.pos-same {
+  color: #6b7280;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-6px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Inputs */
+input, select {
+  width: 100%;
+  padding: .55rem .6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(55,65,81,0.9);
+  background: rgba(15,23,42,0.95);
+  color: var(--text);
+  font-size: .85rem;
+  outline: none;
+  transition: border .12s ease-out, box-shadow .12s ease-out, background .12s ease-out;
+}
+
+input::placeholder {
+  color: #6b7280;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft), 0 0 18px rgba(255,138,31,0.45);
+  background: rgba(15,23,42,1);
+}
+
+/* Flex helpers */
+.flex {
+  display: flex;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.small {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* Leg blocks */
+.leg-block {
+  background: rgba(15,23,42,0.95);
+  padding: .8rem .9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(55,65,81,0.9);
+  margin-bottom: .6rem;
+  position: relative;
+}
+
+.leg-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(255,138,31,0.4));
+  opacity: 0;
+  transition: opacity .18s ease-out;
+  pointer-events: none;
+}
+
+.leg-block:hover::before {
+  opacity: 0.35;
+}
+
+.leg-title {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #9ca3af;
+  margin-bottom: .35rem;
+}
+
+.notice {
+  background: rgba(15,23,42,0.95);
+  border-left: 3px solid var(--accent);
+  padding: .45rem .6rem;
+  border-radius: 8px;
+  margin-top: .4rem;
+  font-size: .75rem;
+  color: #e5e7eb;
+}
+
+/* Tags / chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.chip-info {
+  background: rgba(15,23,42,0.9);
+  border: 1px solid rgba(148,163,184,0.5);
+  color: #e5e7eb;
+}
+
+.chip-danger {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger);
+  color: #fecaca;
+}
+
+.chip-success {
+  background: var(--success-soft);
+  border: 1px solid var(--success);
+  color: #bbf7d0;
+}
+
+/* History */
+.history-item {
+  margin-bottom: .9rem;
+  padding-bottom: .7rem;
+  border-bottom: 1px dashed rgba(55,65,81,0.9);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+}
+
+.history-main {
+  font-size: .85rem;
+}
+
+.history-meta {
+  font-size: .7rem;
+  color: #9ca3af;
+}
+
+/* Messages */
+.message {
+  margin-top: .45rem;
+  font-size: .75rem;
+}
+
+.message-info {
+  color: #bfdbfe;
+}
+
+.message-error {
+  color: #fecaca;
+}
+
+/* Links */
+a {
+  color: var(--accent-strong);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <img src="fox-logo.png" alt="The Fox at Peasemore">
+  <div>
+    <h1>The Fox at Peasemore</h1>
+    <div class="header-sub">Darts Ladder • F1‑Style Live Standings</div>
+    <div style="margin-top:.35rem;">
+      <span class="badge-live">
+        <span class="badge-live-dot"></span>
+        Live Firebase Ladder
+      </span>
+    </div>
+  </div>
+</header>
+
+<div class="nav-card">
+  <div class="nav-left">
+    <span class="nav-dot"></span>
+    <span>Real‑time shared ladder • Match history • Reset & backup</span>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
+    <button class="btn-secondary" onclick="showPage('history')">Match History</button>
+  </div>
+</div>
+
+<!-- PAGE: LADDER -->
+<div id="page-ladder">
+  <div class="main-grid">
+    <!-- LEFT: Ladder -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ladder Standings</div>
+            <div class="card-sub">Ordered by current position • Lower number = higher rank</div>
+          </div>
+          <div class="chip chip-info">
+            <span>Live</span>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>W</th>
+                <th>L</th>
+                <th>Legs</th>
+                <th>Last Match</th>
+              </tr>
+            </thead>
+            <tbody id="ladder-body"></tbody>
+          </table>
+        </div>
+
+        <div class="flex" style="margin-top:.8rem; align-items:center;">
+          <div style="flex:1;">
+            <input id="new-player" placeholder="Add player to ladder">
+          </div>
+          <button class="btn-primary" onclick="addPlayer()">Add Player</button>
+        </div>
+
+        <div style="margin-top:.8rem;" class="flex-between">
+          <div class="small">New players always join at the bottom of the ladder.</div>
+          <button class="btn-danger" onclick="resetLadder()">Reset Ladder & History</button>
+        </div>
+        <div id="reset-msg" class="message message-info"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Backup & Restore</div>
+            <div class="card-sub">Export or import the ladder state (players + stats)</div>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:.7rem;">
+          <button class="btn-secondary" onclick="exportLadder()">Export Ladder JSON</button>
+
+          <label class="btn-secondary" style="cursor:pointer; text-align:center;">
+            Import Ladder JSON
+            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importLadder(event)">
+          </label>
+        </div>
+
+        <div id="import-msg" class="message message-info"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Match entry + rules -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Record Ladder Match</div>
+            <div class="card-sub">Challenges up to 3 places above • Best of 3 legs</div>
+          </div>
+          <div class="chip chip-success">
+            <span>Official</span>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:.7rem;">
+          <div style="flex:1;">
+            <div class="small" style="margin-bottom:.25rem;">Challenger (lower ranked)</div>
+            <select id="challenger"></select>
+          </div>
+          <div style="flex:1;">
+            <div class="small" style="margin-bottom:.25rem;">Opponent (up to 3 places above)</div>
+            <select id="opponent"></select>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:.6rem;">
+          <div style="flex:1;">
+            <div class="small" style="margin-bottom:.25rem;">Starting score</div>
+            <select id="startScore">
+              <option value="501">501 (default)</option>
+              <option value="301">301 (if both agree)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <div class="flex-between" style="margin-bottom:.4rem;">
+            <div class="card-sub" style="text-transform:none; letter-spacing:0;">Leg Results</div>
+            <button class="btn-secondary" style="padding:.35rem .8rem; font-size:.7rem;" onclick="addLeg()">+ Add Leg</button>
+          </div>
+          <div id="legs-area"></div>
+        </div>
+
+        <div style="margin-top:.9rem;">
+          <button class="btn-primary" style="width:100%;" onclick="submitMatch()">Submit Match Result</button>
+        </div>
+
+        <div id="msg" class="message message-info"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ladder Rules</div>
+            <div class="card-sub">Enforced by honour, witnessed scoring, and this dashboard</div>
+          </div>
+        </div>
+
+        <ul style="line-height:1.6; padding-left:1.1rem; margin:.6rem 0 0 0; font-size:.8rem; color:#d1d5db;">
+          <li><strong>Normal darts rules</strong> – straight in, double out.</li>
+          <li><strong>Matches must be scored and witnessed</strong> by a third ladder member.</li>
+          <li><strong>Declare the match</strong> as a ladder match before starting.</li>
+          <li><strong>Format:</strong> Best of 3 legs. Default 501 start, or 301 if both agree.</li>
+          <li><strong>45‑dart rule:</strong> After 45 darts each (15 visits), if no checkout, decide by <strong>one dart nearest the bull</strong>.</li>
+          <li><strong>No remaining‑score comparison</strong> after 45 darts — nearest‑bull only.</li>
+          <li><strong>Challenge rule:</strong> You may challenge up to <strong>3 positions above</strong> you.</li>
+          <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position; others shift down.</li>
+          <li><strong>New players</strong> always join at the bottom.</li>
+          <li><strong>Ladder runs continuously</strong> — inactivity naturally drops players down.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: MATCH HISTORY -->
+<div id="page-history" style="display:none;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Match History</div>
+        <div class="card-sub">Chronological log of recorded ladder matches</div>
+      </div>
+      <div class="chip chip-info">
+        <span>Newest First</span>
+      </div>
+    </div>
+
+    <div id="history-list" style="margin-top:.8rem;"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- FIREBASE (COMPAT MODE) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
+  authDomain: "fox-darts-ladder.firebaseapp.com",
+  databaseURL: "https://fox-darts-ladder-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fox-darts-ladder",
+  storageBucket: "fox-darts-ladder.firebasestorage.app",
+  messagingSenderId: "1028079521201",
+  appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+<script>
+let ladder = [];
+let previousLadder = [];
+
+/* Page switching */
+function showPage(page) {
+  document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
+  document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
+}
+
+/* Render ladder with arrows */
+function renderLadder() {
+  const body = document.getElementById("ladder-body");
+  body.innerHTML = "";
+  ladder.forEach((p,i)=>{
+    let arrow = "";
+    let arrowClass = "";
+    if (p.delta > 0) {
+      arrow = "▲";
+      arrowClass = "pos-up";
+    } else if (p.delta < 0) {
+      arrow = "▼";
+      arrowClass = "pos-down";
+    } else {
+      arrow = "•";
+      arrowClass = "pos-same";
+    }
+
+    body.innerHTML += `
+      <tr>
+        <td class="position">${String(i+1).padStart(2,"0")} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
+        <td class="player-name">${p.name}</td>
+        <td class="record">${p.w}</td>
+        <td class="record">${p.l}</td>
+        <td class="record">${p.lf}:${p.la}</td>
+        <td class="last">${p.last || "—"}</td>
+      </tr>`;
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll(".pos-arrow").forEach(el => el.classList.add("fade-out"));
+  }, 5000);
+}
+
+/* Load ladder from Firebase with movement detection */
+db.ref("ladder").on("value", snapshot => {
+  const newLadder = snapshot.val() || [];
+
+  newLadder.forEach((player, newIndex) => {
+    const oldIndex = previousLadder.findIndex(p => p.name === player.name);
+    if (oldIndex === -1) {
+      player.delta = 0;
+    } else {
+      player.delta = oldIndex - newIndex;
+    }
+  });
+
+  previousLadder = JSON.parse(JSON.stringify(newLadder));
+  ladder = newLadder;
+
+  renderLadder();
+  renderSelects();
+});
+
+/* Load match history */
+db.ref("history").on("value", snapshot => {
+  const data = snapshot.val() || {};
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+
+  const entries = Object.values(data).reverse();
+
+  if (!entries.length) {
+    list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches recorded yet.</div>`;
+    return;
+  }
+
+  entries.forEach(m => {
+    const legsSummary = (m.legs || []).map((l,idx) => {
+      if (!l.winner) return `Leg ${idx+1}: –`;
+      return `Leg ${idx+1}: ${l.winner === "challenger" ? m.challenger : m.opponent}`;
+    }).join(" • ");
+
+    list.innerHTML += `
+      <div class="history-item">
+        <div class="history-header">
+          <div class="history-main">
+            <strong>${m.winner}</strong> beat <strong>${m.loser}</strong>
+          </div>
+          <div class="chip chip-info">
+            <span>${m.movement || ""}</span>
+          </div>
+        </div>
+        <div class="history-meta">
+          <div>${m.timestamp || ""}</div>
+          <div style="margin-top:.2rem;">${legsSummary}</div>
+        </div>
+      </div>
+    `;
+  });
+});
+
+/* Save ladder */
+function save() {
+  db.ref("ladder").set(ladder);
+}
+
+/* Reset ladder + history */
+function resetLadder() {
+  if (!confirm("This will permanently clear the ladder AND match history for everyone. Continue?")) return;
+
+  ladder = [];
+  previousLadder = [];
+  db.ref("ladder").set([]);
+  db.ref("history").set([]);
+  renderLadder();
+  renderSelects();
+  document.getElementById("reset-msg").textContent = "Ladder and history cleared.";
+}
+
+/* Add player */
+function addPlayer() {
+  const name = document.getElementById("new-player").value.trim();
+  if (!name) return;
+  ladder.push({name, w:0, l:0, lf:0, la:0, last:null, delta:0});
+  document.getElementById("new-player").value = "";
+  save();
+  renderSelects();
+}
+
+/* Select options */
+function renderSelects() {
+  const c = document.getElementById("challenger");
+  const o = document.getElementById("opponent");
+  if (!c || !o) return;
+
+  const cVal = c.value;
+  const oVal = o.value;
+
+  c.innerHTML = `<option value="">Select challenger</option>`;
+  o.innerHTML = `<option value="">Select opponent</option>`;
+
+  ladder.forEach((p,i)=>{
+    c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
+  });
+
+  if (cVal) c.value = cVal;
+  if (oVal) o.value = oVal;
+}
+
+document.getElementById("challenger").addEventListener("change", ()=>{
+  const idx = parseInt(document.getElementById("challenger").value);
+  const o = document.getElementById("opponent");
+  o.innerHTML = `<option value="">Select opponent</option>`;
+  ladder.forEach((p,i)=>{
+    if (i < idx && idx - i <= 3) {
+      o.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
+    }
+  });
+});
+
+/* Leg entry */
+function addLeg() {
+  const area = document.getElementById("legs-area");
+  const id = Date.now();
+  area.innerHTML += `
+    <div class="leg-block" id="leg-${id}">
+      <div class="leg-title">Leg</div>
+      <div class="small" style="margin-bottom:.25rem;">Leg winner</div>
+      <select class="leg-winner">
+        <option value="">Select</option>
+        <option value="challenger">Challenger</option>
+        <option value="opponent">Opponent</option>
+      </select>
+
+      <label class="small" style="display:block; margin-top:.45rem;">
+        <input type="checkbox" class="leg-45" style="width:auto; margin-right:.35rem;">
+        45 darts reached (both players)
+      </label>
+
+      <div class="nearest-bull-area" style="display:none;">
+        <div class="notice">
+          After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+        </div>
+        <label class="small" style="display:block; margin-top:.35rem;">
+          <input type="checkbox" class="leg-bull" style="width:auto; margin-right:.35rem;">
+          Nearest bull used to decide this leg
+        </label>
+      </div>
+    </div>`;
+
+  const block = document.getElementById(`leg-${id}`);
+  const cb45 = block.querySelector(".leg-45");
+  const bullArea = block.querySelector(".nearest-bull-area");
+
+  cb45.addEventListener("change", ()=>{
+    bullArea.style.display = cb45.checked ? "block" : "none";
+  });
+}
+addLeg();
+
+/* Submit match */
+function submitMatch() {
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  const c = parseInt(document.getElementById("challenger").value);
+  const o = parseInt(document.getElementById("opponent").value);
+  if (isNaN(c) || isNaN(o)) {
+    msg.textContent = "Select challenger and opponent.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  const legs = [...document.querySelectorAll(".leg-block")].map(block=>{
+    return {
+      winner: block.querySelector(".leg-winner").value,
+      reached45: block.querySelector(".leg-45").checked,
+      bull: block.querySelector(".leg-bull")?.checked || false
+    };
+  });
+
+  const cLegs = legs.filter(l=>l.winner==="challenger").length;
+  const oLegs = legs.filter(l=>l.winner==="opponent").length;
+
+  if (cLegs < 2 && oLegs < 2) {
+    msg.textContent = "A best‑of‑3 match requires someone to reach 2 legs.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  for (const l of legs) {
+    if (l.reached45 && !l.bull) {
+      msg.textContent = "If 45 darts were reached, nearest bull must be used.";
+      msg.className = "message message-error";
+      return;
+    }
+  }
+
+  const winner = cLegs > oLegs ? c : o;
+  const loser  = cLegs > oLegs ? o : c;
+
+  const winnerLegs = cLegs > oLegs ? cLegs : oLegs;
+  const loserLegs  = cLegs > oLegs ? oLegs : cLegs;
+
+  ladder[winner].w++;
+  ladder[loser].l++;
+  ladder[winner].lf += winnerLegs;
+  ladder[winner].la += loserLegs;
+  ladder[loser].lf  += loserLegs;
+  ladder[loser].la  += winnerLegs;
+
+  const stamp = new Date().toLocaleString();
+  const winnerName = ladder[winner].name;
+  const loserName  = ladder[loser].name;
+
+  ladder[winner].last = `W vs ${loserName} (${stamp})`;
+  ladder[loser].last  = `L vs ${winnerName} (${stamp})`;
+
+  if (winner > loser) {
+    const moved = ladder.splice(winner,1)[0];
+    ladder.splice(loser,0,moved);
+  }
+
+  const matchRecord = {
+    challenger: ladder[c].name,
+    opponent: ladder[o].name,
+    winner: winnerName,
+    loser: loserName,
+    legs: legs,
+    timestamp: stamp,
+    movement: winner > loser ? `Moved from ${winner+1} to ${loser+1}` : "No movement"
+  };
+  db.ref("history").push(matchRecord);
+
+  save();
+  msg.textContent = "Match recorded and ladder updated.";
+  msg.className = "message message-info";
+}
+
+/* Export */
+function exportLadder() {
+  const dataStr = JSON.stringify(ladder, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fox-darts-ladder-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+/* Import */
+function importLadder(event) {
+  const file = event.target.files[0];
+  const msg = document.getElementById("import-msg");
+
+  if (!file) {
+    msg.textContent = "No file selected.";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (!Array.isArray(imported)) {
+        msg.textContent = "Invalid file format. Expected an array of players.";
+        return;
+      }
+
+      if (!confirm("Importing will replace the current ladder for everyone. Continue?")) {
+        msg.textContent = "Import cancelled.";
+        return;
+      }
+
+      ladder = imported.map(p => ({...p, delta:0}));
+      previousLadder = JSON.parse(JSON.stringify(ladder));
+      save();
+      renderLadder();
+      renderSelects();
+      msg.textContent = "Ladder imported successfully.";
+
+    } catch (err) {
+      msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+/* Initial selects on load */
+window.addEventListener("load", renderSelects);
+</script>
+
+</body>
+</html>
