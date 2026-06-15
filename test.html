@@ -129,7 +129,31 @@ h1 {
 
 .nav-buttons {
   display: flex;
+  align-items: center;
   gap: .4rem;
+}
+
+/* Admin icon */
+.admin-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5e7eb;
+  cursor: pointer;
+  margin-left: .4rem;
+  background: rgba(15,23,42,0.9);
+  transition: all .16s ease-out;
+  font-size: 1rem;
+}
+
+.admin-icon:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 18px rgba(56,189,248,0.7);
 }
 
 /* Buttons */
@@ -374,22 +398,6 @@ input:focus, select:focus {
   position: relative;
 }
 
-.leg-block::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid transparent;
-  background: linear-gradient(135deg, rgba(56,189,248,0.4), rgba(255,138,31,0.4));
-  opacity: 0;
-  transition: opacity .18s ease-out;
-  pointer-events: none;
-}
-
-.leg-block:hover::before {
-  opacity: 0.35;
-}
-
 .leg-title {
   font-size: .75rem;
   text-transform: uppercase;
@@ -408,7 +416,7 @@ input:focus, select:focus {
   color: #e5e7eb;
 }
 
-/* Tags / chips */
+/* Chips */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -424,18 +432,6 @@ input:focus, select:focus {
   background: rgba(15,23,42,0.9);
   border: 1px solid rgba(148,163,184,0.5);
   color: #e5e7eb;
-}
-
-.chip-danger {
-  background: var(--danger-soft);
-  border: 1px solid var(--danger);
-  color: #fecaca;
-}
-
-.chip-success {
-  background: var(--success-soft);
-  border: 1px solid var(--success);
-  color: #bbf7d0;
 }
 
 /* History */
@@ -475,13 +471,67 @@ input:focus, select:focus {
   color: #fecaca;
 }
 
-/* Links */
-a {
-  color: var(--accent-strong);
-  text-decoration: none;
+/* Admin slide-in panel */
+.admin-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  height: 100vh;
+  background: radial-gradient(circle at top, #111827, #020617);
+  border-left: 1px solid rgba(148,163,184,0.4);
+  box-shadow: -18px 0 45px rgba(0,0,0,0.8);
+  transform: translateX(100%);
+  transition: transform .25s ease-out;
+  z-index: 50;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
 }
-a:hover {
-  text-decoration: underline;
+
+.admin-panel.open {
+  transform: translateX(0);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .8rem;
+}
+
+.admin-title {
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.admin-close {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.admin-section-title {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #9ca3af;
+  margin-top: .8rem;
+  margin-bottom: .3rem;
+}
+
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: .3rem;
+}
+
+.admin-footer {
+  margin-top: .8rem;
+  font-size: .7rem;
+  color: #6b7280;
 }
 </style>
 </head>
@@ -506,11 +556,14 @@ a:hover {
 <div class="nav-card">
   <div class="nav-left">
     <span class="nav-dot"></span>
-    <span>Real‑time shared ladder • Match history • Reset & backup</span>
+    <span>Real‑time shared ladder • Match history</span>
   </div>
   <div class="nav-buttons">
     <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
     <button class="btn-secondary" onclick="showPage('history')">Match History</button>
+    <div class="admin-icon" onclick="toggleAdminPanel()" title="Admin">
+      ⚙
+    </div>
   </div>
 </div>
 
@@ -552,32 +605,6 @@ a:hover {
           </div>
           <button class="btn-primary" onclick="addPlayer()">Add Player</button>
         </div>
-
-        <div style="margin-top:.8rem;" class="flex-between">
-          <div class="small">New players always join at the bottom of the ladder.</div>
-          <button class="btn-danger" onclick="resetLadder()">Reset Ladder & History</button>
-        </div>
-        <div id="reset-msg" class="message message-info"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Backup & Restore</div>
-            <div class="card-sub">Export or import the ladder state (players + stats)</div>
-          </div>
-        </div>
-
-        <div class="flex" style="margin-top:.7rem;">
-          <button class="btn-secondary" onclick="exportLadder()">Export Ladder JSON</button>
-
-          <label class="btn-secondary" style="cursor:pointer; text-align:center;">
-            Import Ladder JSON
-            <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importLadder(event)">
-          </label>
-        </div>
-
-        <div id="import-msg" class="message message-info"></div>
       </div>
     </div>
 
@@ -587,10 +614,7 @@ a:hover {
         <div class="card-header">
           <div>
             <div class="card-title">Record Ladder Match</div>
-            <div class="card-sub">Challenges up to 3 places above • Best of 3 legs</div>
-          </div>
-          <div class="chip chip-success">
-            <span>Official</span>
+            <div class="card-sub">Best of 3 legs • First to 2 wins • Challenge up to 3 places above</div>
           </div>
         </div>
 
@@ -605,22 +629,89 @@ a:hover {
           </div>
         </div>
 
-        <div class="flex" style="margin-top:.6rem;">
-          <div style="flex:1;">
-            <div class="small" style="margin-bottom:.25rem;">Starting score</div>
-            <select id="startScore">
-              <option value="501">501 (default)</option>
-              <option value="301">301 (if both agree)</option>
-            </select>
-          </div>
-        </div>
-
         <div style="margin-top:1rem;">
-          <div class="flex-between" style="margin-bottom:.4rem;">
-            <div class="card-sub" style="text-transform:none; letter-spacing:0;">Leg Results</div>
-            <button class="btn-secondary" style="padding:.35rem .8rem; font-size:.7rem;" onclick="addLeg()">+ Add Leg</button>
+          <div class="card-sub" style="text-transform:none; letter-spacing:0;">Leg Results (first to 2, max 3 legs)</div>
+          <div id="legs-area" style="margin-top:.5rem;">
+
+            <!-- LEG 1 -->
+            <div class="leg-block" id="leg-1">
+              <div class="leg-title">Leg 1</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="1">
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="1" style="width:auto; margin-right:.35rem;">
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-1" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="1" style="width:auto; margin-right:.35rem;">
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
+            <!-- LEG 2 -->
+            <div class="leg-block" id="leg-2">
+              <div class="leg-title">Leg 2</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="2">
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="2" style="width:auto; margin-right:.35rem;">
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-2" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="2" style="width:auto; margin-right:.35rem;">
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
+            <!-- LEG 3 -->
+            <div class="leg-block" id="leg-3">
+              <div class="leg-title">Leg 3</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="3" disabled>
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-3" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
           </div>
-          <div id="legs-area"></div>
         </div>
 
         <div style="margin-top:.9rem;">
@@ -639,16 +730,12 @@ a:hover {
         </div>
 
         <ul style="line-height:1.6; padding-left:1.1rem; margin:.6rem 0 0 0; font-size:.8rem; color:#d1d5db;">
-          <li><strong>Normal darts rules</strong> – straight in, double out.</li>
-          <li><strong>Matches must be scored and witnessed</strong> by a third ladder member.</li>
-          <li><strong>Declare the match</strong> as a ladder match before starting.</li>
-          <li><strong>Format:</strong> Best of 3 legs. Default 501 start, or 301 if both agree.</li>
-          <li><strong>45‑dart rule:</strong> After 45 darts each (15 visits), if no checkout, decide by <strong>one dart nearest the bull</strong>.</li>
-          <li><strong>No remaining‑score comparison</strong> after 45 darts — nearest‑bull only.</li>
-          <li><strong>Challenge rule:</strong> You may challenge up to <strong>3 positions above</strong> you.</li>
+          <li><strong>Best of 3 legs</strong> – first to 2 wins.</li>
+          <li><strong>Leg 3 only played</strong> if the first two legs are 1–1.</li>
+          <li><strong>45‑dart rule:</strong> after 45 darts each, decide by one dart nearest the bull.</li>
+          <li><strong>Challenge rule:</strong> you may challenge up to 3 positions above you.</li>
           <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position; others shift down.</li>
           <li><strong>New players</strong> always join at the bottom.</li>
-          <li><strong>Ladder runs continuously</strong> — inactivity naturally drops players down.</li>
         </ul>
       </div>
     </div>
@@ -672,9 +759,36 @@ a:hover {
   </div>
 </div>
 
+<!-- ADMIN SLIDE-IN PANEL -->
+<div id="admin-panel" class="admin-panel">
+  <div class="admin-header">
+    <div class="admin-title">Admin</div>
+    <div class="admin-close" onclick="toggleAdminPanel()">✕</div>
+  </div>
+  <div class="admin-body">
+    <div class="admin-section-title">Resets</div>
+    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetLadderOnly()">Reset Ladder Only</button>
+    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetHistoryOnly()">Reset Match History Only</button>
+    <button class="btn-danger" style="width:100%;" onclick="resetLadderAndHistory()">Reset Ladder & History</button>
+
+    <div class="admin-section-title">Backup & Restore</div>
+    <button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()">Export Ladder + History JSON</button>
+
+    <label class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; margin-bottom:.4rem;">
+      Import Ladder + History JSON
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
+    </label>
+
+    <div id="admin-msg" class="message message-info"></div>
+  </div>
+  <div class="admin-footer">
+    Changes here affect everyone using this ladder (shared Firebase backend).
+  </div>
 </div>
 
-<!-- FIREBASE (COMPAT MODE) -->
+</div>
+
+<!-- FIREBASE (COMPAT) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
@@ -691,16 +805,23 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+let ladder = [];
+let previousLadder = [];
+let historyCache = {};
 </script>
 
 <script>
-let ladder = [];
-let previousLadder = [];
-
 /* Page switching */
 function showPage(page) {
   document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
+}
+
+/* Admin panel toggle */
+function toggleAdminPanel() {
+  const panel = document.getElementById("admin-panel");
+  panel.classList.toggle("open");
 }
 
 /* Render ladder with arrows */
@@ -737,17 +858,17 @@ function renderLadder() {
   }, 5000);
 }
 
-/* Load ladder from Firebase with movement detection */
+/* Load ladder with movement detection */
 db.ref("ladder").on("value", snapshot => {
   const newLadder = snapshot.val() || [];
 
   newLadder.forEach((player, newIndex) => {
     const oldIndex = previousLadder.findIndex(p => p.name === player.name);
-    if (oldIndex === -1) {
-      player.delta = 0;
-    } else {
-      player.delta = oldIndex - newIndex;
-    }
+    player.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;
+    if (player.w == null) player.w = 0;
+    if (player.l == null) player.l = 0;
+    if (player.lf == null) player.lf = 0;
+    if (player.la == null) player.la = 0;
   });
 
   previousLadder = JSON.parse(JSON.stringify(newLadder));
@@ -759,18 +880,17 @@ db.ref("ladder").on("value", snapshot => {
 
 /* Load match history */
 db.ref("history").on("value", snapshot => {
-  const data = snapshot.val() || {};
+  historyCache = snapshot.val() || {};
   const list = document.getElementById("history-list");
   list.innerHTML = "";
 
-  const entries = Object.values(data).reverse();
-
+  const entries = Object.entries(historyCache);
   if (!entries.length) {
     list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches recorded yet.</div>`;
     return;
   }
 
-  entries.forEach(m => {
+  entries.reverse().forEach(([id, m]) => {
     const legsSummary = (m.legs || []).map((l,idx) => {
       if (!l.winner) return `Leg ${idx+1}: –`;
       return `Leg ${idx+1}: ${l.winner === "challenger" ? m.challenger : m.opponent}`;
@@ -796,21 +916,40 @@ db.ref("history").on("value", snapshot => {
 });
 
 /* Save ladder */
-function save() {
+function saveLadder() {
   db.ref("ladder").set(ladder);
 }
 
-/* Reset ladder + history */
-function resetLadder() {
-  if (!confirm("This will permanently clear the ladder AND match history for everyone. Continue?")) return;
-
+/* Resets */
+function resetLadderOnly() {
+  if (!confirm("Reset ladder only? Match history will be kept.")) return;
   ladder = [];
   previousLadder = [];
   db.ref("ladder").set([]);
-  db.ref("history").set([]);
   renderLadder();
   renderSelects();
-  document.getElementById("reset-msg").textContent = "Ladder and history cleared.";
+  document.getElementById("admin-msg").textContent = "Ladder reset.";
+}
+
+function resetHistoryOnly() {
+  if (!confirm("Reset match history only? Ladder positions will be kept.")) return;
+  historyCache = {};
+  db.ref("history").set({});
+  document.getElementById("history-list").innerHTML = "";
+  document.getElementById("admin-msg").textContent = "Match history reset.";
+}
+
+function resetLadderAndHistory() {
+  if (!confirm("Reset ladder AND match history for everyone?")) return;
+  ladder = [];
+  previousLadder = [];
+  historyCache = {};
+  db.ref("ladder").set([]);
+  db.ref("history").set({});
+  renderLadder();
+  renderSelects();
+  document.getElementById("history-list").innerHTML = "";
+  document.getElementById("admin-msg").textContent = "Ladder and history reset.";
 }
 
 /* Add player */
@@ -819,7 +958,7 @@ function addPlayer() {
   if (!name) return;
   ladder.push({name, w:0, l:0, lf:0, la:0, last:null, delta:0});
   document.getElementById("new-player").value = "";
-  save();
+  saveLadder();
   renderSelects();
 }
 
@@ -854,50 +993,93 @@ document.getElementById("challenger").addEventListener("change", ()=>{
   });
 });
 
-/* Leg entry */
-function addLeg() {
-  const area = document.getElementById("legs-area");
-  const id = Date.now();
-  area.innerHTML += `
-    <div class="leg-block" id="leg-${id}">
-      <div class="leg-title">Leg</div>
-      <div class="small" style="margin-bottom:.25rem;">Leg winner</div>
-      <select class="leg-winner">
-        <option value="">Select</option>
-        <option value="challenger">Challenger</option>
-        <option value="opponent">Opponent</option>
-      </select>
-
-      <label class="small" style="display:block; margin-top:.45rem;">
-        <input type="checkbox" class="leg-45" style="width:auto; margin-right:.35rem;">
-        45 darts reached (both players)
-      </label>
-
-      <div class="nearest-bull-area" style="display:none;">
-        <div class="notice">
-          After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
-        </div>
-        <label class="small" style="display:block; margin-top:.35rem;">
-          <input type="checkbox" class="leg-bull" style="width:auto; margin-right:.35rem;">
-          Nearest bull used to decide this leg
-        </label>
-      </div>
-    </div>`;
-
-  const block = document.getElementById(`leg-${id}`);
-  const cb45 = block.querySelector(".leg-45");
-  const bullArea = block.querySelector(".nearest-bull-area");
-
-  cb45.addEventListener("change", ()=>{
-    bullArea.style.display = cb45.checked ? "block" : "none";
+/* Leg state helpers */
+function getLegsFromDOM() {
+  const legs = [1,2,3].map(n => {
+    const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;
+    const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;
+    const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+    const bull = bullEl ? bullEl.checked : false;
+    return { winner, reached45, bull };
   });
+  return legs;
 }
-addLeg();
+
+function recalcLegState() {
+  const legs = getLegsFromDOM();
+  const cLegs = legs.filter(l => l.winner === "challenger").length;
+  const oLegs = legs.filter(l => l.winner === "opponent").length;
+  const totalPlayed = legs.filter(l => l.winner).length;
+
+  const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');
+  const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');
+  const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');
+
+  // Default: leg 3 disabled
+  let enableLeg3 = false;
+
+  if (cLegs === 1 && oLegs === 1) {
+    // 1–1 after two legs -> leg 3 must be played
+    enableLeg3 = true;
+  }
+
+  // If someone already has 2 legs, lock everything
+  const someoneWon = (cLegs === 2 || oLegs === 2);
+
+  // Enable/disable leg 3 controls
+  [leg3Winner, leg3_45, leg3_bull].forEach(el => {
+    if (!el) return;
+    if (someoneWon) {
+      el.disabled = true;
+    } else {
+      el.disabled = !enableLeg3;
+    }
+  });
+
+  // If someone has 2 legs, lock all winners and 45/bull checkboxes
+  if (someoneWon) {
+    [1,2,3].forEach(n => {
+      const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+      const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+      const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+      if (w) w.disabled = true;
+      if (c45) c45.disabled = true;
+      if (b) b.disabled = true;
+    });
+  } else {
+    // Ensure leg 1 and 2 always enabled
+    [1,2].forEach(n => {
+      const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+      const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+      const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+      if (w) w.disabled = false;
+      if (c45) c45.disabled = false;
+      if (b) b.disabled = false;
+    });
+  }
+}
+
+/* 45-dart toggle -> nearest bull visibility */
+[1,2,3].forEach(n => {
+  const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+  const bullArea = document.getElementById(`bull-${n}`);
+  if (cb45 && bullArea) {
+    cb45.addEventListener("change", () => {
+      bullArea.style.display = cb45.checked ? "block" : "none";
+    });
+  }
+});
+
+/* Leg winner change listeners */
+document.querySelectorAll(".leg-winner").forEach(sel => {
+  sel.addEventListener("change", recalcLegState);
+});
 
 /* Submit match */
 function submitMatch() {
   const msg = document.getElementById("msg");
   msg.textContent = "";
+  msg.className = "message message-info";
 
   const c = parseInt(document.getElementById("challenger").value);
   const o = parseInt(document.getElementById("opponent").value);
@@ -907,54 +1089,69 @@ function submitMatch() {
     return;
   }
 
-  const legs = [...document.querySelectorAll(".leg-block")].map(block=>{
-    return {
-      winner: block.querySelector(".leg-winner").value,
-      reached45: block.querySelector(".leg-45").checked,
-      bull: block.querySelector(".leg-bull")?.checked || false
-    };
-  });
+  const legs = getLegsFromDOM();
+  const cLegs = legs.filter(l => l.winner === "challenger").length;
+  const oLegs = legs.filter(l => l.winner === "opponent").length;
+  const totalPlayed = legs.filter(l => l.winner).length;
 
-  const cLegs = legs.filter(l=>l.winner==="challenger").length;
-  const oLegs = legs.filter(l=>l.winner==="opponent").length;
-
-  if (cLegs < 2 && oLegs < 2) {
-    msg.textContent = "A best‑of‑3 match requires someone to reach 2 legs.";
+  // Must be first to 2, max 3 legs
+  if (!(cLegs === 2 || oLegs === 2)) {
+    msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";
     msg.className = "message message-error";
     return;
   }
 
-  for (const l of legs) {
+  if (totalPlayed < 2 || totalPlayed > 3) {
+    msg.textContent = "Invalid leg structure. Must be 2–0 (2 legs) or 2–1 (3 legs).";
+    msg.className = "message message-error";
+    return;
+  }
+
+  if (totalPlayed === 3 && !( (cLegs === 2 && oLegs === 1) || (cLegs === 1 && oLegs === 2) )) {
+    msg.textContent = "Invalid 2–1 structure.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  if (totalPlayed === 2 && !( (cLegs === 2 && oLegs === 0) || (cLegs === 0 && oLegs === 2) )) {
+    msg.textContent = "Invalid 2–0 structure.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  // 45-dart / nearest bull validation
+  for (let i = 0; i < legs.length; i++) {
+    const l = legs[i];
     if (l.reached45 && !l.bull) {
-      msg.textContent = "If 45 darts were reached, nearest bull must be used.";
+      msg.textContent = `Leg ${i+1} reached 45 darts but nearest bull not confirmed.`;
       msg.className = "message message-error";
       return;
     }
   }
 
-  const winner = cLegs > oLegs ? c : o;
-  const loser  = cLegs > oLegs ? o : c;
+  const winnerIndex = cLegs > oLegs ? c : o;
+  const loserIndex  = cLegs > oLegs ? o : c;
+  const winnerLegs = Math.max(cLegs, oLegs);
+  const loserLegs  = Math.min(cLegs, oLegs);
 
-  const winnerLegs = cLegs > oLegs ? cLegs : oLegs;
-  const loserLegs  = cLegs > oLegs ? oLegs : cLegs;
-
-  ladder[winner].w++;
-  ladder[loser].l++;
-  ladder[winner].lf += winnerLegs;
-  ladder[winner].la += loserLegs;
-  ladder[loser].lf  += loserLegs;
-  ladder[loser].la  += winnerLegs;
+  ladder[winnerIndex].w++;
+  ladder[loserIndex].l++;
+  ladder[winnerIndex].lf += winnerLegs;
+  ladder[winnerIndex].la += loserLegs;
+  ladder[loserIndex].lf  += loserLegs;
+  ladder[loserIndex].la  += winnerLegs;
 
   const stamp = new Date().toLocaleString();
-  const winnerName = ladder[winner].name;
-  const loserName  = ladder[loser].name;
+  const winnerName = ladder[winnerIndex].name;
+  const loserName  = ladder[loserIndex].name;
 
-  ladder[winner].last = `W vs ${loserName} (${stamp})`;
-  ladder[loser].last  = `L vs ${winnerName} (${stamp})`;
+  ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;
+  ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
 
-  if (winner > loser) {
-    const moved = ladder.splice(winner,1)[0];
-    ladder.splice(loser,0,moved);
+  // Movement: if winner was lower ranked (higher index), move them up
+  if (winnerIndex > loserIndex) {
+    const moved = ladder.splice(winnerIndex,1)[0];
+    ladder.splice(loserIndex,0,moved);
   }
 
   const matchRecord = {
@@ -964,33 +1161,60 @@ function submitMatch() {
     loser: loserName,
     legs: legs,
     timestamp: stamp,
-    movement: winner > loser ? `Moved from ${winner+1} to ${loser+1}` : "No movement"
+    movement: winnerIndex > loserIndex ? `Moved from ${winnerIndex+1} to ${loserIndex+1}` : "No movement"
   };
   db.ref("history").push(matchRecord);
 
-  save();
+  saveLadder();
   msg.textContent = "Match recorded and ladder updated.";
   msg.className = "message message-info";
+
+  // Reset leg UI for next match
+  document.querySelectorAll(".leg-winner").forEach(sel => {
+    sel.value = "";
+    sel.disabled = false;
+  });
+  document.querySelectorAll(".leg-45").forEach(cb => {
+    cb.checked = false;
+    cb.disabled = false;
+  });
+  document.querySelectorAll(".leg-bull").forEach(cb => {
+    cb.checked = false;
+    cb.disabled = false;
+  });
+  [1,2,3].forEach(n => {
+    const bullArea = document.getElementById(`bull-${n}`);
+    if (bullArea) bullArea.style.display = "none";
+  });
+  // Ensure leg 3 disabled again until needed
+  document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-45[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
 }
 
-/* Export */
-function exportLadder() {
-  const dataStr = JSON.stringify(ladder, null, 2);
+/* Export ladder + history */
+function exportAll() {
+  const data = {
+    ladder: ladder,
+    history: historyCache
+  };
+  const dataStr = JSON.stringify(data, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "fox-darts-ladder-backup.json";
+  a.download = "fox-darts-ladder-and-history-backup.json";
   a.click();
 
   URL.revokeObjectURL(url);
+  document.getElementById("admin-msg").textContent = "Exported ladder + history.";
 }
 
-/* Import */
-function importLadder(event) {
+/* Import ladder + history */
+function importAll(event) {
   const file = event.target.files[0];
-  const msg = document.getElementById("import-msg");
+  const msg = document.getElementById("admin-msg");
 
   if (!file) {
     msg.textContent = "No file selected.";
@@ -1002,23 +1226,32 @@ function importLadder(event) {
     try {
       const imported = JSON.parse(e.target.result);
 
-      if (!Array.isArray(imported)) {
-        msg.textContent = "Invalid file format. Expected an array of players.";
+      if (typeof imported !== "object" || imported === null) {
+        msg.textContent = "Invalid file format. Expected an object with ladder and history.";
         return;
       }
 
-      if (!confirm("Importing will replace the current ladder for everyone. Continue?")) {
+      if (!Array.isArray(imported.ladder) || typeof imported.history !== "object") {
+        msg.textContent = "Invalid file format. Missing ladder or history.";
+        return;
+      }
+
+      if (!confirm("Importing will replace the current ladder and history for everyone. Continue?")) {
         msg.textContent = "Import cancelled.";
         return;
       }
 
-      ladder = imported.map(p => ({...p, delta:0}));
+      ladder = imported.ladder.map(p => ({...p, delta:0}));
       previousLadder = JSON.parse(JSON.stringify(ladder));
-      save();
+      historyCache = imported.history;
+
+      db.ref("ladder").set(ladder);
+      db.ref("history").set(historyCache);
+
       renderLadder();
       renderSelects();
-      msg.textContent = "Ladder imported successfully.";
 
+      msg.textContent = "Ladder and history imported successfully.";
     } catch (err) {
       msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";
     }
@@ -1028,7 +1261,10 @@ function importLadder(event) {
 }
 
 /* Initial selects on load */
-window.addEventListener("load", renderSelects);
+window.addEventListener("load", () => {
+  renderSelects();
+  recalcLegState();
+});
 </script>
 
 </body>
