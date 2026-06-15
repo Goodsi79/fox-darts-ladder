@@ -140,44 +140,6 @@ tbody tr:hover {
   background: rgba(30,64,175,0.55);
 }
 
-/* Position arrows */
-.pos-arrow {
-  margin-left: 6px;
-  font-size: .75rem;
-  opacity: 1;
-  transition: all .6s ease;
-}
-
-.pos-up {
-  color: #22c55e;
-  text-shadow: 0 0 8px rgba(34,197,94,0.8);
-  animation: slideUp .6s ease;
-}
-
-.pos-down {
-  color: #ff4b5c;
-  text-shadow: 0 0 8px rgba(255,75,92,0.8);
-  animation: slideDown .6s ease;
-}
-
-.pos-same {
-  color: #6b7280;
-}
-
-.fade-out {
-  opacity: 0;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(6px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-6px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
 /* Inputs */
 input, select {
   width: 100%;
@@ -304,7 +266,6 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let ladder = [];
-let previousLadder = [];
 
 /* PAGE SWITCHING */
 function showPage(page) {
@@ -312,29 +273,14 @@ function showPage(page) {
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
 }
 
-/* RENDER LADDER WITH ARROWS */
+/* RENDER LADDER */
 function renderLadder() {
   const body = document.getElementById("ladder-body");
   body.innerHTML = "";
-
   ladder.forEach((p,i)=>{
-    let arrow = "";
-    let arrowClass = "";
-
-    if (p.delta > 0) {
-      arrow = "▲";
-      arrowClass = "pos-up";
-    } else if (p.delta < 0) {
-      arrow = "▼";
-      arrowClass = "pos-down";
-    } else {
-      arrow = "•";
-      arrowClass = "pos-same";
-    }
-
     body.innerHTML += `
       <tr>
-        <td>${i+1} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
+        <td>${i+1}</td>
         <td>${p.name}</td>
         <td>${p.w}</td>
         <td>${p.l}</td>
@@ -342,28 +288,11 @@ function renderLadder() {
         <td>${p.last || "—"}</td>
       </tr>`;
   });
-
-  setTimeout(() => {
-    document.querySelectorAll(".pos-arrow").forEach(el => el.classList.add("fade-out"));
-  }, 5000);
 }
 
-/* LOAD LADDER WITH MOVEMENT DETECTION */
+/* LOAD LADDER — FIXED (NO renderSelects HERE) */
 db.ref("ladder").on("value", snapshot => {
-  const newLadder = snapshot.val() || [];
-
-  newLadder.forEach((player, newIndex) => {
-    const oldIndex = previousLadder.findIndex(p => p.name === player.name);
-    if (oldIndex === -1) {
-      player.delta = 0;
-    } else {
-      player.delta = oldIndex - newIndex;
-    }
-  });
-
-  previousLadder = JSON.parse(JSON.stringify(newLadder));
-  ladder = newLadder;
-
+  ladder = snapshot.val() || [];
   renderLadder();
 });
 
@@ -394,7 +323,6 @@ function resetLadder() {
   db.ref("ladder").set([]);
   db.ref("history").set([]);
   ladder = [];
-  previousLadder = [];
   renderLadder();
   renderSelects();
   document.getElementById("reset-msg").textContent = "Ladder reset.";
@@ -524,4 +452,3 @@ function submitMatch() {
 
 </body>
 </html>
-``
