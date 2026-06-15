@@ -6,7 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-/* ---------------- LIGHT MODERN UI ---------------- */
 :root {
   --bg: #f7f7f9;
   --card: #ffffff;
@@ -157,12 +156,21 @@ button {
 <div class="container">
 
 <header>
-  <img src="https://www.foxatpeasemore.co.uk/assets/img/the-fox-at-peasemore-logo.jpg?=v2">
+  <img src="fox-logo.png">
   <div>
     <h1>The Fox at Peasemore – Darts Ladder</h1>
-    <div class="small">JB's Design Alpha 1 (Firebase)</div>
+    <div class="small">Shared, real‑time ladder • Firebase‑backed</div>
   </div>
 </header>
+
+<!-- NAVIGATION -->
+<div class="card" style="margin-top:1rem;">
+  <button class="btn" onclick="showPage('ladder')">Ladder</button>
+  <button class="btn-secondary" onclick="showPage('history')">Match History</button>
+</div>
+
+<!-- PAGE: LADDER -->
+<div id="page-ladder">
 
 <!-- LADDER -->
 <div class="card">
@@ -180,6 +188,12 @@ button {
     <input id="new-player" placeholder="Add player">
     <button class="btn" onclick="addPlayer()">Add</button>
   </div>
+
+  <button class="btn-secondary" onclick="resetLadder()" style="margin-top:1rem;">
+    Reset Ladder (Clear All Data)
+  </button>
+  <div id="reset-msg" class="small" style="margin-top:.5rem;"></div>
+
   <div class="small">New players always join at the bottom.</div>
 </div>
 
@@ -260,6 +274,16 @@ button {
   <div id="import-msg" class="small" style="margin-top:.7rem;"></div>
 </div>
 
+</div> <!-- END PAGE LADDER -->
+
+<!-- PAGE: MATCH HISTORY -->
+<div id="page-history" style="display:none;">
+  <div class="card">
+    <h2>Match History</h2>
+    <div id="history-list" class="small"></div>
+  </div>
+</div>
+
 </div>
 
 <!-- FIREBASE (COMPAT MODE) -->
@@ -285,7 +309,13 @@ const db = firebase.database();
 <script>
 let ladder = [];
 
-/* ------------------ RENDER LADDER ------------------ */
+/* PAGE SWITCHING */
+function showPage(page) {
+  document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
+  document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
+}
+
+/* RENDER LADDER */
 function renderLadder() {
   const body = document.getElementById("ladder-body");
   body.innerHTML = "";
@@ -300,21 +330,52 @@ function renderLadder() {
         <td>${p.last || "—"}</td>
       </tr>`;
   });
-  renderSelects();
 }
 
-function save() {
-  db.ref("ladder").set(ladder);
-}
-
-/* ------------------ LOAD FROM FIREBASE ------------------ */
+/* LOAD LADDER FROM FIREBASE */
 db.ref("ladder").on("value", snapshot => {
   const data = snapshot.val();
   ladder = Array.isArray(data) ? data : (data || []);
   renderLadder();
+  renderSelects();
 });
 
-/* ------------------ ADD PLAYER ------------------ */
+/* LOAD MATCH HISTORY */
+db.ref("history").on("value", snapshot => {
+  const data = snapshot.val() || {};
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+
+  const entries = Object.values(data).reverse();
+
+  entries.forEach(m => {
+    list.innerHTML += `
+      <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px solid #ddd;">
+        <strong>${m.winner}</strong> beat <strong>${m.loser}</strong><br>
+        <span>${m.timestamp}</span><br>
+        <span>${m.movement}</span><br>
+        <span>Legs: ${m.legs.map(l => l.winner).join(", ")}</span>
+      </div>
+    `;
+  });
+});
+
+/* SAVE */
+function save() {
+  db.ref("ladder").set(ladder);
+}
+
+/* RESET LADDER + HISTORY */
+function resetLadder() {
+  if (!confirm("This will permanently clear the ladder AND match history for everyone. Continue?")) return;
+
+  ladder = [];
+  db.ref("ladder").set([]);
+  db.ref("history").set([]);
+  document.getElementById("reset-msg").textContent = "Ladder and history cleared.";
+}
+
+/* ADD PLAYER */
 function addPlayer() {
   const name = document.getElementById("new-player").value.trim();
   if (!name) return;
@@ -323,7 +384,7 @@ function addPlayer() {
   save();
 }
 
-/* ------------------ SELECT OPTIONS ------------------ */
+/* SELECT OPTIONS */
 function renderSelects() {
   const c = document.getElementById("challenger");
   const o = document.getElementById("opponent");
@@ -346,7 +407,7 @@ document.getElementById("challenger").addEventListener("change", ()=>{
   });
 });
 
-/* ------------------ LEG ENTRY ------------------ */
+/* LEG ENTRY */
 function addLeg() {
   const area = document.getElementById("legs-area");
   const id = Date.now();
@@ -379,7 +440,7 @@ function addLeg() {
 }
 addLeg();
 
-/* ------------------ SUBMIT MATCH ------------------ */
+/* SUBMIT MATCH */
 function submitMatch() {
   const msg = document.getElementById("msg");
   msg.textContent = "";
@@ -433,11 +494,23 @@ function submitMatch() {
     ladder.splice(loser,0,moved);
   }
 
+  // log match history
+  const matchRecord = {
+    challenger: ladder[c].name,
+    opponent: ladder[o].name,
+    winner: ladder[winner].name,
+    loser: ladder[loser].name,
+    legs: legs,
+    timestamp: stamp,
+    movement: winner > loser ? `Moved from ${winner+1} to ${loser+1}` : "No movement"
+  };
+  db.ref("history").push(matchRecord);
+
   save();
   msg.textContent = "Match recorded and ladder updated.";
 }
 
-/* ------------------ EXPORT ------------------ */
+/* EXPORT */
 function exportLadder() {
   const dataStr = JSON.stringify(ladder, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
@@ -451,7 +524,7 @@ function exportLadder() {
   URL.revokeObjectURL(url);
 }
 
-/* ------------------ IMPORT ------------------ */
+/* IMPORT */
 function importLadder(event) {
   const file = event.target.files[0];
   const msg = document.getElementById("import-msg");
