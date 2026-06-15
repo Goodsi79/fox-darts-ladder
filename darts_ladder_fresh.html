@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    // paste your config here
+  };
+
+  const app = firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 <meta charset="UTF-8">
 <title>The Fox at Peasemore – Darts Ladder</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -268,7 +280,7 @@ button {
 
 <script>
 /* ------------------ DATA ------------------ */
-let ladder = JSON.parse(localStorage.getItem("ladder") || "[]");
+let firebase.database().ref("ladder").on("value", snapshot => {   ladder = snapshot.val() || [];   renderLadder(); });
 
 /* ------------------ RENDER LADDER ------------------ */
 function renderLadder() {
@@ -288,7 +300,7 @@ function renderLadder() {
   renderSelects();
 }
 function save() {
-  localStorage.setItem("ladder", JSON.stringify(ladder));
+  firebase.database().ref("ladder").set(ladder);
   renderLadder();
 }
 
