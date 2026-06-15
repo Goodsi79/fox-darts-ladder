@@ -1065,12 +1065,16 @@ function submitMatch() {
     return;
   }
 
+  // 🔥 Capture correct names BEFORE ladder reordering
+  const challengerName = ladder[c].name;
+  const opponentName = ladder[o].name;
+
   const legs = getLegsFromDOM();
   const cLegs = legs.filter(l => l.winner === "challenger").length;
   const oLegs = legs.filter(l => l.winner === "opponent").length;
   const totalPlayed = legs.filter(l => l.winner).length;
 
-  // Must be first to 2, max 3 legs
+  // Validation
   if (!(cLegs === 2 || oLegs === 2)) {
     msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";
     msg.className = "message message-error";
@@ -1083,19 +1087,19 @@ function submitMatch() {
     return;
   }
 
-  if (totalPlayed === 3 && !( (cLegs === 2 && oLegs === 1) || (cLegs === 1 && oLegs === 2) )) {
+  if (totalPlayed === 3 && !((cLegs === 2 && oLegs === 1) || (cLegs === 1 && oLegs === 2))) {
     msg.textContent = "Invalid 2–1 structure.";
     msg.className = "message message-error";
     return;
   }
 
-  if (totalPlayed === 2 && !( (cLegs === 2 && oLegs === 0) || (cLegs === 0 && oLegs === 2) )) {
+  if (totalPlayed === 2 && !((cLegs === 2 && oLegs === 0) || (cLegs === 0 && oLegs === 2))) {
     msg.textContent = "Invalid 2–0 structure.";
     msg.className = "message message-error";
     return;
   }
 
-  // 45-dart / nearest bull validation
+  // 45-dart rule
   for (let i = 0; i < legs.length; i++) {
     const l = legs[i];
     if (l.reached45 && !l.bull) {
@@ -1105,11 +1109,16 @@ function submitMatch() {
     }
   }
 
+  // Determine winner/loser
   const winnerIndex = cLegs > oLegs ? c : o;
   const loserIndex  = cLegs > oLegs ? o : c;
+  const winnerName = ladder[winnerIndex].name;
+  const loserName  = ladder[loserIndex].name;
+
   const winnerLegs = Math.max(cLegs, oLegs);
   const loserLegs  = Math.min(cLegs, oLegs);
 
+  // Update stats
   ladder[winnerIndex].w++;
   ladder[loserIndex].l++;
   ladder[winnerIndex].lf += winnerLegs;
@@ -1118,13 +1127,11 @@ function submitMatch() {
   ladder[loserIndex].la  += winnerLegs;
 
   const stamp = new Date().toLocaleString();
-  const winnerName = ladder[winnerIndex].name;
-  const loserName  = ladder[loserIndex].name;
 
   ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;
   ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
 
-  // Movement: if winner was lower ranked (higher index), move them up
+  // Movement
   let movementText = "No movement";
   if (winnerIndex > loserIndex) {
     const oldPos = winnerIndex + 1;
@@ -1134,22 +1141,24 @@ function submitMatch() {
     movementText = `Moved from ${oldPos} to ${newPos}`;
   }
 
+  // 🔥 Use the captured names here (correct mapping)
   const matchRecord = {
-    challenger: ladder[c].name,
-    opponent: ladder[o].name,
+    challenger: challengerName,
+    opponent: opponentName,
     winner: winnerName,
     loser: loserName,
     legs: legs,
     timestamp: stamp,
     movement: movementText
   };
+
   db.ref("history").push(matchRecord);
 
   saveLadder();
   msg.textContent = "Match recorded and ladder updated.";
   msg.className = "message message-info";
 
-  // Reset leg UI for next match
+  // Reset UI
   document.querySelectorAll(".leg-winner").forEach(sel => {
     sel.value = "";
     sel.disabled = false;
@@ -1166,7 +1175,8 @@ function submitMatch() {
     const bullArea = document.getElementById(`bull-${n}`);
     if (bullArea) bullArea.style.display = "none";
   });
-  // Ensure leg 3 disabled again until needed
+
+  // Reset leg 3 disabled state
   document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
   document.querySelector('.leg-45[data-leg="3"]').disabled = true;
   document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
