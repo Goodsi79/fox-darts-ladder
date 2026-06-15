@@ -774,11 +774,10 @@ input:focus, select:focus {
     <div class="admin-section-title">Backup & Restore</div>
     <button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()">Export Ladder + History JSON</button>
 
-<label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block;">
-  Import Ladder + History JSON
-</label>
-<input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
-
+    <label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block; margin-bottom:.4rem;">
+      Import Ladder + History JSON
+    </label>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
 
     <div id="admin-msg" class="message message-info"></div>
   </div>
@@ -788,7 +787,6 @@ input:focus, select:focus {
 </div>
 
 </div>
-
 <!-- FIREBASE (COMPAT) -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -973,7 +971,7 @@ function renderSelects() {
   const oVal = o.value;
 
   c.innerHTML = `<option value="">Select challenger</option>`;
-  o.innerHTML = `<option value="">Select opponent</option>`;
+  o.innerHTML = `<option value="">Select opponent</option`;
 
   ladder.forEach((p,i)=>{
     c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
@@ -1006,58 +1004,36 @@ function getLegsFromDOM() {
   return legs;
 }
 
+/* Recalculate leg state – editable, Leg 3 only enabled at 1–1 */
 function recalcLegState() {
   const legs = getLegsFromDOM();
   const cLegs = legs.filter(l => l.winner === "challenger").length;
   const oLegs = legs.filter(l => l.winner === "opponent").length;
-  const totalPlayed = legs.filter(l => l.winner).length;
 
   const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');
   const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');
   const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');
 
-  // Default: leg 3 disabled
-  let enableLeg3 = false;
+  const enableLeg3 = (cLegs === 1 && oLegs === 1);
 
-  if (cLegs === 1 && oLegs === 1) {
-    // 1–1 after two legs -> leg 3 must be played
-    enableLeg3 = true;
-  }
-
-  // If someone already has 2 legs, lock everything
-  const someoneWon = (cLegs === 2 || oLegs === 2);
-
-  // Enable/disable leg 3 controls
   [leg3Winner, leg3_45, leg3_bull].forEach(el => {
     if (!el) return;
-    if (someoneWon) {
-      el.disabled = true;
-    } else {
-      el.disabled = !enableLeg3;
+    el.disabled = !enableLeg3;
+    if (!enableLeg3) {
+      if (el.type === "checkbox") el.checked = false;
+      if (el.tagName === "SELECT") el.value = "";
     }
   });
 
-  // If someone has 2 legs, lock all winners and 45/bull checkboxes
-  if (someoneWon) {
-    [1,2,3].forEach(n => {
-      const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
-      const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
-      const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
-      if (w) w.disabled = true;
-      if (c45) c45.disabled = true;
-      if (b) b.disabled = true;
-    });
-  } else {
-    // Ensure leg 1 and 2 always enabled
-    [1,2].forEach(n => {
-      const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
-      const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
-      const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
-      if (w) w.disabled = false;
-      if (c45) c45.disabled = false;
-      if (b) b.disabled = false;
-    });
-  }
+  // Leg 1 and 2 always editable
+  [1,2].forEach(n => {
+    const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+    const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+    if (w) w.disabled = false;
+    if (c45) c45.disabled = false;
+    if (b) b.disabled = false;
+  });
 }
 
 /* 45-dart toggle -> nearest bull visibility */
@@ -1075,7 +1051,6 @@ function recalcLegState() {
 document.querySelectorAll(".leg-winner").forEach(sel => {
   sel.addEventListener("change", recalcLegState);
 });
-
 /* Submit match */
 function submitMatch() {
   const msg = document.getElementById("msg");
@@ -1150,9 +1125,13 @@ function submitMatch() {
   ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
 
   // Movement: if winner was lower ranked (higher index), move them up
+  let movementText = "No movement";
   if (winnerIndex > loserIndex) {
+    const oldPos = winnerIndex + 1;
+    const newPos = loserIndex + 1;
     const moved = ladder.splice(winnerIndex,1)[0];
     ladder.splice(loserIndex,0,moved);
+    movementText = `Moved from ${oldPos} to ${newPos}`;
   }
 
   const matchRecord = {
@@ -1162,7 +1141,7 @@ function submitMatch() {
     loser: loserName,
     legs: legs,
     timestamp: stamp,
-    movement: winnerIndex > loserIndex ? `Moved from ${winnerIndex+1} to ${loserIndex+1}` : "No movement"
+    movement: movementText
   };
   db.ref("history").push(matchRecord);
 
@@ -1191,6 +1170,8 @@ function submitMatch() {
   document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
   document.querySelector('.leg-45[data-leg="3"]').disabled = true;
   document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
+
+  recalcLegState();
 }
 
 /* Export ladder + history */
