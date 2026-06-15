@@ -774,10 +774,11 @@ input:focus, select:focus {
     <div class="admin-section-title">Backup & Restore</div>
     <button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()">Export Ladder + History JSON</button>
 
-    <label class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; margin-bottom:.4rem;">
-      Import Ladder + History JSON
-      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
-    </label>
+<label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block;">
+  Import Ladder + History JSON
+</label>
+<input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
+
 
     <div id="admin-msg" class="message message-info"></div>
   </div>
