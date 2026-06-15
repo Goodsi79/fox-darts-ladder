@@ -543,11 +543,11 @@ input:focus, select:focus {
   <img src="https://www.foxatpeasemore.co.uk/assets/img/the-fox-at-peasemore-logo.jpg?=v2" alt="The Fox at Peasemore">
   <div>
     <h1>The Fox at Peasemore</h1>
-    <div class="header-sub">Darts Ladder • Live Standings</div>
+    <div class="header-sub">Darts Ladder</div>
     <div style="margin-top:.35rem;">
       <span class="badge-live">
         <span class="badge-live-dot"></span>
-        Live Firebase Ladder
+        Live Standings
       </span>
     </div>
   </div>
@@ -556,7 +556,7 @@ input:focus, select:focus {
 <div class="nav-card">
   <div class="nav-left">
     <span class="nav-dot"></span>
-    <span>Real‑time ladder • Alpha Version</span>
+    <span>Real‑time shared ladder Alpha Version</span>
   </div>
   <div class="nav-buttons">
     <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
@@ -601,7 +601,10 @@ input:focus, select:focus {
 
         <div class="flex" style="margin-top:.8rem; align-items:center;">
           <div style="flex:1;">
-            <input id="new-player" placeholder="Add player to ladder">
+            <input id="new-player-name" placeholder="Full name">
+          </div>
+          <div style="flex:1;">
+            <input id="new-player-nick" placeholder="Nickname (optional)">
           </div>
           <button class="btn-primary" onclick="addPlayer()">Add Player</button>
         </div>
@@ -831,10 +834,14 @@ function renderLadder() {
     if (p.delta > 0) { arrow = "▲"; arrowClass = "pos-up"; }
     else if (p.delta < 0) { arrow = "▼"; arrowClass = "pos-down"; }
 
+    const nameDisplay = p.nick
+      ? `${p.name} <span style="color:#9ca3af; font-size:.75rem;">“${p.nick}”</span>`
+      : p.name;
+
     body.innerHTML += `
       <tr>
         <td class="position">${String(i+1).padStart(2,"0")} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
-        <td class="player-name">${p.name}</td>
+        <td class="player-name">${nameDisplay}</td>
         <td class="record">${p.w}</td>
         <td class="record">${p.l}</td>
         <td class="record">${p.lf}:${p.la}</td>
@@ -858,6 +865,7 @@ db.ref("ladder").on("value", snapshot => {
     if (player.l == null) player.l = 0;
     if (player.lf == null) player.lf = 0;
     if (player.la == null) player.la = 0;
+    if (player.nick === undefined) player.nick = null;
   });
 
   previousLadder = JSON.parse(JSON.stringify(newLadder));
@@ -880,16 +888,26 @@ db.ref("history").on("value", snapshot => {
   }
 
   entries.reverse().forEach(([id, m]) => {
+    const challengerLabel = m.challengerNick
+      ? `${m.challenger} “${m.challengerNick}”`
+      : m.challenger;
+    const opponentLabel = m.opponentNick
+      ? `${m.opponent} “${m.opponentNick}”`
+      : m.opponent;
+
+    const winnerLabel = m.winner === m.challenger ? challengerLabel : opponentLabel;
+    const loserLabel  = m.loser  === m.challenger ? challengerLabel : opponentLabel;
+
     const legsSummary = (m.legs || []).map((l,idx) => {
       if (!l.winner) return `Leg ${idx+1}: –`;
-      return `Leg ${idx+1}: ${l.winner === "challenger" ? m.challenger : m.opponent}`;
+      return `Leg ${idx+1}: ${l.winner === "challenger" ? challengerLabel : opponentLabel}`;
     }).join(" • ");
 
     list.innerHTML += `
       <div class="history-item">
         <div class="history-header">
           <div class="history-main">
-            <strong>${m.winner}</strong> beat <strong>${m.loser}</strong>
+            <strong>${winnerLabel}</strong> beat <strong>${loserLabel}</strong>
           </div>
           <div class="chip chip-info">
             <span>${m.movement || ""}</span>
@@ -940,12 +958,27 @@ function resetLadderAndHistory() {
   document.getElementById("admin-msg").textContent = "Ladder and history reset.";
 }
 
-/* Add player */
+/* Add player with nickname */
 function addPlayer() {
-  const name = document.getElementById("new-player").value.trim();
+  const name = document.getElementById("new-player-name").value.trim();
+  const nick = document.getElementById("new-player-nick").value.trim();
+
   if (!name) return;
-  ladder.push({name, w:0, l:0, lf:0, la:0, last:null, delta:0});
-  document.getElementById("new-player").value = "";
+
+  ladder.push({
+    name,
+    nick: nick || null,
+    w: 0,
+    l: 0,
+    lf: 0,
+    la: 0,
+    last: null,
+    delta: 0
+  });
+
+  document.getElementById("new-player-name").value = "";
+  document.getElementById("new-player-nick").value = "";
+
   saveLadder();
   renderSelects();
 }
@@ -963,7 +996,8 @@ function renderSelects() {
   o.innerHTML = `<option value="">Select opponent</option>`;
 
   ladder.forEach((p,i)=>{
-    c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
+    const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
+    c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
   });
 
   if (cVal) c.value = cVal;
@@ -977,7 +1011,8 @@ document.getElementById("challenger").addEventListener("change", ()=>{
   o.innerHTML = `<option value="">Select opponent</option>`;
   ladder.forEach((p,i)=>{
     if (i < idx && idx - i <= 3) {
-      o.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
+      const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
+      o.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
     }
   });
 });
@@ -997,7 +1032,6 @@ function getLegsFromDOM() {
 function recalcLegState() {
   const legs = getLegsFromDOM();
 
-  // Only count legs 1 & 2 for enabling Leg 3
   const firstTwo = legs.slice(0,2);
   const cLegsFirstTwo = firstTwo.filter(l => l.winner === "challenger").length;
   const oLegsFirstTwo = firstTwo.filter(l => l.winner === "opponent").length;
@@ -1017,7 +1051,6 @@ function recalcLegState() {
     }
   });
 
-  // Leg 1 and 2 always editable
   [1,2].forEach(n => {
     const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
     const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
@@ -1043,7 +1076,7 @@ function recalcLegState() {
 document.querySelectorAll(".leg-winner").forEach(sel => {
   sel.addEventListener("change", recalcLegState);
 });
-/***** SUBMIT MATCH – with correct history mapping *****/
+/***** SUBMIT MATCH – with correct history mapping + nicknames *****/
 function submitMatch() {
   const msg = document.getElementById("msg");
   msg.textContent = "";
@@ -1057,9 +1090,11 @@ function submitMatch() {
     return;
   }
 
-  // Capture names BEFORE any ladder reordering
+  // Capture names and nicknames BEFORE any ladder reordering
   const challengerName = ladder[c].name;
+  const challengerNick = ladder[c].nick || null;
   const opponentName = ladder[o].name;
+  const opponentNick = ladder[o].nick || null;
 
   const legs = getLegsFromDOM();
   const cLegs = legs.filter(l => l.winner === "challenger").length;
@@ -1132,10 +1167,12 @@ function submitMatch() {
     movementText = `Moved from ${oldPos} to ${newPos}`;
   }
 
-  // Match record with correct challenger/opponent mapping
+  // Match record with correct challenger/opponent mapping + nicknames
   const matchRecord = {
     challenger: challengerName,
+    challengerNick: challengerNick,
     opponent: opponentName,
+    opponentNick: opponentNick,
     winner: winnerName,
     loser: loserName,
     legs: legs,
@@ -1224,7 +1261,11 @@ function importAll(event) {
         return;
       }
 
-      ladder = imported.ladder.map(p => ({...p, delta:0}));
+      ladder = imported.ladder.map(p => ({
+        ...p,
+        nick: p.nick || null,
+        delta: 0
+      }));
       previousLadder = JSON.parse(JSON.stringify(ladder));
       historyCache = imported.history;
 
