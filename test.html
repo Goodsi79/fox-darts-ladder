@@ -547,7 +547,7 @@ input:focus, select:focus {
     <div style="margin-top:.35rem;">
       <span class="badge-live">
         <span class="badge-live-dot"></span>
-        Live
+        Live Firebase Ladder
       </span>
     </div>
   </div>
@@ -556,7 +556,7 @@ input:focus, select:focus {
 <div class="nav-card">
   <div class="nav-left">
     <span class="nav-dot"></span>
-    <span>Real‑time shared ladder • Match history</span>
+    <span>Real‑time ladder • Alpha Version</span>
   </div>
   <div class="nav-buttons">
     <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
@@ -811,35 +811,25 @@ let historyCache = {};
 </script>
 
 <script>
-/* Page switching */
 function showPage(page) {
   document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
 }
 
-/* Admin panel toggle */
 function toggleAdminPanel() {
   const panel = document.getElementById("admin-panel");
   panel.classList.toggle("open");
 }
 
-/* Render ladder with arrows */
+/* Render ladder */
 function renderLadder() {
   const body = document.getElementById("ladder-body");
   body.innerHTML = "";
   ladder.forEach((p,i)=>{
-    let arrow = "";
-    let arrowClass = "";
-    if (p.delta > 0) {
-      arrow = "▲";
-      arrowClass = "pos-up";
-    } else if (p.delta < 0) {
-      arrow = "▼";
-      arrowClass = "pos-down";
-    } else {
-      arrow = "•";
-      arrowClass = "pos-same";
-    }
+    let arrow = "•";
+    let arrowClass = "pos-same";
+    if (p.delta > 0) { arrow = "▲"; arrowClass = "pos-up"; }
+    else if (p.delta < 0) { arrow = "▼"; arrowClass = "pos-down"; }
 
     body.innerHTML += `
       <tr>
@@ -857,7 +847,7 @@ function renderLadder() {
   }, 5000);
 }
 
-/* Load ladder with movement detection */
+/* Ladder listener */
 db.ref("ladder").on("value", snapshot => {
   const newLadder = snapshot.val() || [];
 
@@ -877,7 +867,7 @@ db.ref("ladder").on("value", snapshot => {
   renderSelects();
 });
 
-/* Load match history */
+/* History listener */
 db.ref("history").on("value", snapshot => {
   historyCache = snapshot.val() || {};
   const list = document.getElementById("history-list");
@@ -914,7 +904,6 @@ db.ref("history").on("value", snapshot => {
   });
 });
 
-/* Save ladder */
 function saveLadder() {
   db.ref("ladder").set(ladder);
 }
@@ -971,7 +960,7 @@ function renderSelects() {
   const oVal = o.value;
 
   c.innerHTML = `<option value="">Select challenger</option>`;
-  o.innerHTML = `<option value="">Select opponent</option`;
+  o.innerHTML = `<option value="">Select opponent</option>`;
 
   ladder.forEach((p,i)=>{
     c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${p.name}</option>`;
@@ -981,6 +970,7 @@ function renderSelects() {
   if (oVal) o.value = oVal;
 }
 
+/* Opponent constrained to 3 above */
 document.getElementById("challenger").addEventListener("change", ()=>{
   const idx = parseInt(document.getElementById("challenger").value);
   const o = document.getElementById("opponent");
@@ -992,29 +982,31 @@ document.getElementById("challenger").addEventListener("change", ()=>{
   });
 });
 
-/* Leg state helpers */
+/* Leg helpers */
 function getLegsFromDOM() {
-  const legs = [1,2,3].map(n => {
+  return [1,2,3].map(n => {
     const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;
     const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;
     const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);
     const bull = bullEl ? bullEl.checked : false;
     return { winner, reached45, bull };
   });
-  return legs;
 }
 
-/* Recalculate leg state – editable, Leg 3 only enabled at 1–1 */
+/* Recalculate leg state – Leg 3 enabled only if Leg 1 & 2 are 1–1 */
 function recalcLegState() {
   const legs = getLegsFromDOM();
-  const cLegs = legs.filter(l => l.winner === "challenger").length;
-  const oLegs = legs.filter(l => l.winner === "opponent").length;
+
+  // Only count legs 1 & 2 for enabling Leg 3
+  const firstTwo = legs.slice(0,2);
+  const cLegsFirstTwo = firstTwo.filter(l => l.winner === "challenger").length;
+  const oLegsFirstTwo = firstTwo.filter(l => l.winner === "opponent").length;
 
   const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');
   const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');
   const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');
 
-  const enableLeg3 = (cLegs === 1 && oLegs === 1);
+  const enableLeg3 = (cLegsFirstTwo === 1 && oLegsFirstTwo === 1);
 
   [leg3Winner, leg3_45, leg3_bull].forEach(el => {
     if (!el) return;
@@ -1036,7 +1028,7 @@ function recalcLegState() {
   });
 }
 
-/* 45-dart toggle -> nearest bull visibility */
+/* 45-dart -> nearest bull visibility */
 [1,2,3].forEach(n => {
   const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
   const bullArea = document.getElementById(`bull-${n}`);
@@ -1051,7 +1043,7 @@ function recalcLegState() {
 document.querySelectorAll(".leg-winner").forEach(sel => {
   sel.addEventListener("change", recalcLegState);
 });
-/* Submit match */
+/***** SUBMIT MATCH – with correct history mapping *****/
 function submitMatch() {
   const msg = document.getElementById("msg");
   msg.textContent = "";
@@ -1065,7 +1057,7 @@ function submitMatch() {
     return;
   }
 
-  // 🔥 Capture correct names BEFORE ladder reordering
+  // Capture names BEFORE any ladder reordering
   const challengerName = ladder[c].name;
   const opponentName = ladder[o].name;
 
@@ -1074,7 +1066,7 @@ function submitMatch() {
   const oLegs = legs.filter(l => l.winner === "opponent").length;
   const totalPlayed = legs.filter(l => l.winner).length;
 
-  // Validation
+  // Validation: first to 2, max 3 legs
   if (!(cLegs === 2 || oLegs === 2)) {
     msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";
     msg.className = "message message-error";
@@ -1109,7 +1101,7 @@ function submitMatch() {
     }
   }
 
-  // Determine winner/loser
+  // Winner / loser
   const winnerIndex = cLegs > oLegs ? c : o;
   const loserIndex  = cLegs > oLegs ? o : c;
   const winnerName = ladder[winnerIndex].name;
@@ -1118,7 +1110,7 @@ function submitMatch() {
   const winnerLegs = Math.max(cLegs, oLegs);
   const loserLegs  = Math.min(cLegs, oLegs);
 
-  // Update stats
+  // Stats
   ladder[winnerIndex].w++;
   ladder[loserIndex].l++;
   ladder[winnerIndex].lf += winnerLegs;
@@ -1127,7 +1119,6 @@ function submitMatch() {
   ladder[loserIndex].la  += winnerLegs;
 
   const stamp = new Date().toLocaleString();
-
   ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;
   ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
 
@@ -1141,7 +1132,7 @@ function submitMatch() {
     movementText = `Moved from ${oldPos} to ${newPos}`;
   }
 
-  // 🔥 Use the captured names here (correct mapping)
+  // Match record with correct challenger/opponent mapping
   const matchRecord = {
     challenger: challengerName,
     opponent: opponentName,
@@ -1153,12 +1144,12 @@ function submitMatch() {
   };
 
   db.ref("history").push(matchRecord);
-
   saveLadder();
+
   msg.textContent = "Match recorded and ladder updated.";
   msg.className = "message message-info";
 
-  // Reset UI
+  // Reset leg UI
   document.querySelectorAll(".leg-winner").forEach(sel => {
     sel.value = "";
     sel.disabled = false;
@@ -1176,7 +1167,7 @@ function submitMatch() {
     if (bullArea) bullArea.style.display = "none";
   });
 
-  // Reset leg 3 disabled state
+  // Leg 3 should start disabled again
   document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
   document.querySelector('.leg-45[data-leg="3"]').disabled = true;
   document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
@@ -1252,7 +1243,7 @@ function importAll(event) {
   reader.readAsText(file);
 }
 
-/* Initial selects on load */
+/* Init */
 window.addEventListener("load", () => {
   renderSelects();
   recalcLegState();
