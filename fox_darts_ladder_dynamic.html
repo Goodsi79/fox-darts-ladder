@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Fox at Peasemore – Darts Ladder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* ---------------- LIGHT MODERN UI ---------------- */
+:root {
+  --bg: #f7f7f9;
+  --card: #ffffff;
+  --border: #e5e7eb;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #e07a1f; /* Fox brand orange */
+  --accent-soft: rgba(224,122,31,0.12);
+  --radius: 12px;
+  --shadow: 0 4px 14px rgba(0,0,0,0.08);
+  --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+}
+
+/* ---------------- HEADER ---------------- */
+header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+header img {
+  height: 70px;
+  border-radius: 10px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ---------------- CARDS ---------------- */
+.card {
+  background: var(--card);
+  padding: 1.2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  margin-top: 1rem;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* ---------------- TABLE ---------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: .5rem;
+}
+
+th, td {
+  padding: .6rem .4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  text-align: left;
+  color: var(--muted);
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+/* ---------------- INPUTS ---------------- */
+input, select {
+  width: 100%;
+  padding: .55rem .6rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: .9rem;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+/* ---------------- BUTTONS ---------------- */
+button {
+  padding: .55rem 1.1rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .9rem;
+}
+
+.btn {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-secondary {
+  background: #f3f4f6;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ---------------- LAYOUT HELPERS ---------------- */
+.flex {
+  display: flex;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.small {
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+/* ---------------- LEG BLOCK ---------------- */
+.leg-block {
+  background: #fafafa;
+  padding: 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: .7rem;
+}
+
+.notice {
+  background: var(--accent-soft);
+  border-left: 4px solid var(--accent);
+  padding: .6rem .8rem;
+  border-radius: 8px;
+  margin-top: .5rem;
+  font-size: .85rem;
+  color: var(--text);
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <img src="fox-logo.png">
+  <div>
+    <h1>The Fox at Peasemore – Darts Ladder</h1>
+    <div class="small">Shared, real‑time ladder • Firebase‑backed</div>
+  </div>
+</header>
+
+<!-- LADDER -->
+<div class="card">
+  <h2>Ladder</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Player</th><th>W</th><th>L</th><th>Legs</th><th>Last Match</th>
+      </tr>
+    </thead>
+    <tbody id="ladder-body"></tbody>
+  </table>
+
+  <div class="flex" style="margin-top:.7rem;">
+    <input id="new-player" placeholder="Add player">
+    <button class="btn" onclick="addPlayer()">Add</button>
+  </div>
+  <div class="small">New players always join at the bottom.</div>
+</div>
+
+<!-- MATCH ENTRY -->
+<div class="card">
+  <h2>Record Ladder Match</h2>
+
+  <div class="flex">
+    <div style="flex:1;">
+      <label>Challenger (lower ranked)</label>
+      <select id="challenger"></select>
+    </div>
+    <div style="flex:1;">
+      <label>Opponent (up to 3 places above)</label>
+      <select id="opponent"></select>
+    </div>
+  </div>
+
+  <div class="flex" style="margin-top:.5rem;">
+    <div style="flex:1;">
+      <label>Starting score</label>
+      <select id="startScore">
+        <option value="501">501</option>
+        <option value="301">301</option>
+      </select>
+    </div>
+  </div>
+
+  <h3 style="margin-top:1rem;">Leg Results</h3>
+  <div id="legs-area"></div>
+
+  <button class="btn-secondary" onclick="addLeg()">+ Add Leg</button>
+
+  <div style="margin-top:1rem;">
+    <button class="btn" onclick="submitMatch()">Submit Match</button>
+  </div>
+
+  <div id="msg" class="small" style="margin-top:.5rem;"></div>
+</div>
+
+<!-- RULES -->
+<div class="card">
+  <h2>Ladder Rules</h2>
+
+  <ul style="line-height:1.55; padding-left:1.1rem; margin:0;">
+    <li><strong>Normal darts rules apply</strong> – straight in, double out.</li>
+    <li><strong>Matches must be scored and witnessed</strong> by a third member of the ladder.</li>
+    <li><strong>Players must declare</strong> to the scorer/witness that the match is a ladder match before starting.</li>
+    <li><strong>Format:</strong> Best of 3 legs. Default 501 start, or 301 if both players agree.</li>
+    <li><strong>45‑dart rule:</strong> After each player has thrown 45 darts (15 visits), if neither has checked out, the leg is decided by <strong>one dart nearest the bull</strong>.</li>
+    <li><strong>No remaining‑score comparison</strong> is used after 45 darts — nearest‑bull only.</li>
+    <li><strong>Challenge rule:</strong> A player may challenge up to <strong>3 positions above</strong> them in the ladder.</li>
+    <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position and everyone below shifts down one.</li>
+    <li><strong>New players join at the bottom</strong> of the ladder.</li>
+    <li><strong>The ladder runs continuously</strong> — inactive players naturally drift downward as others challenge above them.</li>
+  </ul>
+
+  <div class="small" style="margin-top:.8rem;">
+    These rules are enforced automatically by the dashboard where applicable.
+  </div>
+</div>
+
+<!-- BACKUP / RESTORE -->
+<div class="card">
+  <h2>Backup & Restore</h2>
+
+  <p class="small">Export your ladder data for safekeeping, or import a previous backup. This will read/write to the shared Firebase ladder.</p>
+
+  <div class="flex" style="margin-top:.7rem;">
+    <button class="btn" onclick="exportLadder()">Export Ladder Data</button>
+
+    <label class="btn-secondary" style="cursor:pointer;">
+      Import Ladder Data
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importLadder(event)">
+    </label>
+  </div>
+
+  <div id="import-msg" class="small" style="margin-top:.7rem;"></div>
+</div>
+
+</div>
+
+<!-- FIREBASE SCRIPTS -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+// TODO: Replace with your actual Firebase config from the Firebase console
+const firebaseConfig = {
+ apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
+    authDomain: "fox-darts-ladder.firebaseapp.com",
+    projectId: "fox-darts-ladder",
+    storageBucket: "fox-darts-ladder.firebasestorage.app",
+    messagingSenderId: "1028079521201",
+    appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ------------------ DATA ------------------ */
+let ladder = [];
+
+/* ------------------ RENDER LADDER ------------------ */
+function renderLadder() {
+  const body = document.getElementById("ladder-body");
+  body.innerHTML = "";
+  ladder.forEach((p,i)=>{
+    body.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${p.name}</td>
+        <td>${p.w}</td>
+        <td>${p.l}</td>
+        <td>${p.lf}:${p.la}</td>
+        <td>${p.last || "—"}</td>
+      </tr>`;
+  });
+  renderSelects();
+}
+
+function save() {
+  db.ref("ladder").set(ladder);
+}
+
+/* ------------------ LOAD FROM FIREBASE (REAL-TIME) ------------------ */
+db.ref("ladder").on("value", snapshot => {
+  const data = snapshot.val();
+  ladder = Array.isArray(data) ? data : (data || []);
+  renderLadder();
+});
+
+/* ------------------ ADD PLAYER ------------------ */
+function addPlayer() {
+  const name = document.getElementById("new-player").value.trim();
+  if (!name) return;
+  ladder.push({name, w:0, l:0, lf:0, la:0, last:null});
+  document.getElementById("new-player").value = "";
+  save();
+}
+
+/* ------------------ SELECT OPTIONS ------------------ */
+function renderSelects() {
+  const c = document.getElementById("challenger");
+  const o = document.getElementById("opponent");
+  c.innerHTML = `<option value="">Select</option>`;
+  o.innerHTML = `<option value="">Select</option>`;
+
+  ladder.forEach((p,i)=>{
+    c.innerHTML += `<option value="${i}">${i+1}. ${p.name}</option>`;
+  });
+}
+
+document.getElementById("challenger").addEventListener("change", ()=>{
+  const idx = parseInt(document.getElementById("challenger").value);
+  const o = document.getElementById("opponent");
+  o.innerHTML = `<option value="">Select</option>`;
+  ladder.forEach((p,i)=>{
+    if (i < idx && idx - i <= 3) {
+      o.innerHTML += `<option value="${i}">${i+1}. ${p.name}</option>`;
+    }
+  });
+});
+
+/* ------------------ LEG ENTRY ------------------ */
+function addLeg() {
+  const area = document.getElementById("legs-area");
+  const id = Date.now();
+  area.innerHTML += `
+    <div class="leg-block" id="leg-${id}">
+      <label>Leg winner</label>
+      <select class="leg-winner">
+        <option value="">Select</option>
+        <option value="challenger">Challenger</option>
+        <option value="opponent">Opponent</option>
+      </select>
+
+      <label class="small"><input type="checkbox" class="leg-45"> 45 darts reached (both players)</label>
+
+      <div class="nearest-bull-area" style="display:none;">
+        <div class="notice">
+          After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+        </div>
+        <label class="small"><input type="checkbox" class="leg-bull"> Nearest bull used</label>
+      </div>
+    </div>`;
+
+  const block = document.getElementById(`leg-${id}`);
+  const cb45 = block.querySelector(".leg-45");
+  const bullArea = block.querySelector(".nearest-bull-area");
+
+  cb45.addEventListener("change", ()=>{
+    bullArea.style.display = cb45.checked ? "block" : "none";
+  });
+}
+addLeg();
+
+/* ------------------ SUBMIT MATCH ------------------ */
+function submitMatch() {
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  const c = parseInt(document.getElementById("challenger").value);
+  const o = parseInt(document.getElementById("opponent").value);
+  if (isNaN(c) || isNaN(o)) {
+    msg.textContent = "Select challenger and opponent.";
+    return;
+  }
+
+  const legs = [...document.querySelectorAll(".leg-block")].map(block=>{
+    return {
+      winner: block.querySelector(".leg-winner").value,
+      reached45: block.querySelector(".leg-45").checked,
+      bull: block.querySelector(".leg-bull").checked
+    };
+  });
+
+  const cLegs = legs.filter(l=>l.winner==="challenger").length;
+  const oLegs = legs.filter(l=>l.winner==="opponent").length;
+
+  if (cLegs < 2 && oLegs < 2) {
+    msg.textContent = "A best‑of‑3 match requires someone to reach 2 legs.";
+    return;
+  }
+
+  // Validate 45-dart rule
+  for (const l of legs) {
+    if (l.reached45 && !l.bull) {
+      msg.textContent = "If 45 darts were reached, nearest bull must be used.";
+      return;
+    }
+  }
+
+  const winner = cLegs > oLegs ? c : o;
+  const loser  = cLegs > oLegs ? o : c;
+
+  // Update stats
+  ladder[winner].w++;
+  ladder[loser].l++;
+  ladder[winner].lf += cLegs > oLegs ? cLegs : oLegs;
+  ladder[winner].la += cLegs > oLegs ? oLegs : cLegs;
+  ladder[loser].lf  += cLegs > oLegs ? oLegs : cLegs;
+  ladder[loser].la  += cLegs > oLegs ? cLegs : oLegs;
+
+  const stamp = new Date().toLocaleString();
+  ladder[winner].last = `W vs ${ladder[loser].name} (${stamp})`;
+  ladder[loser].last  = `L vs ${ladder[winner].name} (${stamp})`;
+
+  // Ladder movement
+  if (winner > loser) {
+    const moved = ladder.splice(winner,1)[0];
+    ladder.splice(loser,0,moved);
+  }
+
+  save();
+  msg.textContent = "Match recorded and ladder updated.";
+}
+
+/* ------------------ EXPORT LADDER ------------------ */
+function exportLadder() {
+  const dataStr = JSON.stringify(ladder, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fox-darts-ladder-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+/* ------------------ IMPORT LADDER ------------------ */
+function importLadder(event) {
+  const file = event.target.files[0];
+  const msg = document.getElementById("import-msg");
+
+  if (!file) {
+    msg.textContent = "No file selected.";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (!Array.isArray(imported)) {
+        msg.textContent = "Invalid file format. Expected an array of players.";
+        return;
+      }
+
+      if (!confirm("Importing will replace the current ladder for everyone. Continue?")) {
+        msg.textContent = "Import cancelled.";
+        return;
+      }
+
+      ladder = imported;
+      save();
+      msg.textContent = "Ladder imported successfully.";
+
+    } catch (err) {
+      msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";
+    }
+  };
+
+  reader.readAsText(file);
+}
+</script>
+
+</body>
+</html>
