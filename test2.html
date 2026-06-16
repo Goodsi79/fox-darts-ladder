@@ -270,6 +270,50 @@ tbody tr:hover {
   letter-spacing: .12em;
   margin-bottom: .2rem;
 }
+
+/* Simple card + small text helpers */
+.card {
+  background: rgba(15,23,42,0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(55,65,81,0.9);
+  box-shadow: var(--shadow);
+  padding: .9rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.card-sub {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.small {
+  font-size: .75rem;
+}
+
+.flex {
+  display: flex;
+  gap: .5rem;
+}
+
+input, select {
+  background: #0b1120;
+  border-radius: 999px;
+  border: 1px solid rgba(55,65,81,0.9);
+  color: var(--text);
+  padding: .4rem .7rem;
+  font-size: .8rem;
+}
 </style>
 </head>
 
@@ -459,7 +503,6 @@ function renderLadder() {
       ? `${p.name} <span style="color:#9ca3af; font-size:.75rem;">“${p.nick}”</span>`
       : p.name;
 
-    // Achievement star (computed later in Part 3)
     const stats = computeAdvancedStats(p.name);
     const hasAch = computeAchievements(stats).length > 0;
     const star = hasAch ? `<span class="ach-star">★</span>` : "";
@@ -688,12 +731,10 @@ function buildLegUI() {
     `;
   }
 
-  // Leg 3 disabled initially
   document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
   document.querySelector('.leg-45[data-leg="3"]').disabled = true;
   document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
 
-  // Show bull area when 45 darts checked
   [1,2,3].forEach(n => {
     const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
     const bullArea = document.getElementById(`bull-${n}`);
@@ -702,7 +743,6 @@ function buildLegUI() {
     });
   });
 
-  // Recalc leg 3 enable/disable
   document.querySelectorAll(".leg-winner").forEach(sel => {
     sel.addEventListener("change", recalcLegState);
   });
@@ -762,7 +802,6 @@ function submitMatch() {
   const oLegs = legs.filter(l => l.winner === "opponent").length;
   const total = legs.filter(l => l.winner).length;
 
-  // Validate structure
   if (!(cLegs === 2 || oLegs === 2)) {
     msg.textContent = "Match must end 2–0 or 2–1.";
     return;
@@ -776,7 +815,6 @@ function submitMatch() {
     return;
   }
 
-  // 45-dart rule
   for (let i = 0; i < legs.length; i++) {
     if (legs[i].reached45 && !legs[i].bull) {
       msg.textContent = `Leg ${i+1} reached 45 darts but bull not confirmed.`;
@@ -784,11 +822,9 @@ function submitMatch() {
     }
   }
 
-  // Determine winner
   const winner = cLegs > oLegs ? challenger : opponent;
   const loser  = cLegs > oLegs ? opponent : challenger;
 
-  // Update stats
   winner.w++;
   loser.l++;
   winner.lf += Math.max(cLegs, oLegs);
@@ -800,7 +836,6 @@ function submitMatch() {
   winner.last = `W vs ${loser.name} (${stamp})`;
   loser.last  = `L vs ${winner.name} (${stamp})`;
 
-  // Movement
   let movement = "No movement";
   const wIndex = ladder.indexOf(winner);
   const lIndex = ladder.indexOf(loser);
@@ -813,7 +848,6 @@ function submitMatch() {
     movement = `Moved from ${oldPos} to ${newPos}`;
   }
 
-  // Save match
   db.ref("history").push({
     challenger: challenger.name,
     challengerNick: challenger.nick,
@@ -893,7 +927,12 @@ function resetAll() {
   ladder = [];
   historyCache = {};
   db.ref("ladder").set([]);
-  db.ref("
+  db.ref("history").set({});
+  renderLadder();
+  renderSelects();
+  document.getElementById("history-list").innerHTML = "";
+}
+</script>
 <!-- ===========================================================
      PART 3 — ADVANCED STATS ENGINE + ACHIEVEMENTS + PROFILE PANEL
      =========================================================== -->
@@ -1034,12 +1073,10 @@ function computeAdvancedStats(name) {
 function computeAchievements(stats) {
   const ach = [];
 
-  // Sharpshooter – 10+ wins
   if (stats.wins >= 10) {
     ach.push({ label: "Sharpshooter", desc: "10+ ladder wins" });
   }
 
-  // Marathon Man – 5+ matches in a single day
   const matches = getPlayerMatches(stats.name);
   const byDay = {};
   matches.forEach(m => {
@@ -1050,17 +1087,14 @@ function computeAchievements(stats) {
     ach.push({ label: "Marathon Man", desc: "5+ matches in one day" });
   }
 
-  // Bull Master – 3+ bull-decided wins
   if (stats.bullWins >= 3) {
     ach.push({ label: "Bull Master", desc: "Won 3+ bull-decided legs" });
   }
 
-  // Ice Cold – 3+ 2–0 wins
   if (stats.wins20 >= 3) {
     ach.push({ label: "Ice Cold", desc: "Won 3+ matches 2–0" });
   }
 
-  // Never Say Die – 2+ comeback wins
   let nsd = 0;
   matches.forEach(m => {
     const isChallenger = m.challenger === stats.name;
@@ -1080,7 +1114,6 @@ function computeAchievements(stats) {
     ach.push({ label: "Never Say Die", desc: "Won 2+ matches 2–1 after losing Leg 1" });
   }
 
-  // Giant Killer – beat someone 3+ places above
   let giant = false;
   matches.forEach(m => {
     if (m.winner !== stats.name) return;
