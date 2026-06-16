@@ -452,13 +452,6 @@ input, select {
   </div>
   <div class="admin-body" id="pp-body"></div>
 
-  <!-- CHARTS -->
-  <div style="margin-top:.8rem;">
-    <div class="admin-section-title">Analytics</div>
-    <canvas id="pp-chart-position" height="120" style="width:100%; margin-bottom:.6rem;"></canvas>
-    <canvas id="pp-chart-winrate" height="120" style="width:100%; margin-bottom:.6rem;"></canvas>
-    <canvas id="pp-chart-scorelines" height="120" style="width:100%;"></canvas>
-  </div>
 
   <div class="admin-footer">Stats generated from match history</div>
 </div>
@@ -958,91 +951,8 @@ function resetAll() {
 /* -----------------------------------------------------------
    SIMPLE CHART HELPERS (Stage 4)
    ----------------------------------------------------------- */
-function drawLineChart(canvasId, labels, values, color) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
 
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (!labels.length || !values.length) {
-    ctx.fillStyle = "#6b7280";
-    ctx.font = "12px Inter";
-    ctx.fillText("No data", 10, 20);
-    return;
-  }
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const padding = 20;
-
-  const maxVal = Math.max(...values);
-  const minVal = Math.min(...values);
-  const range = maxVal - minVal || 1;
-
-  ctx.strokeStyle = "#374151";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, h - padding);
-  ctx.lineTo(w - padding, h - padding);
-  ctx.stroke();
-
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-
-  values.forEach((v, i) => {
-    const x = padding + (i / Math.max(1, values.length - 1)) * (w - 2 * padding);
-    const y = h - padding - ((v - minVal) / range) * (h - 2 * padding);
-    if (i === 0) ctx.moveTo(x, y);
-    else ctx.lineTo(x, y);
-  });
-
-  ctx.stroke();
-}
-
-function drawBarChart(canvasId, labels, values, color) {
-  const canvas = document.getElementById(canvasId);
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
-
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  if (!labels.length || !values.length) {
-    ctx.fillStyle = "#6b7280";
-    ctx.font = "12px Inter";
-    ctx.fillText("No data", 10, 20);
-    return;
-  }
-
-  const w = canvas.width;
-  const h = canvas.height;
-  const padding = 20;
-
-  const maxVal = Math.max(...values) || 1;
-  const barWidth = (w - 2 * padding) / labels.length * 0.7;
-  const gap = (w - 2 * padding) / labels.length * 0.3;
-
-  ctx.strokeStyle = "#374151";
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(padding, padding);
-  ctx.lineTo(padding, h - padding);
-  ctx.lineTo(w - padding, h - padding);
-  ctx.stroke();
-
-  labels.forEach((label, i) => {
-    const x = padding + i * (barWidth + gap);
-    const barHeight = (values[i] / maxVal) * (h - 2 * padding);
-    const y = h - padding - barHeight;
-
-    ctx.fillStyle = color;
-    ctx.fillRect(x, y, barWidth, barHeight);
-  });
-}
 
 /* -----------------------------------------------------------
    GET MATCHES FOR PLAYER
@@ -1446,10 +1356,6 @@ function openPlayerProfile(index) {
 
   panel.classList.add("open");
 
-  // Draw charts
-  drawLineChart("pp-chart-position", labels, positions, "#00e5ff");
-  drawLineChart("pp-chart-winrate", labels, winRateSeries, "#22c55e");
-  drawBarChart("pp-chart-scorelines", scoreLabels, scoreValues, "#ff8a1f");
 }
 /* -----------------------------------------------------------
    CLOSE PROFILE PANEL
