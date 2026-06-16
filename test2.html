@@ -1,1373 +1,1356 @@
 <!DOCTYPE html>
-<html lang = "en">
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; -webkit-text-stroke: #000000; min-height: 14.0px}
-    span.s1 {font-kerning: none}
-  </style>
+<meta charset="UTF-8">
+<title>The Fox at Peasemore – Darts Ladder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #05070a;
+  --bg-alt: #0b0f16;
+  --panel: #0f141d;
+  --panel-soft: #151b26;
+  --border: #1f2933;
+  --text: #e5e7eb;
+  --muted: #6b7280;
+  --accent: #ff8a1f;
+  --accent-soft: rgba(255,138,31,0.18);
+  --accent-strong: #ffb347;
+  --danger: #ff4b5c;
+  --danger-soft: rgba(255,75,92,0.18);
+  --success: #22c55e;
+  --success-soft: rgba(34,197,94,0.18);
+  --cyan: #00e5ff;
+  --radius: 12px;
+  --shadow: 0 18px 45px rgba(0,0,0,0.65);
+  --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: radial-gradient(circle at top, #141b2a 0, #05070a 55%);
+  color: var(--text);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+header img {
+  height: 70px;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.header-sub {
+  font-size: .85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  background: rgba(220,38,38,0.12);
+  color: #fecaca;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #f97373;
+  box-shadow: 0 0 10px #f97373;
+}
+
+/* Nav */
+.nav-card {
+  background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.85));
+  border-radius: var(--radius);
+  border: 1px solid rgba(148,163,184,0.25);
+  box-shadow: var(--shadow);
+  padding: .6rem .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  margin-bottom: 1rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+/* Admin icon */
+.admin-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e5e7eb;
+  cursor: pointer;
+  margin-left: .4rem;
+  background: rgba(15,23,42,0.9);
+  transition: all .16s ease-out;
+  font-size: 1rem;
+}
+
+.admin-icon:hover {
+  border-color: var(--cyan);
+  color: var(--cyan);
+  box-shadow: 0 0 18px rgba(56,189,248,0.7);
+}
+
+/* Buttons */
+button {
+  padding: .55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .85rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: all .16s ease-out;
+}
+
+.btn-primary {
+  background: radial-gradient(circle at top, var(--accent-strong), var(--accent));
+  color: #111827;
+  box-shadow: 0 0 18px rgba(255,138,31,0.55);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 26px rgba(255,138,31,0.75);
+}
+
+.btn-secondary {
+  background: rgba(15,23,42,0.9);
+  color: var(--text);
+  border-color: rgba(148,163,184,0.4);
+}
+
+.btn-secondary:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(148,163,184,0.35);
+}
+
+.btn-danger {
+  background: rgba(127,29,29,0.9);
+  color: #fecaca;
+  border-color: rgba(248,113,113,0.6);
+}
+
+.btn-danger:hover {
+  box-shadow: 0 0 18px rgba(248,113,113,0.7);
+}
+
+/* Cards */
+.card {
+  background: radial-gradient(circle at top left, rgba(148,163,184,0.12), transparent 55%),
+              linear-gradient(145deg, var(--panel), var(--panel-soft));
+  padding: 1.1rem 1.2rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(148,163,184,0.25);
+  box-shadow: var(--shadow);
+  margin-top: 1rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .6rem;
+}
+
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.card-sub {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* Layout grid */
+.main-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .main-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Table / Ladder */
+.table-wrapper {
+  margin-top: .6rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(55,65,81,0.8);
+  background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+th, td {
+  padding: .45rem .55rem;
+  border-bottom: 1px solid rgba(31,41,55,0.9);
+}
+
+th {
+  text-align: left;
+  color: #9ca3af;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.8));
+}
+
+tbody tr {
+  transition: background .12s ease-out, box-shadow .12s ease-out;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(15,23,42,0.9);
+}
+
+tbody tr:nth-child(odd) {
+  background: rgba(15,23,42,0.96);
+}
+
+tbody tr:hover {
+  background: rgba(30,64,175,0.55);
+  box-shadow: inset 0 0 0 1px rgba(191,219,254,0.4);
+}
+
+td.position {
+  color: var(--cyan);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+td.player-name {
+  font-weight: 500;
+}
+
+td.record {
+  font-variant-numeric: tabular-nums;
+}
+
+td.last {
+  font-size: .75rem;
+  color: #9ca3af;
+}
+
+/* Position arrows */
+.pos-arrow {
+  margin-left: 6px;
+  font-size: .75rem;
+  opacity: 1;
+  transition: all .6s ease;
+}
+
+.pos-up {
+  color: #22c55e;
+  text-shadow: 0 0 8px rgba(34,197,94,0.8);
+  animation: slideUp .6s ease;
+}
+
+.pos-down {
+  color: #ff4b5c;
+  text-shadow: 0 0 8px rgba(255,75,92,0.8);
+  animation: slideDown .6s ease;
+}
+
+.pos-same {
+  color: #6b7280;
+}
+
+.fade-out {
+  opacity: 0;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-6px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Inputs */
+input, select {
+  width: 100%;
+  padding: .55rem .6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(55,65,81,0.9);
+  background: rgba(15,23,42,0.95);
+  color: var(--text);
+  font-size: .85rem;
+  outline: none;
+  transition: border .12s ease-out, box-shadow .12s ease-out, background .12s ease-out;
+}
+
+input::placeholder {
+  color: #6b7280;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-soft), 0 0 18px rgba(255,138,31,0.45);
+  background: rgba(15,23,42,1);
+}
+
+/* Flex helpers */
+.flex {
+  display: flex;
+  gap: .7rem;
+  flex-wrap: wrap;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.small {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+/* Leg blocks */
+.leg-block {
+  background: rgba(15,23,42,0.95);
+  padding: .8rem .9rem;
+  border-radius: 10px;
+  border: 1px solid rgba(55,65,81,0.9);
+  margin-bottom: .6rem;
+  position: relative;
+}
+
+.leg-title {
+  font-size: .75rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #9ca3af;
+  margin-bottom: .35rem;
+}
+
+.notice {
+  background: rgba(15,23,42,0.95);
+  border-left: 3px solid var(--accent);
+  padding: .45rem .6rem;
+  border-radius: 8px;
+  margin-top: .4rem;
+  font-size: .75rem;
+  color: #e5e7eb;
+}
+
+/* Chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.chip-info {
+  background: rgba(15,23,42,0.9);
+  border: 1px solid rgba(148,163,184,0.5);
+  color: #e5e7eb;
+}
+
+/* History */
+.history-item {
+  margin-bottom: .9rem;
+  padding-bottom: .7rem;
+  border-bottom: 1px dashed rgba(55,65,81,0.9);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: .5rem;
+}
+
+.history-main {
+  font-size: .85rem;
+}
+
+.history-meta {
+  font-size: .7rem;
+  color: #9ca3af;
+}
+
+/* Messages */
+.message {
+  margin-top: .45rem;
+  font-size: .75rem;
+}
+
+.message-info {
+  color: #bfdbfe;
+}
+
+.message-error {
+  color: #fecaca;
+}
+
+/* Admin slide-in panel */
+.admin-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  height: 100vh;
+  background: radial-gradient(circle at top, #111827, #020617);
+  border-left: 1px solid rgba(148,163,184,0.4);
+  box-shadow: -18px 0 45px rgba(0,0,0,0.8);
+  transform: translateX(100%);
+  transition: transform .25s ease-out;
+  z-index: 50;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-panel.open {
+  transform: translateX(0);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .8rem;
+}
+
+.admin-title {
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.admin-close {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.admin-section-title {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #9ca3af;
+  margin-top: .8rem;
+  margin-bottom: .3rem;
+}
+
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: .3rem;
+}
+
+.admin-footer {
+  margin-top: .8rem;
+  font-size: .7rem;
+  color: #6b7280;
+}
+</style>
 </head>
+
 <body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="en"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;title&gt;The Fox at Peasemore – Darts Ladder&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width, initial-scale=1"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.googleapis.com"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;link rel="preconnect" href="https://fonts.gstatic.com" crossorigin&gt;</span></p>
-<p class="p1"><span class="s1">&lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;style&gt;</span></p>
-<p class="p1"><span class="s1">:root {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--bg: #05070a;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--bg-alt: #0b0f16;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--panel: #0f141d;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--panel-soft: #151b26;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--border: #1f2933;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--text: #e5e7eb;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--muted: #6b7280;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--accent: #ff8a1f;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--accent-soft: rgba(255,138,31,0.18);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--accent-strong: #ffb347;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--danger: #ff4b5c;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--danger-soft: rgba(255,75,92,0.18);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--success: #22c55e;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--success-soft: rgba(34,197,94,0.18);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--cyan: #00e5ff;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--radius: 12px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--shadow: 0 18px 45px rgba(0,0,0,0.65);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>--font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">* { box-sizing: border-box; }</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-family: var(--font);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: radial-gradient(circle at top, #141b2a 0, #05070a 55%);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--text);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.container {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 1200px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: auto;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Header */</span></p>
-<p class="p1"><span class="s1">header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: 1.2rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>flex-wrap: wrap;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">header img {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 70px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 14px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 25px rgba(0,0,0,0.7);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">h1 {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 1.9rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-weight: 700;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: 0.04em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.header-sub {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .85rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--muted);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.badge-live {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: inline-flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .35rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .15rem .55rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(220,38,38,0.12);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #fecaca;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.badge-live-dot {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 7px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 7px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: #f97373;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 10px #f97373;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Nav */</span></p>
-<p class="p1"><span class="s1">.nav-card {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.85));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: var(--radius);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(148,163,184,0.25);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: var(--shadow);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .6rem .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.nav-left {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .6rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--muted);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.nav-dot {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: var(--cyan);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 12px var(--cyan);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.nav-buttons {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .4rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Admin icon */</span></p>
-<p class="p1"><span class="s1">.admin-icon {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 32px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 32px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(148,163,184,0.4);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #e5e7eb;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-left: .4rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: all .16s ease-out;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-icon:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-color: var(--cyan);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--cyan);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 18px rgba(56,189,248,0.7);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Buttons */</span></p>
-<p class="p1"><span class="s1">button {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .55rem 1.1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid transparent;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .85rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .06em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: all .16s ease-out;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-primary {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: radial-gradient(circle at top, var(--accent-strong), var(--accent));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #111827;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 18px rgba(255,138,31,0.55);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-primary:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transform: translateY(-1px);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 26px rgba(255,138,31,0.75);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-secondary {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--text);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-color: rgba(148,163,184,0.4);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-secondary:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-color: var(--accent);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 16px rgba(148,163,184,0.35);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-danger {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(127,29,29,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #fecaca;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-color: rgba(248,113,113,0.6);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.btn-danger:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 18px rgba(248,113,113,0.7);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Cards */</span></p>
-<p class="p1"><span class="s1">.card {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: radial-gradient(circle at top left, rgba(148,163,184,0.12), transparent 55%),</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>linear-gradient(145deg, var(--panel), var(--panel-soft));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 1.1rem 1.2rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: var(--radius);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(148,163,184,0.25);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: var(--shadow);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.card-header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: baseline;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .6rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.card-title {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 1.05rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .12em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.card-sub {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--muted);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Layout grid */</span></p>
-<p class="p1"><span class="s1">.main-grid {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: grid;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: 1rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">@media (max-width: 900px) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>.main-grid {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>grid-template-columns: minmax(0, 1fr);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Table / Ladder */</span></p>
-<p class="p1"><span class="s1">.table-wrapper {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: .6rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>overflow: hidden;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(55,65,81,0.8);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">table {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-collapse: collapse;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .85rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">th, td {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .45rem .55rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-bottom: 1px solid rgba(31,41,55,0.9);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">th {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-align: left;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.8));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">tbody tr {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: background .12s ease-out, box-shadow .12s ease-out;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">tbody tr:nth-child(even) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.9);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">tbody tr:nth-child(odd) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.96);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">tbody tr:hover {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(30,64,175,0.55);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: inset 0 0 0 1px rgba(191,219,254,0.4);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">td.position {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--cyan);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-weight: 600;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-variant-numeric: tabular-nums;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">td.player-name {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-weight: 500;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">td.record {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-variant-numeric: tabular-nums;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">td.last {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Position arrows */</span></p>
-<p class="p1"><span class="s1">.pos-arrow {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-left: 6px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>opacity: 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: all .6s ease;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.pos-up {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #22c55e;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-shadow: 0 0 8px rgba(34,197,94,0.8);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animation: slideUp .6s ease;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.pos-down {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #ff4b5c;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-shadow: 0 0 8px rgba(255,75,92,0.8);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>animation: slideDown .6s ease;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.pos-same {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #6b7280;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.fade-out {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>opacity: 0;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">@keyframes slideUp {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>from { transform: translateY(6px); opacity: 0; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>to <span class="Apple-converted-space">  </span>{ transform: translateY(0); opacity: 1; }</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">@keyframes slideDown {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>from { transform: translateY(-6px); opacity: 0; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>to <span class="Apple-converted-space">  </span>{ transform: translateY(0); opacity: 1; }</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Inputs */</span></p>
-<p class="p1"><span class="s1">input, select {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .55rem .6rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(55,65,81,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.95);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--text);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .85rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>outline: none;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: border .12s ease-out, box-shadow .12s ease-out, background .12s ease-out;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">input::placeholder {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #6b7280;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">input:focus, select:focus {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-color: var(--accent);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: 0 0 0 1px var(--accent-soft), 0 0 18px rgba(255,138,31,0.45);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,1);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Flex helpers */</span></p>
-<p class="p1"><span class="s1">.flex {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>flex-wrap: wrap;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.flex-between {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.small {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: var(--muted);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Leg blocks */</span></p>
-<p class="p1"><span class="s1">.leg-block {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.95);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .8rem .9rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 10px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(55,65,81,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: .6rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>position: relative;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.leg-title {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: .35rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.notice {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.95);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-left: 3px solid var(--accent);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .45rem .6rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 8px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: .4rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #e5e7eb;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Chips */</span></p>
-<p class="p1"><span class="s1">.chip {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: inline-flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .3rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: .2rem .55rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-radius: 999px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .12em;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.chip-info {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: rgba(15,23,42,0.9);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border: 1px solid rgba(148,163,184,0.5);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #e5e7eb;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* History */</span></p>
-<p class="p1"><span class="s1">.history-item {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: .9rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding-bottom: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-bottom: 1px dashed rgba(55,65,81,0.9);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.history-header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: baseline;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>gap: .5rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.history-main {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .85rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.history-meta {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Messages */</span></p>
-<p class="p1"><span class="s1">.message {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: .45rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .75rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.message-info {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #bfdbfe;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.message-error {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #fecaca;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Admin slide-in panel */</span></p>
-<p class="p1"><span class="s1">.admin-panel {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>position: fixed;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>top: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>right: 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>width: 320px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>max-width: 90vw;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>height: 100vh;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background: radial-gradient(circle at top, #111827, #020617);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>border-left: 1px solid rgba(148,163,184,0.4);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>box-shadow: -18px 0 45px rgba(0,0,0,0.8);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transform: translateX(100%);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transition: transform .25s ease-out;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>z-index: 50;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding: 1rem 1.1rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>flex-direction: column;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-panel.open {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>transform: translateX(0);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-header {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>display: flex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>justify-content: space-between;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>align-items: center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: .8rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-title {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .95rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-close {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>cursor: pointer;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: 1.2rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-section-title {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>text-transform: uppercase;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>letter-spacing: .16em;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #9ca3af;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-bottom: .3rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-body {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>flex: 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>overflow-y: auto;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>padding-right: .3rem;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">.admin-footer {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>margin-top: .8rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>font-size: .7rem;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>color: #6b7280;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">&lt;/style&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div class="container"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;header&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;img src="fox-logo.png" alt="The Fox at Peasemore"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h1&gt;The Fox at Peasemore&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="header-sub"&gt;Darts Ladder • F1‑Style Live Standings&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div style="margin-top:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;span class="badge-live"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;span class="badge-live-dot"&gt;&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>Live Firebase Ladder</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/header&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;div class="nav-card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="nav-left"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;span class="nav-dot"&gt;&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;span&gt;Real‑time shared ladder • Match history&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="nav-buttons"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-primary" onclick="showPage('ladder')"&gt;Ladder&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-secondary" onclick="showPage('history')"&gt;Match History&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="admin-icon" onclick="toggleAdminPanel()" title="Admin"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>⚙</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- PAGE: LADDER --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div id="page-ladder"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="main-grid"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- LEFT: Ladder --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-title"&gt;Ladder Standings&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-sub"&gt;Ordered by current position • Lower number = higher rank&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="chip chip-info"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span&gt;Live&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="table-wrapper"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;thead&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;#&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;Player&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;W&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;L&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;Legs&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;th&gt;Last Match&lt;/th&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/thead&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;tbody id="ladder-body"&gt;&lt;/tbody&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/table&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="flex" style="margin-top:.8rem; align-items:center;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="flex:1;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input id="new-player-name" placeholder="Full name"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="flex:1;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;input id="new-player-nick" placeholder="Nickname (optional)"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn-primary" onclick="addPlayer()"&gt;Add Player&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;!-- RIGHT: Match entry + rules --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-title"&gt;Record Ladder Match&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-sub"&gt;Best of 3 legs • First to 2 wins • Challenge up to 3 places above&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="flex" style="margin-top:.7rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="flex:1;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="small" style="margin-bottom:.25rem;"&gt;Challenger (lower ranked)&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="challenger"&gt;&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="flex:1;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="small" style="margin-bottom:.25rem;"&gt;Opponent (up to 3 places above)&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;select id="opponent"&gt;&lt;/select&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div style="margin-top:1rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="card-sub" style="text-transform:none; letter-spacing:0;"&gt;Leg Results (first to 2, max 3 legs)&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div id="legs-area" style="margin-top:.5rem;"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;!-- LEG 1 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="leg-block" id="leg-1"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="leg-title"&gt;Leg 1&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="small" style="margin-bottom:.25rem;"&gt;Winner&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;select class="leg-winner" data-leg="1"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value=""&gt;Select&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="challenger"&gt;Challenger&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="opponent"&gt;Opponent&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/select&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label class="small" style="display:block; margin-top:.45rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;input type="checkbox" class="leg-45" data-leg="1" style="width:auto; margin-right:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>45 darts reached (both players)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/label&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="nearest-bull-area" id="bull-1" style="display:none;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="notice"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>After 45 darts each, the leg MUST be decided by a single dart nearest the bull.</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;label class="small" style="display:block; margin-top:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;input type="checkbox" class="leg-bull" data-leg="1" style="width:auto; margin-right:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>Nearest bull used to decide this leg</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;!-- LEG 2 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="leg-block" id="leg-2"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="leg-title"&gt;Leg 2&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="small" style="margin-bottom:.25rem;"&gt;Winner&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;select class="leg-winner" data-leg="2"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value=""&gt;Select&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="challenger"&gt;Challenger&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="opponent"&gt;Opponent&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/select&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label class="small" style="display:block; margin-top:.45rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;input type="checkbox" class="leg-45" data-leg="2" style="width:auto; margin-right:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>45 darts reached (both players)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/label&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="nearest-bull-area" id="bull-2" style="display:none;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="notice"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>After 45 darts each, the leg MUST be decided by a single dart nearest the bull.</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;label class="small" style="display:block; margin-top:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;input type="checkbox" class="leg-bull" data-leg="2" style="width:auto; margin-right:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>Nearest bull used to decide this leg</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;!-- LEG 3 --&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="leg-block" id="leg-3"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="leg-title"&gt;Leg 3&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="small" style="margin-bottom:.25rem;"&gt;Winner&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;select class="leg-winner" data-leg="3" disabled&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value=""&gt;Select&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="challenger"&gt;Challenger&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;option value="opponent"&gt;Opponent&lt;/option&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/select&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;label class="small" style="display:block; margin-top:.45rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;input type="checkbox" class="leg-45" data-leg="3" style="width:auto; margin-right:.35rem;" disabled&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>45 darts reached (both players)</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/label&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;div class="nearest-bull-area" id="bull-3" style="display:none;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;div class="notice"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>After 45 darts each, the leg MUST be decided by a single dart nearest the bull.</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;label class="small" style="display:block; margin-top:.35rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>&lt;input type="checkbox" class="leg-bull" data-leg="3" style="width:auto; margin-right:.35rem;" disabled&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                  </span>Nearest bull used to decide this leg</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">                </span>&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div style="margin-top:.9rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;button class="btn-primary" style="width:100%;" onclick="submitMatch()"&gt;Submit Match Result&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div id="msg" class="message message-info"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-title"&gt;Ladder Rules&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;div class="card-sub"&gt;Enforced by honour, witnessed scoring, and this dashboard&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;ul style="line-height:1.6; padding-left:1.1rem; margin:.6rem 0 0 0; font-size:.8rem; color:#d1d5db;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;Best of 3 legs&lt;/strong&gt; – first to 2 wins.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;Leg 3 only played&lt;/strong&gt; if the first two legs are 1–1.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;45‑dart rule:&lt;/strong&gt; after 45 darts each, decide by one dart nearest the bull.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;Challenge rule:&lt;/strong&gt; you may challenge up to 3 positions above you.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;If the lower‑ranked player wins&lt;/strong&gt;, they take the higher player’s position; others shift down.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;li&gt;&lt;strong&gt;New players&lt;/strong&gt; always join at the bottom.&lt;/li&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/ul&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- PAGE: MATCH HISTORY --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div id="page-history" style="display:none;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="card"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="card-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card-title"&gt;Match History&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="card-sub"&gt;Chronological log of recorded ladder matches&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="chip chip-info"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;span&gt;Newest First&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="history-list" style="margin-top:.8rem;"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- ADMIN SLIDE-IN PANEL --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div id="admin-panel" class="admin-panel"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="admin-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="admin-title"&gt;Admin&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="admin-close" onclick="toggleAdminPanel()"&gt;✕&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="admin-body"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="admin-section-title"&gt;Resets&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetLadderOnly()"&gt;Reset Ladder Only&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetHistoryOnly()"&gt;Reset Match History Only&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-danger" style="width:100%;" onclick="resetLadderAndHistory()"&gt;Reset Ladder &amp; History&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div class="admin-section-title"&gt;Backup &amp; Restore&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()"&gt;Export Ladder + History JSON&lt;/button&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block; margin-bottom:.4rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>Import Ladder + History JSON</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div id="admin-msg" class="message message-info"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div class="admin-footer"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>Changes here affect everyone using this ladder (shared Firebase backend).</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;!-- EDIT PLAYER MODAL --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div id="edit-player-modal" style="</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>position:fixed; top:0; left:0; width:100%; height:100%;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>z-index:9999;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;div style="</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>background:#111827; padding:1.2rem; border-radius:12px; width:320px;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>border:1px solid rgba(148,163,184,0.3); box-shadow:0 0 25px rgba(0,0,0,0.6);"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;h3 style="margin-top:0; margin-bottom:.8rem; font-size:1rem;"&gt;Edit Player&lt;/h3&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;label class="small"&gt;Full Name&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;input id="edit-player-name" style="margin-bottom:.6rem;"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;label class="small"&gt;Nickname&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;input id="edit-player-nick" style="margin-bottom:1rem;"&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;div style="display:flex; gap:.6rem;"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-primary" style="flex:1;" onclick="savePlayerEdit()"&gt;Save&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;button class="btn-secondary" style="flex:1;" onclick="closeEditPlayer()"&gt;Cancel&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;/div&gt; &lt;!-- end .container --&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;!-- FIREBASE (COMPAT) --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"&gt;&lt;/script&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;script&gt;</span></p>
-<p class="p1"><span class="s1">const firebaseConfig = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>authDomain: "fox-darts-ladder.firebaseapp.com",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>databaseURL: "https://fox-darts-ladder-default-rtdb.europe-west1.firebasedatabase.app",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>projectId: "fox-darts-ladder",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>storageBucket: "fox-darts-ladder.firebasestorage.app",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>messagingSenderId: "1028079521201",</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">firebase.initializeApp(firebaseConfig);</span></p>
-<p class="p1"><span class="s1">const db = firebase.database();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">let ladder = [];</span></p>
-<p class="p1"><span class="s1">let previousLadder = [];</span></p>
-<p class="p1"><span class="s1">let historyCache = {};</span></p>
-<p class="p1"><span class="s1">let editIndex = null;</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;script&gt;</span></p>
-<p class="p1"><span class="s1">function showPage(page) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("page-history").style.display = page === "history" ? "block" : "none";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function toggleAdminPanel() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const panel = document.getElementById("admin-panel");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>panel.classList.toggle("open");</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Render ladder */</span></p>
-<p class="p1"><span class="s1">function renderLadder() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const body = document.getElementById("ladder-body");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>body.innerHTML = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder.forEach((p,i)=&gt;{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let arrow = "•";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>let arrowClass = "pos-same";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (p.delta &gt; 0) { arrow = "▲"; arrowClass = "pos-up"; }</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>else if (p.delta &lt; 0) { arrow = "▼"; arrowClass = "pos-down"; }</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const nameDisplay = p.nick</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>? `${p.name} &lt;span style="color:#9ca3af; font-size:.75rem;"&gt;“${p.nick}”&lt;/span&gt;`</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>: p.name;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>body.innerHTML += `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;tr&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="position"&gt;${String(i+1).padStart(2,"0")} &lt;span class="pos-arrow ${arrowClass}"&gt;${arrow}&lt;/span&gt;&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="player-name"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>${nameDisplay}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;span style="cursor:pointer; margin-left:8px; color:#60a5fa;" onclick="openEditPlayer(${i})"&gt;✎&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="record"&gt;${p.w}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="record"&gt;${p.l}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="record"&gt;${p.lf}:${p.la}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;td class="last"&gt;${p.last || "—"}&lt;/td&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/tr&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>setTimeout(() =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>document.querySelectorAll(".pos-arrow").forEach(el =&gt; el.classList.add("fade-out"));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}, 5000);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Ladder listener */</span></p>
-<p class="p1"><span class="s1">db.ref("ladder").on("value", snapshot =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const newLadder = snapshot.val() || [];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>newLadder.forEach((player, newIndex) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const oldIndex = previousLadder.findIndex(p =&gt; p.name === player.name);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>player.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (player.w == null) player.w = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (player.l == null) player.l = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (player.lf == null) player.lf = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (player.la == null) player.la = 0;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (player.nick === undefined) player.nick = null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>previousLadder = JSON.parse(JSON.stringify(newLadder));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder = newLadder;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* History listener */</span></p>
-<p class="p1"><span class="s1">db.ref("history").on("value", snapshot =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>historyCache = snapshot.val() || {};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const list = document.getElementById("history-list");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>list.innerHTML = "";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const entries = Object.entries(historyCache);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!entries.length) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>list.innerHTML = `&lt;div class="small" style="color:#9ca3af;"&gt;No matches recorded yet.&lt;/div&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>entries.reverse().forEach(([id, m]) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const challengerLabel = m.challengerNick</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>? `${m.challenger} “${m.challengerNick}”`</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>: m.challenger;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const opponentLabel = m.opponentNick</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>? `${m.opponent} “${m.opponentNick}”`</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>: m.opponent;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const winnerLabel = m.winner === m.challenger ? challengerLabel : opponentLabel;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const loserLabel<span class="Apple-converted-space">  </span>= m.loser<span class="Apple-converted-space">  </span>=== m.challenger ? challengerLabel : opponentLabel;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const legsSummary = (m.legs || []).map((l,idx) =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!l.winner) return `Leg ${idx+1}: –`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return `Leg ${idx+1}: ${l.winner === "challenger" ? challengerLabel : opponentLabel}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}).join(" • ");</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>list.innerHTML += `</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;div class="history-item"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="history-header"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="history-main"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;strong&gt;${winnerLabel}&lt;/strong&gt; beat &lt;strong&gt;${loserLabel}&lt;/strong&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div class="chip chip-info"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">            </span>&lt;span&gt;${m.movement || ""}&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;div class="history-meta"&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div&gt;${m.timestamp || ""}&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">          </span>&lt;div style="margin-top:.2rem;"&gt;${legsSummary}&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function saveLadder() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("ladder").set(ladder);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Resets */</span></p>
-<p class="p1"><span class="s1">function resetLadderOnly() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!confirm("Reset ladder only? Match history will be kept.")) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder = [];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>previousLadder = [];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("ladder").set([]);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("admin-msg").textContent = "Ladder reset.";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function resetHistoryOnly() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!confirm("Reset match history only? Ladder positions will be kept.")) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>historyCache = {};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("history").set({});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("history-list").innerHTML = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("admin-msg").textContent = "Match history reset.";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function resetLadderAndHistory() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!confirm("Reset ladder AND match history for everyone?")) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder = [];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>previousLadder = [];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>historyCache = {};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("ladder").set([]);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("history").set({});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("history-list").innerHTML = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("admin-msg").textContent = "Ladder and history reset.";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Add player with nickname */</span></p>
-<p class="p1"><span class="s1">function addPlayer() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const name = document.getElementById("new-player-name").value.trim();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const nick = document.getElementById("new-player-nick").value.trim();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!name) return;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder.push({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>name,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>nick: nick || null,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>w: 0,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>l: 0,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>lf: 0,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>la: 0,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>last: null,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>delta: 0</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("new-player-name").value = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("new-player-nick").value = "";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>saveLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Edit player modal */</span></p>
-<p class="p1"><span class="s1">function openEditPlayer(i) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>editIndex = i;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const p = ladder[i];</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("edit-player-name").value = p.name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("edit-player-nick").value = p.nick || "";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("edit-player-modal").style.display = "flex";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function closeEditPlayer() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("edit-player-modal").style.display = "none";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>editIndex = null;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">function savePlayerEdit() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (editIndex === null) return;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const newName = document.getElementById("edit-player-name").value.trim();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const newNick = document.getElementById("edit-player-nick").value.trim();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!newName) return;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[editIndex].name = newName;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[editIndex].nick = newNick || null;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>saveLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>closeEditPlayer();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Select options */</span></p>
-<p class="p1"><span class="s1">function renderSelects() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const c = document.getElementById("challenger");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const o = document.getElementById("opponent");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!c || !o) return;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const cVal = c.value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const oVal = o.value;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>c.innerHTML = `&lt;option value=""&gt;Select challenger&lt;/option&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>o.innerHTML = `&lt;option value=""&gt;Select opponent&lt;/option&gt;`;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder.forEach((p,i)=&gt;{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>c.innerHTML += `&lt;option value="${i}"&gt;${String(i+1).padStart(2,"0")} • ${label}&lt;/option&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (cVal) c.value = cVal;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (oVal) o.value = oVal;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Opponent constrained to 3 above */</span></p>
-<p class="p1"><span class="s1">document.getElementById("challenger").addEventListener("change", ()=&gt;{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const idx = parseInt(document.getElementById("challenger").value);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const o = document.getElementById("opponent");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>o.innerHTML = `&lt;option value=""&gt;Select opponent&lt;/option&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder.forEach((p,i)=&gt;{</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (i &lt; idx &amp;&amp; idx - i &lt;= 3) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>o.innerHTML += `&lt;option value="${i}"&gt;${String(i+1).padStart(2,"0")} • ${label}&lt;/option&gt;`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Leg helpers */</span></p>
-<p class="p1"><span class="s1">function getLegsFromDOM() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>return [1,2,3].map(n =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const bull = bullEl ? bullEl.checked : false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return { winner, reached45, bull };</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Recalculate leg state – Leg 3 enabled only if Leg 1 &amp; 2 are 1–1 */</span></p>
-<p class="p1"><span class="s1">function recalcLegState() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const legs = getLegsFromDOM();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const firstTwo = legs.slice(0,2);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const cLegsFirstTwo = firstTwo.filter(l =&gt; l.winner === "challenger").length;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const oLegsFirstTwo = firstTwo.filter(l =&gt; l.winner === "opponent").length;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const enableLeg3 = (cLegsFirstTwo === 1 &amp;&amp; oLegsFirstTwo === 1);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>[leg3Winner, leg3_45, leg3_bull].forEach(el =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (!el) return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>el.disabled = !enableLeg3;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (!enableLeg3) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (el.type === "checkbox") el.checked = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (el.tagName === "SELECT") el.value = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>[1,2].forEach(n =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (w) w.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (c45) c45.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (b) b.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* 45-dart -&gt; nearest bull visibility */</span></p>
-<p class="p1"><span class="s1">[1,2,3].forEach(n =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const bullArea = document.getElementById(`bull-${n}`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (cb45 &amp;&amp; bullArea) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cb45.addEventListener("change", () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>bullArea.style.display = cb45.checked ? "block" : "none";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Leg winner change listeners */</span></p>
-<p class="p1"><span class="s1">document.querySelectorAll(".leg-winner").forEach(sel =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>sel.addEventListener("change", recalcLegState);</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p1"><span class="s1">/***** SUBMIT MATCH – with correct history mapping + nicknames *****/</span></p>
-<p class="p1"><span class="s1">function submitMatch() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const msg = document.getElementById("msg");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>msg.textContent = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>msg.className = "message message-info";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const c = parseInt(document.getElementById("challenger").value);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const o = parseInt(document.getElementById("opponent").value);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (isNaN(c) || isNaN(o)) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "Select challenger and opponent.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Capture names and nicknames BEFORE any ladder reordering</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const challengerName = ladder[c].name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const challengerNick = ladder[c].nick || null;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const opponentName = ladder[o].name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const opponentNick = ladder[o].nick || null;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const legs = getLegsFromDOM();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const cLegs = legs.filter(l =&gt; l.winner === "challenger").length;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const oLegs = legs.filter(l =&gt; l.winner === "opponent").length;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const totalPlayed = legs.filter(l =&gt; l.winner).length;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Validation: first to 2, max 3 legs</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!(cLegs === 2 || oLegs === 2)) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (totalPlayed &lt; 2 || totalPlayed &gt; 3) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "Invalid leg structure. Must be 2–0 (2 legs) or 2–1 (3 legs).";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (totalPlayed === 3 &amp;&amp; !((cLegs === 2 &amp;&amp; oLegs === 1) || (cLegs === 1 &amp;&amp; oLegs === 2))) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "Invalid 2–1 structure.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (totalPlayed === 2 &amp;&amp; !((cLegs === 2 &amp;&amp; oLegs === 0) || (cLegs === 0 &amp;&amp; oLegs === 2))) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "Invalid 2–0 structure.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// 45-dart rule</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>for (let i = 0; i &lt; legs.length; i++) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const l = legs[i];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (l.reached45 &amp;&amp; !l.bull) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>msg.textContent = `Leg ${i+1} reached 45 darts but nearest bull not confirmed.`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>msg.className = "message message-error";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Winner / loser</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const winnerIndex = cLegs &gt; oLegs ? c : o;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const loserIndex<span class="Apple-converted-space">  </span>= cLegs &gt; oLegs ? o : c;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const winnerName = ladder[winnerIndex].name;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const loserName<span class="Apple-converted-space">  </span>= ladder[loserIndex].name;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const winnerLegs = Math.max(cLegs, oLegs);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const loserLegs<span class="Apple-converted-space">  </span>= Math.min(cLegs, oLegs);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Stats</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[winnerIndex].w++;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[loserIndex].l++;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[winnerIndex].lf += winnerLegs;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[winnerIndex].la += loserLegs;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[loserIndex].lf<span class="Apple-converted-space">  </span>+= loserLegs;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[loserIndex].la<span class="Apple-converted-space">  </span>+= winnerLegs;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const stamp = new Date().toLocaleString();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>ladder[loserIndex].last<span class="Apple-converted-space">  </span>= `L vs ${winnerName} (${stamp})`;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Movement</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>let movementText = "No movement";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (winnerIndex &gt; loserIndex) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const oldPos = winnerIndex + 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const newPos = loserIndex + 1;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const moved = ladder.splice(winnerIndex,1)[0];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ladder.splice(loserIndex,0,moved);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>movementText = `Moved from ${oldPos} to ${newPos}`;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Match record with correct challenger/opponent mapping + nicknames</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const matchRecord = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>challenger: challengerName,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>challengerNick: challengerNick,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>opponent: opponentName,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>opponentNick: opponentNick,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>winner: winnerName,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>loser: loserName,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>legs: legs,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>timestamp: stamp,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>movement: movementText</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>db.ref("history").push(matchRecord);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>saveLadder();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>msg.textContent = "Match recorded and ladder updated.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>msg.className = "message message-info";</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Reset leg UI</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelectorAll(".leg-winner").forEach(sel =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>sel.value = "";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>sel.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelectorAll(".leg-45").forEach(cb =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cb.checked = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cb.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelectorAll(".leg-bull").forEach(cb =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cb.checked = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>cb.disabled = false;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>[1,2,3].forEach(n =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>const bullArea = document.getElementById(`bull-${n}`);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>if (bullArea) bullArea.style.display = "none";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>});</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>// Leg 3 should start disabled again</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelector('.leg-winner[data-leg="3"]').disabled = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelector('.leg-45[data-leg="3"]').disabled = true;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.querySelector('.leg-bull[data-leg="3"]').disabled = true;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>recalcLegState();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Export ladder + history */</span></p>
-<p class="p1"><span class="s1">function exportAll() {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const data = {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>ladder: ladder,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>history: historyCache</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const dataStr = JSON.stringify(data, null, 2);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const blob = new Blob([dataStr], { type: "application/json" });</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const url = URL.createObjectURL(blob);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const a = document.createElement("a");</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>a.href = url;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>a.download = "fox-darts-ladder-and-history-backup.json";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>a.click();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>URL.revokeObjectURL(url);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>document.getElementById("admin-msg").textContent = "Exported ladder + history.";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Import ladder + history */</span></p>
-<p class="p1"><span class="s1">function importAll(event) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const file = event.target.files[0];</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const msg = document.getElementById("admin-msg");</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>if (!file) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>msg.textContent = "No file selected.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>const reader = new FileReader();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>reader.onload = function(e) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>try {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>const imported = JSON.parse(e.target.result);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (typeof imported !== "object" || imported === null) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>msg.textContent = "Invalid file format. Expected an object with ladder and history.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!Array.isArray(imported.ladder) || typeof imported.history !== "object") {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>msg.textContent = "Invalid file format. Missing ladder or history.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>if (!confirm("Importing will replace the current ladder and history for everyone. Continue?")) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>msg.textContent = "Import cancelled.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>return;</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>ladder = imported.ladder.map(p =&gt; ({</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>...p,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>nick: p.nick || null,</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">        </span>delta: 0</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>}));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>previousLadder = JSON.parse(JSON.stringify(ladder));</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>historyCache = imported.history;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>db.ref("ladder").set(ladder);</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>db.ref("history").set(historyCache);</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderLadder();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>renderSelects();</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>msg.textContent = "Ladder and history imported successfully.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>} catch (err) {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">      </span>msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">    </span>}</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>};</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>reader.readAsText(file);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">/* Init */</span></p>
-<p class="p1"><span class="s1">window.addEventListener("load", () =&gt; {</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>renderSelects();</span></p>
-<p class="p1"><span class="s1"><span class="Apple-converted-space">  </span>recalcLegState();</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p2"><span class="s1"></span><br></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt;</span></p>
+<div class="container">
+
+<header>
+  <img src="fox-logo.png" alt="The Fox at Peasemore">
+  <div>
+    <h1>The Fox at Peasemore</h1>
+    <div class="header-sub">Darts Ladder • F1‑Style Live Standings</div>
+    <div style="margin-top:.35rem;">
+      <span class="badge-live">
+        <span class="badge-live-dot"></span>
+        Live Firebase Ladder
+      </span>
+    </div>
+  </div>
+</header>
+
+<div class="nav-card">
+  <div class="nav-left">
+    <span class="nav-dot"></span>
+    <span>Real‑time shared ladder • Match history</span>
+  </div>
+  <div class="nav-buttons">
+    <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
+    <button class="btn-secondary" onclick="showPage('history')">Match History</button>
+    <div class="admin-icon" onclick="toggleAdminPanel()" title="Admin">
+      ⚙
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: LADDER -->
+<div id="page-ladder">
+  <div class="main-grid">
+    <!-- LEFT: Ladder -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ladder Standings</div>
+            <div class="card-sub">Ordered by current position • Lower number = higher rank</div>
+          </div>
+          <div class="chip chip-info">
+            <span>Live</span>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Player</th>
+                <th>W</th>
+                <th>L</th>
+                <th>Legs</th>
+                <th>Last Match</th>
+              </tr>
+            </thead>
+            <tbody id="ladder-body"></tbody>
+          </table>
+        </div>
+
+        <div class="flex" style="margin-top:.8rem; align-items:center;">
+          <div style="flex:1;">
+            <input id="new-player-name" placeholder="Full name">
+          </div>
+          <div style="flex:1;">
+            <input id="new-player-nick" placeholder="Nickname (optional)">
+          </div>
+          <button class="btn-primary" onclick="addPlayer()">Add Player</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Match entry + rules -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Record Ladder Match</div>
+            <div class="card-sub">Best of 3 legs • First to 2 wins • Challenge up to 3 places above</div>
+          </div>
+        </div>
+
+        <div class="flex" style="margin-top:.7rem;">
+          <div style="flex:1;">
+            <div class="small" style="margin-bottom:.25rem;">Challenger (lower ranked)</div>
+            <select id="challenger"></select>
+          </div>
+          <div style="flex:1;">
+            <div class="small" style="margin-bottom:.25rem;">Opponent (up to 3 places above)</div>
+            <select id="opponent"></select>
+          </div>
+        </div>
+
+        <div style="margin-top:1rem;">
+          <div class="card-sub" style="text-transform:none; letter-spacing:0;">Leg Results (first to 2, max 3 legs)</div>
+          <div id="legs-area" style="margin-top:.5rem;">
+
+            <!-- LEG 1 -->
+            <div class="leg-block" id="leg-1">
+              <div class="leg-title">Leg 1</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="1">
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="1" style="width:auto; margin-right:.35rem;">
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-1" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="1" style="width:auto; margin-right:.35rem;">
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
+            <!-- LEG 2 -->
+            <div class="leg-block" id="leg-2">
+              <div class="leg-title">Leg 2</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="2">
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="2" style="width:auto; margin-right:.35rem;">
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-2" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="2" style="width:auto; margin-right:.35rem;">
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
+            <!-- LEG 3 -->
+            <div class="leg-block" id="leg-3">
+              <div class="leg-title">Leg 3</div>
+              <div class="small" style="margin-bottom:.25rem;">Winner</div>
+              <select class="leg-winner" data-leg="3" disabled>
+                <option value="">Select</option>
+                <option value="challenger">Challenger</option>
+                <option value="opponent">Opponent</option>
+              </select>
+
+              <label class="small" style="display:block; margin-top:.45rem;">
+                <input type="checkbox" class="leg-45" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
+                45 darts reached (both players)
+              </label>
+
+              <div class="nearest-bull-area" id="bull-3" style="display:none;">
+                <div class="notice">
+                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
+                </div>
+                <label class="small" style="display:block; margin-top:.35rem;">
+                  <input type="checkbox" class="leg-bull" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
+                  Nearest bull used to decide this leg
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="margin-top:.9rem;">
+          <button class="btn-primary" style="width:100%;" onclick="submitMatch()">Submit Match Result</button>
+        </div>
+
+        <div id="msg" class="message message-info"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Ladder Rules</div>
+            <div class="card-sub">Enforced by honour, witnessed scoring, and this dashboard</div>
+          </div>
+        </div>
+
+        <ul style="line-height:1.6; padding-left:1.1rem; margin:.6rem 0 0 0; font-size:.8rem; color:#d1d5db;">
+          <li><strong>Best of 3 legs</strong> – first to 2 wins.</li>
+          <li><strong>Leg 3 only played</strong> if the first two legs are 1–1.</li>
+          <li><strong>45‑dart rule:</strong> after 45 darts each, decide by one dart nearest the bull.</li>
+          <li><strong>Challenge rule:</strong> you may challenge up to 3 positions above you.</li>
+          <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position; others shift down.</li>
+          <li><strong>New players</strong> always join at the bottom.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: MATCH HISTORY -->
+<div id="page-history" style="display:none;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Match History</div>
+        <div class="card-sub">Chronological log of recorded ladder matches</div>
+      </div>
+      <div class="chip chip-info">
+        <span>Newest First</span>
+      </div>
+    </div>
+
+    <div id="history-list" style="margin-top:.8rem;"></div>
+  </div>
+</div>
+
+<!-- ADMIN SLIDE-IN PANEL -->
+<div id="admin-panel" class="admin-panel">
+  <div class="admin-header">
+    <div class="admin-title">Admin</div>
+    <div class="admin-close" onclick="toggleAdminPanel()">✕</div>
+  </div>
+  <div class="admin-body">
+    <div class="admin-section-title">Resets</div>
+    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetLadderOnly()">Reset Ladder Only</button>
+    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetHistoryOnly()">Reset Match History Only</button>
+    <button class="btn-danger" style="width:100%;" onclick="resetLadderAndHistory()">Reset Ladder & History</button>
+
+    <div class="admin-section-title">Backup & Restore</div>
+    <button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()">Export Ladder + History JSON</button>
+
+    <label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block; margin-bottom:.4rem;">
+      Import Ladder + History JSON
+    </label>
+    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
+
+    <div id="admin-msg" class="message message-info"></div>
+  </div>
+  <div class="admin-footer">
+    Changes here affect everyone using this ladder (shared Firebase backend).
+  </div>
+</div>
+<!-- EDIT PLAYER MODAL -->
+<div id="edit-player-modal" style="
+  position:fixed; top:0; left:0; width:100%; height:100%;
+  background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center;
+  z-index:9999;">
+  <div style="
+    background:#111827; padding:1.2rem; border-radius:12px; width:320px;
+    border:1px solid rgba(148,163,184,0.3); box-shadow:0 0 25px rgba(0,0,0,0.6);">
+    <h3 style="margin-top:0; margin-bottom:.8rem; font-size:1rem;">Edit Player</h3>
+
+    <label class="small">Full Name</label>
+    <input id="edit-player-name" style="margin-bottom:.6rem;">
+
+    <label class="small">Nickname</label>
+    <input id="edit-player-nick" style="margin-bottom:1rem;">
+
+    <div style="display:flex; gap:.6rem;">
+      <button class="btn-primary" style="flex:1;" onclick="savePlayerEdit()">Save</button>
+      <button class="btn-secondary" style="flex:1;" onclick="closeEditPlayer()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</div> <!-- end .container -->
+
+<!-- FIREBASE (COMPAT) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
+  authDomain: "fox-darts-ladder.firebaseapp.com",
+  databaseURL: "https://fox-darts-ladder-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fox-darts-ladder",
+  storageBucket: "fox-darts-ladder.firebasestorage.app",
+  messagingSenderId: "1028079521201",
+  appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+let ladder = [];
+let previousLadder = [];
+let historyCache = {};
+let editIndex = null;
+</script>
+
+<script>
+function showPage(page) {
+  document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
+  document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
+}
+
+function toggleAdminPanel() {
+  const panel = document.getElementById("admin-panel");
+  panel.classList.toggle("open");
+}
+
+/* Render ladder */
+function renderLadder() {
+  const body = document.getElementById("ladder-body");
+  body.innerHTML = "";
+  ladder.forEach((p,i)=>{
+    let arrow = "•";
+    let arrowClass = "pos-same";
+    if (p.delta > 0) { arrow = "▲"; arrowClass = "pos-up"; }
+    else if (p.delta < 0) { arrow = "▼"; arrowClass = "pos-down"; }
+
+    const nameDisplay = p.nick
+      ? `${p.name} <span style="color:#9ca3af; font-size:.75rem;">“${p.nick}”</span>`
+      : p.name;
+
+    body.innerHTML += `
+      <tr>
+        <td class="position">${String(i+1).padStart(2,"0")} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
+        <td class="player-name">
+          ${nameDisplay}
+          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;" onclick="openEditPlayer(${i})">✎</span>
+        </td>
+        <td class="record">${p.w}</td>
+        <td class="record">${p.l}</td>
+        <td class="record">${p.lf}:${p.la}</td>
+        <td class="last">${p.last || "—"}</td>
+      </tr>`;
+  });
+
+  setTimeout(() => {
+    document.querySelectorAll(".pos-arrow").forEach(el => el.classList.add("fade-out"));
+  }, 5000);
+}
+
+/* Ladder listener */
+db.ref("ladder").on("value", snapshot => {
+  const newLadder = snapshot.val() || [];
+
+  newLadder.forEach((player, newIndex) => {
+    const oldIndex = previousLadder.findIndex(p => p.name === player.name);
+    player.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;
+    if (player.w == null) player.w = 0;
+    if (player.l == null) player.l = 0;
+    if (player.lf == null) player.lf = 0;
+    if (player.la == null) player.la = 0;
+    if (player.nick === undefined) player.nick = null;
+  });
+
+  previousLadder = JSON.parse(JSON.stringify(newLadder));
+  ladder = newLadder;
+
+  renderLadder();
+  renderSelects();
+});
+
+/* History listener */
+db.ref("history").on("value", snapshot => {
+  historyCache = snapshot.val() || {};
+  const list = document.getElementById("history-list");
+  list.innerHTML = "";
+
+  const entries = Object.entries(historyCache);
+  if (!entries.length) {
+    list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches recorded yet.</div>`;
+    return;
+  }
+
+  entries.reverse().forEach(([id, m]) => {
+    const challengerLabel = m.challengerNick
+      ? `${m.challenger} “${m.challengerNick}”`
+      : m.challenger;
+    const opponentLabel = m.opponentNick
+      ? `${m.opponent} “${m.opponentNick}”`
+      : m.opponent;
+
+    const winnerLabel = m.winner === m.challenger ? challengerLabel : opponentLabel;
+    const loserLabel  = m.loser  === m.challenger ? challengerLabel : opponentLabel;
+
+    const legsSummary = (m.legs || []).map((l,idx) => {
+      if (!l.winner) return `Leg ${idx+1}: –`;
+      return `Leg ${idx+1}: ${l.winner === "challenger" ? challengerLabel : opponentLabel}`;
+    }).join(" • ");
+
+    list.innerHTML += `
+      <div class="history-item">
+        <div class="history-header">
+          <div class="history-main">
+            <strong>${winnerLabel}</strong> beat <strong>${loserLabel}</strong>
+          </div>
+          <div class="chip chip-info">
+            <span>${m.movement || ""}</span>
+          </div>
+        </div>
+        <div class="history-meta">
+          <div>${m.timestamp || ""}</div>
+          <div style="margin-top:.2rem;">${legsSummary}</div>
+        </div>
+      </div>
+    `;
+  });
+});
+
+function saveLadder() {
+  db.ref("ladder").set(ladder);
+}
+
+/* Resets */
+function resetLadderOnly() {
+  if (!confirm("Reset ladder only? Match history will be kept.")) return;
+  ladder = [];
+  previousLadder = [];
+  db.ref("ladder").set([]);
+  renderLadder();
+  renderSelects();
+  document.getElementById("admin-msg").textContent = "Ladder reset.";
+}
+
+function resetHistoryOnly() {
+  if (!confirm("Reset match history only? Ladder positions will be kept.")) return;
+  historyCache = {};
+  db.ref("history").set({});
+  document.getElementById("history-list").innerHTML = "";
+  document.getElementById("admin-msg").textContent = "Match history reset.";
+}
+
+function resetLadderAndHistory() {
+  if (!confirm("Reset ladder AND match history for everyone?")) return;
+  ladder = [];
+  previousLadder = [];
+  historyCache = {};
+  db.ref("ladder").set([]);
+  db.ref("history").set({});
+  renderLadder();
+  renderSelects();
+  document.getElementById("history-list").innerHTML = "";
+  document.getElementById("admin-msg").textContent = "Ladder and history reset.";
+}
+
+/* Add player with nickname */
+function addPlayer() {
+  const name = document.getElementById("new-player-name").value.trim();
+  const nick = document.getElementById("new-player-nick").value.trim();
+
+  if (!name) return;
+
+  ladder.push({
+    name,
+    nick: nick || null,
+    w: 0,
+    l: 0,
+    lf: 0,
+    la: 0,
+    last: null,
+    delta: 0
+  });
+
+  document.getElementById("new-player-name").value = "";
+  document.getElementById("new-player-nick").value = "";
+
+  saveLadder();
+  renderSelects();
+}
+
+/* Edit player modal */
+function openEditPlayer(i) {
+  editIndex = i;
+  const p = ladder[i];
+
+  document.getElementById("edit-player-name").value = p.name;
+  document.getElementById("edit-player-nick").value = p.nick || "";
+
+  document.getElementById("edit-player-modal").style.display = "flex";
+}
+
+function closeEditPlayer() {
+  document.getElementById("edit-player-modal").style.display = "none";
+  editIndex = null;
+}
+
+function savePlayerEdit() {
+  if (editIndex === null) return;
+
+  const newName = document.getElementById("edit-player-name").value.trim();
+  const newNick = document.getElementById("edit-player-nick").value.trim();
+
+  if (!newName) return;
+
+  ladder[editIndex].name = newName;
+  ladder[editIndex].nick = newNick || null;
+
+  saveLadder();
+  renderLadder();
+  renderSelects();
+
+  closeEditPlayer();
+}
+
+/* Select options */
+function renderSelects() {
+  const c = document.getElementById("challenger");
+  const o = document.getElementById("opponent");
+  if (!c || !o) return;
+
+  const cVal = c.value;
+  const oVal = o.value;
+
+  c.innerHTML = `<option value="">Select challenger</option>`;
+  o.innerHTML = `<option value="">Select opponent</option>`;
+
+  ladder.forEach((p,i)=>{
+    const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
+    c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
+  });
+
+  if (cVal) c.value = cVal;
+  if (oVal) o.value = oVal;
+}
+
+/* Opponent constrained to 3 above */
+document.getElementById("challenger").addEventListener("change", ()=>{
+  const idx = parseInt(document.getElementById("challenger").value);
+  const o = document.getElementById("opponent");
+  o.innerHTML = `<option value="">Select opponent</option>`;
+  ladder.forEach((p,i)=>{
+    if (i < idx && idx - i <= 3) {
+      const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
+      o.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
+    }
+  });
+});
+
+/* Leg helpers */
+function getLegsFromDOM() {
+  return [1,2,3].map(n => {
+    const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;
+    const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;
+    const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+    const bull = bullEl ? bullEl.checked : false;
+    return { winner, reached45, bull };
+  });
+}
+
+/* Recalculate leg state – Leg 3 enabled only if Leg 1 & 2 are 1–1 */
+function recalcLegState() {
+  const legs = getLegsFromDOM();
+
+  const firstTwo = legs.slice(0,2);
+  const cLegsFirstTwo = firstTwo.filter(l => l.winner === "challenger").length;
+  const oLegsFirstTwo = firstTwo.filter(l => l.winner === "opponent").length;
+
+  const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');
+  const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');
+  const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');
+
+  const enableLeg3 = (cLegsFirstTwo === 1 && oLegsFirstTwo === 1);
+
+  [leg3Winner, leg3_45, leg3_bull].forEach(el => {
+    if (!el) return;
+    el.disabled = !enableLeg3;
+    if (!enableLeg3) {
+      if (el.type === "checkbox") el.checked = false;
+      if (el.tagName === "SELECT") el.value = "";
+    }
+  });
+
+  [1,2].forEach(n => {
+    const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+    const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+    if (w) w.disabled = false;
+    if (c45) c45.disabled = false;
+    if (b) b.disabled = false;
+  });
+}
+
+/* 45-dart -> nearest bull visibility */
+[1,2,3].forEach(n => {
+  const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+  const bullArea = document.getElementById(`bull-${n}`);
+  if (cb45 && bullArea) {
+    cb45.addEventListener("change", () => {
+      bullArea.style.display = cb45.checked ? "block" : "none";
+    });
+  }
+});
+
+/* Leg winner change listeners */
+document.querySelectorAll(".leg-winner").forEach(sel => {
+  sel.addEventListener("change", recalcLegState);
+});
+/***** SUBMIT MATCH – with correct history mapping + nicknames *****/
+function submitMatch() {
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+  msg.className = "message message-info";
+
+  const c = parseInt(document.getElementById("challenger").value);
+  const o = parseInt(document.getElementById("opponent").value);
+  if (isNaN(c) || isNaN(o)) {
+    msg.textContent = "Select challenger and opponent.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  // Capture names and nicknames BEFORE any ladder reordering
+  const challengerName = ladder[c].name;
+  const challengerNick = ladder[c].nick || null;
+  const opponentName = ladder[o].name;
+  const opponentNick = ladder[o].nick || null;
+
+  const legs = getLegsFromDOM();
+  const cLegs = legs.filter(l => l.winner === "challenger").length;
+  const oLegs = legs.filter(l => l.winner === "opponent").length;
+  const totalPlayed = legs.filter(l => l.winner).length;
+
+  // Validation: first to 2, max 3 legs
+  if (!(cLegs === 2 || oLegs === 2)) {
+    msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  if (totalPlayed < 2 || totalPlayed > 3) {
+    msg.textContent = "Invalid leg structure. Must be 2–0 (2 legs) or 2–1 (3 legs).";
+    msg.className = "message message-error";
+    return;
+  }
+
+  if (totalPlayed === 3 && !((cLegs === 2 && oLegs === 1) || (cLegs === 1 && oLegs === 2))) {
+    msg.textContent = "Invalid 2–1 structure.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  if (totalPlayed === 2 && !((cLegs === 2 && oLegs === 0) || (cLegs === 0 && oLegs === 2))) {
+    msg.textContent = "Invalid 2–0 structure.";
+    msg.className = "message message-error";
+    return;
+  }
+
+  // 45-dart rule
+  for (let i = 0; i < legs.length; i++) {
+    const l = legs[i];
+    if (l.reached45 && !l.bull) {
+      msg.textContent = `Leg ${i+1} reached 45 darts but nearest bull not confirmed.`;
+      msg.className = "message message-error";
+      return;
+    }
+  }
+
+  // Winner / loser
+  const winnerIndex = cLegs > oLegs ? c : o;
+  const loserIndex  = cLegs > oLegs ? o : c;
+  const winnerName = ladder[winnerIndex].name;
+  const loserName  = ladder[loserIndex].name;
+
+  const winnerLegs = Math.max(cLegs, oLegs);
+  const loserLegs  = Math.min(cLegs, oLegs);
+
+  // Stats
+  ladder[winnerIndex].w++;
+  ladder[loserIndex].l++;
+  ladder[winnerIndex].lf += winnerLegs;
+  ladder[winnerIndex].la += loserLegs;
+  ladder[loserIndex].lf  += loserLegs;
+  ladder[loserIndex].la  += winnerLegs;
+
+  const stamp = new Date().toLocaleString();
+  ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;
+  ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
+
+  // Movement
+  let movementText = "No movement";
+  if (winnerIndex > loserIndex) {
+    const oldPos = winnerIndex + 1;
+    const newPos = loserIndex + 1;
+    const moved = ladder.splice(winnerIndex,1)[0];
+    ladder.splice(loserIndex,0,moved);
+    movementText = `Moved from ${oldPos} to ${newPos}`;
+  }
+
+  // Match record with correct challenger/opponent mapping + nicknames
+  const matchRecord = {
+    challenger: challengerName,
+    challengerNick: challengerNick,
+    opponent: opponentName,
+    opponentNick: opponentNick,
+    winner: winnerName,
+    loser: loserName,
+    legs: legs,
+    timestamp: stamp,
+    movement: movementText
+  };
+
+  db.ref("history").push(matchRecord);
+  saveLadder();
+
+  msg.textContent = "Match recorded and ladder updated.";
+  msg.className = "message message-info";
+
+  // Reset leg UI
+  document.querySelectorAll(".leg-winner").forEach(sel => {
+    sel.value = "";
+    sel.disabled = false;
+  });
+  document.querySelectorAll(".leg-45").forEach(cb => {
+    cb.checked = false;
+    cb.disabled = false;
+  });
+  document.querySelectorAll(".leg-bull").forEach(cb => {
+    cb.checked = false;
+    cb.disabled = false;
+  });
+  [1,2,3].forEach(n => {
+    const bullArea = document.getElementById(`bull-${n}`);
+    if (bullArea) bullArea.style.display = "none";
+  });
+
+  // Leg 3 should start disabled again
+  document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-45[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
+
+  recalcLegState();
+}
+
+/* Export ladder + history */
+function exportAll() {
+  const data = {
+    ladder: ladder,
+    history: historyCache
+  };
+  const dataStr = JSON.stringify(data, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "fox-darts-ladder-and-history-backup.json";
+  a.click();
+
+  URL.revokeObjectURL(url);
+  document.getElementById("admin-msg").textContent = "Exported ladder + history.";
+}
+
+/* Import ladder + history */
+function importAll(event) {
+  const file = event.target.files[0];
+  const msg = document.getElementById("admin-msg");
+
+  if (!file) {
+    msg.textContent = "No file selected.";
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+
+      if (typeof imported !== "object" || imported === null) {
+        msg.textContent = "Invalid file format. Expected an object with ladder and history.";
+        return;
+      }
+
+      if (!Array.isArray(imported.ladder) || typeof imported.history !== "object") {
+        msg.textContent = "Invalid file format. Missing ladder or history.";
+        return;
+      }
+
+      if (!confirm("Importing will replace the current ladder and history for everyone. Continue?")) {
+        msg.textContent = "Import cancelled.";
+        return;
+      }
+
+      ladder = imported.ladder.map(p => ({
+        ...p,
+        nick: p.nick || null,
+        delta: 0
+      }));
+      previousLadder = JSON.parse(JSON.stringify(ladder));
+      historyCache = imported.history;
+
+      db.ref("ladder").set(ladder);
+      db.ref("history").set(historyCache);
+
+      renderLadder();
+      renderSelects();
+
+      msg.textContent = "Ladder and history imported successfully.";
+    } catch (err) {
+      msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";
+    }
+  };
+
+  reader.readAsText(file);
+}
+
+/* Init */
+window.addEventListener("load", () => {
+  renderSelects();
+  recalcLegState();
+});
+</script>
+
 </body>
 </html>
