@@ -10,9 +10,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+/* -----------------------------------------------------------
+   CLEAN REBUILD — MINIMAL & PREMIUM F1‑STYLE THEME
+   ----------------------------------------------------------- */
+
 :root {
   --bg: #05070a;
-  --bg-alt: #0b0f16;
   --panel: #0f141d;
   --panel-soft: #151b26;
   --border: #1f2933;
@@ -20,18 +23,13 @@
   --muted: #6b7280;
   --accent: #ff8a1f;
   --accent-soft: rgba(255,138,31,0.18);
-  --accent-strong: #ffb347;
-  --danger: #ff4b5c;
-  --danger-soft: rgba(255,75,92,0.18);
-  --success: #22c55e;
-  --success-soft: rgba(34,197,94,0.18);
   --cyan: #00e5ff;
+  --success: #22c55e;
+  --danger: #ff4b5c;
   --radius: 12px;
   --shadow: 0 18px 45px rgba(0,0,0,0.65);
-  --font: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font: "Inter", system-ui, sans-serif;
 }
-
-* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -46,7 +44,7 @@ body {
   margin: auto;
 }
 
-/* Header */
+/* HEADER */
 header {
   display: flex;
   align-items: center;
@@ -97,7 +95,7 @@ h1 {
   box-shadow: 0 0 10px #f97373;
 }
 
-/* Nav */
+/* NAV */
 .nav-card {
   background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.85));
   border-radius: var(--radius);
@@ -133,30 +131,7 @@ h1 {
   gap: .4rem;
 }
 
-/* Admin icon */
-.admin-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 999px;
-  border: 1px solid rgba(148,163,184,0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #e5e7eb;
-  cursor: pointer;
-  margin-left: .4rem;
-  background: rgba(15,23,42,0.9);
-  transition: all .16s ease-out;
-  font-size: 1rem;
-}
-
-.admin-icon:hover {
-  border-color: var(--cyan);
-  color: var(--cyan);
-  box-shadow: 0 0 18px rgba(56,189,248,0.7);
-}
-
-/* Buttons */
+/* BUTTONS */
 button {
   padding: .55rem 1.1rem;
   border-radius: 999px;
@@ -170,14 +145,9 @@ button {
 }
 
 .btn-primary {
-  background: radial-gradient(circle at top, var(--accent-strong), var(--accent));
+  background: radial-gradient(circle at top, var(--accent), #ff7a00);
   color: #111827;
   box-shadow: 0 0 18px rgba(255,138,31,0.55);
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 26px rgba(255,138,31,0.75);
 }
 
 .btn-secondary {
@@ -186,71 +156,13 @@ button {
   border-color: rgba(148,163,184,0.4);
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent);
-  box-shadow: 0 0 16px rgba(148,163,184,0.35);
-}
-
-.btn-danger {
-  background: rgba(127,29,29,0.9);
-  color: #fecaca;
-  border-color: rgba(248,113,113,0.6);
-}
-
-.btn-danger:hover {
-  box-shadow: 0 0 18px rgba(248,113,113,0.7);
-}
-
-/* Cards */
-.card {
-  background: radial-gradient(circle at top left, rgba(148,163,184,0.12), transparent 55%),
-              linear-gradient(145deg, var(--panel), var(--panel-soft));
-  padding: 1.1rem 1.2rem;
-  border-radius: var(--radius);
-  border: 1px solid rgba(148,163,184,0.25);
-  box-shadow: var(--shadow);
-  margin-top: 1rem;
-}
-
-.card-header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: .6rem;
-}
-
-.card-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  letter-spacing: .12em;
-  text-transform: uppercase;
-}
-
-.card-sub {
-  font-size: .75rem;
-  color: var(--muted);
-}
-
-/* Layout grid */
-.main-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: 1rem;
-}
-
-@media (max-width: 900px) {
-  .main-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/* Table / Ladder */
+/* TABLE */
 .table-wrapper {
   margin-top: .6rem;
   border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(55,65,81,0.8);
-  background: radial-gradient(circle at top, rgba(15,23,42,0.9), rgba(15,23,42,0.98));
+  background: rgba(15,23,42,0.95);
 }
 
 table {
@@ -270,208 +182,20 @@ th {
   font-size: .7rem;
   text-transform: uppercase;
   letter-spacing: .16em;
-  background: linear-gradient(to right, rgba(15,23,42,0.95), rgba(15,23,42,0.8));
-}
-
-tbody tr {
-  transition: background .12s ease-out, box-shadow .12s ease-out;
-}
-
-tbody tr:nth-child(even) {
-  background: rgba(15,23,42,0.9);
-}
-
-tbody tr:nth-child(odd) {
-  background: rgba(15,23,42,0.96);
 }
 
 tbody tr:hover {
   background: rgba(30,64,175,0.55);
-  box-shadow: inset 0 0 0 1px rgba(191,219,254,0.4);
 }
 
-td.position {
-  color: var(--cyan);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-td.player-name {
-  font-weight: 500;
-}
-
-td.record {
-  font-variant-numeric: tabular-nums;
-}
-
-td.last {
-  font-size: .75rem;
-  color: #9ca3af;
-}
-
-/* Position arrows */
-.pos-arrow {
+/* ACHIEVEMENT STAR */
+.ach-star {
+  color: #fbbf24;
   margin-left: 6px;
-  font-size: .75rem;
-  opacity: 1;
-  transition: all .6s ease;
+  font-size: .8rem;
 }
 
-.pos-up {
-  color: #22c55e;
-  text-shadow: 0 0 8px rgba(34,197,94,0.8);
-  animation: slideUp .6s ease;
-}
-
-.pos-down {
-  color: #ff4b5c;
-  text-shadow: 0 0 8px rgba(255,75,92,0.8);
-  animation: slideDown .6s ease;
-}
-
-.pos-same {
-  color: #6b7280;
-}
-
-.fade-out {
-  opacity: 0;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(6px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes slideDown {
-  from { transform: translateY(-6px); opacity: 0; }
-  to   { transform: translateY(0); opacity: 1; }
-}
-
-/* Inputs */
-input, select {
-  width: 100%;
-  padding: .55rem .6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(55,65,81,0.9);
-  background: rgba(15,23,42,0.95);
-  color: var(--text);
-  font-size: .85rem;
-  outline: none;
-  transition: border .12s ease-out, box-shadow .12s ease-out, background .12s ease-out;
-}
-
-input::placeholder {
-  color: #6b7280;
-}
-
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-soft), 0 0 18px rgba(255,138,31,0.45);
-  background: rgba(15,23,42,1);
-}
-
-/* Flex helpers */
-.flex {
-  display: flex;
-  gap: .7rem;
-  flex-wrap: wrap;
-}
-
-.flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.small {
-  font-size: .75rem;
-  color: var(--muted);
-}
-
-/* Leg blocks */
-.leg-block {
-  background: rgba(15,23,42,0.95);
-  padding: .8rem .9rem;
-  border-radius: 10px;
-  border: 1px solid rgba(55,65,81,0.9);
-  margin-bottom: .6rem;
-  position: relative;
-}
-
-.leg-title {
-  font-size: .75rem;
-  text-transform: uppercase;
-  letter-spacing: .16em;
-  color: #9ca3af;
-  margin-bottom: .35rem;
-}
-
-.notice {
-  background: rgba(15,23,42,0.95);
-  border-left: 3px solid var(--accent);
-  padding: .45rem .6rem;
-  border-radius: 8px;
-  margin-top: .4rem;
-  font-size: .75rem;
-  color: #e5e7eb;
-}
-
-/* Chips */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: .3rem;
-  padding: .2rem .55rem;
-  border-radius: 999px;
-  font-size: .7rem;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-
-.chip-info {
-  background: rgba(15,23,42,0.9);
-  border: 1px solid rgba(148,163,184,0.5);
-  color: #e5e7eb;
-}
-
-/* History */
-.history-item {
-  margin-bottom: .9rem;
-  padding-bottom: .7rem;
-  border-bottom: 1px dashed rgba(55,65,81,0.9);
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: .5rem;
-}
-
-.history-main {
-  font-size: .85rem;
-}
-
-.history-meta {
-  font-size: .7rem;
-  color: #9ca3af;
-}
-
-/* Messages */
-.message {
-  margin-top: .45rem;
-  font-size: .75rem;
-}
-
-.message-info {
-  color: #bfdbfe;
-}
-
-.message-error {
-  color: #fecaca;
-}
-
-/* Admin / profile slide-in panel */
+/* SLIDE-IN PANELS */
 .admin-panel {
   position: fixed;
   top: 0;
@@ -479,7 +203,7 @@ input:focus, select:focus {
   width: 320px;
   max-width: 90vw;
   height: 100vh;
-  background: radial-gradient(circle at top, #111827, #020617);
+  background: #0f141d;
   border-left: 1px solid rgba(148,163,184,0.4);
   box-shadow: -18px 0 45px rgba(0,0,0,0.8);
   transform: translateX(100%);
@@ -513,6 +237,12 @@ input:focus, select:focus {
   color: #9ca3af;
 }
 
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: .3rem;
+}
+
 .admin-section-title {
   font-size: .8rem;
   text-transform: uppercase;
@@ -522,16 +252,23 @@ input:focus, select:focus {
   margin-bottom: .3rem;
 }
 
-.admin-body {
-  flex: 1;
-  overflow-y: auto;
-  padding-right: .3rem;
-}
-
 .admin-footer {
   margin-top: .8rem;
   font-size: .7rem;
   color: #6b7280;
+}
+
+/* PROFILE PANEL */
+#player-profile-panel .badge {
+  display: inline-block;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.6);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: .2rem;
 }
 </style>
 </head>
@@ -560,281 +297,120 @@ input:focus, select:focus {
   </div>
   <div class="nav-buttons">
     <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
-    <button class="btn-secondary" onclick="showPage('history')">Match History</button>
-    <div class="admin-icon" onclick="toggleAdminPanel()" title="Admin">
-      ⚙
-    </div>
+    <button class="btn-secondary" onclick="showPage('history')">History</button>
+    <div class="admin-icon" onclick="toggleAdminPanel()" title="Admin">⚙</div>
   </div>
 </div>
 
-<!-- PAGE: LADDER -->
+<!-- LADDER PAGE -->
 <div id="page-ladder">
-  <div class="main-grid">
-    <!-- LEFT: Ladder -->
-    <div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Ladder Standings</div>
-            <div class="card-sub">Ordered by current position • Lower number = higher rank</div>
-          </div>
-          <div class="chip chip-info">
-            <span>Live</span>
-          </div>
-        </div>
-
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Player</th>
-                <th>W</th>
-                <th>L</th>
-                <th>Legs</th>
-                <th>Last Match</th>
-              </tr>
-            </thead>
-            <tbody id="ladder-body"></tbody>
-          </table>
-        </div>
-
-        <div class="flex" style="margin-top:.8rem; align-items:center;">
-          <div style="flex:1;">
-            <input id="new-player-name" placeholder="Full name">
-          </div>
-          <div style="flex:1;">
-            <input id="new-player-nick" placeholder="Nickname (optional)">
-          </div>
-          <button class="btn-primary" onclick="addPlayer()">Add Player</button>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Ladder Standings</div>
+        <div class="card-sub">Ordered by current position</div>
       </div>
     </div>
 
-    <!-- RIGHT: Match entry + rules -->
-    <div>
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Record Ladder Match</div>
-            <div class="card-sub">Best of 3 legs • First to 2 wins • Challenge up to 3 places above</div>
-          </div>
-        </div>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>W</th>
+            <th>L</th>
+            <th>Legs</th>
+            <th>Last</th>
+          </tr>
+        </thead>
+        <tbody id="ladder-body"></tbody>
+      </table>
+    </div>
 
-        <div class="flex" style="margin-top:.7rem;">
-          <div style="flex:1;">
-            <div class="small" style="margin-bottom:.25rem;">Challenger (lower ranked)</div>
-            <select id="challenger"></select>
-          </div>
-          <div style="flex:1;">
-            <div class="small" style="margin-bottom:.25rem;">Opponent (up to 3 places above)</div>
-            <select id="opponent"></select>
-          </div>
-        </div>
+    <div class="flex" style="margin-top:.8rem; align-items:center;">
+      <input id="new-player-name" placeholder="Full name" style="flex:1;">
+      <input id="new-player-nick" placeholder="Nickname (optional)" style="flex:1;">
+      <button class="btn-primary" onclick="addPlayer()">Add</button>
+    </div>
+  </div>
 
-        <div style="margin-top:1rem;">
-          <div class="card-sub" style="text-transform:none; letter-spacing:0;">Leg Results (first to 2, max 3 legs)</div>
-          <div id="legs-area" style="margin-top:.5rem;">
-
-            <!-- LEG 1 -->
-            <div class="leg-block" id="leg-1">
-              <div class="leg-title">Leg 1</div>
-              <div class="small" style="margin-bottom:.25rem;">Winner</div>
-              <select class="leg-winner" data-leg="1">
-                <option value="">Select</option>
-                <option value="challenger">Challenger</option>
-                <option value="opponent">Opponent</option>
-              </select>
-
-              <label class="small" style="display:block; margin-top:.45rem;">
-                <input type="checkbox" class="leg-45" data-leg="1" style="width:auto; margin-right:.35rem;">
-                45 darts reached (both players)
-              </label>
-
-              <div class="nearest-bull-area" id="bull-1" style="display:none;">
-                <div class="notice">
-                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
-                </div>
-                <label class="small" style="display:block; margin-top:.35rem;">
-                  <input type="checkbox" class="leg-bull" data-leg="1" style="width:auto; margin-right:.35rem;">
-                  Nearest bull used to decide this leg
-                </label>
-              </div>
-            </div>
-
-            <!-- LEG 2 -->
-            <div class="leg-block" id="leg-2">
-              <div class="leg-title">Leg 2</div>
-              <div class="small" style="margin-bottom:.25rem;">Winner</div>
-              <select class="leg-winner" data-leg="2">
-                <option value="">Select</option>
-                <option value="challenger">Challenger</option>
-                <option value="opponent">Opponent</option>
-              </select>
-
-              <label class="small" style="display:block; margin-top:.45rem;">
-                <input type="checkbox" class="leg-45" data-leg="2" style="width:auto; margin-right:.35rem;">
-                45 darts reached (both players)
-              </label>
-
-              <div class="nearest-bull-area" id="bull-2" style="display:none;">
-                <div class="notice">
-                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
-                </div>
-                <label class="small" style="display:block; margin-top:.35rem;">
-                  <input type="checkbox" class="leg-bull" data-leg="2" style="width:auto; margin-right:.35rem;">
-                  Nearest bull used to decide this leg
-                </label>
-              </div>
-            </div>
-
-            <!-- LEG 3 -->
-            <div class="leg-block" id="leg-3">
-              <div class="leg-title">Leg 3</div>
-              <div class="small" style="margin-bottom:.25rem;">Winner</div>
-              <select class="leg-winner" data-leg="3" disabled>
-                <option value="">Select</option>
-                <option value="challenger">Challenger</option>
-                <option value="opponent">Opponent</option>
-              </select>
-
-              <label class="small" style="display:block; margin-top:.45rem;">
-                <input type="checkbox" class="leg-45" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
-                45 darts reached (both players)
-              </label>
-
-              <div class="nearest-bull-area" id="bull-3" style="display:none;">
-                <div class="notice">
-                  After 45 darts each, the leg MUST be decided by a single dart nearest the bull.
-                </div>
-                <label class="small" style="display:block; margin-top:.35rem;">
-                  <input type="checkbox" class="leg-bull" data-leg="3" style="width:auto; margin-right:.35rem;" disabled>
-                  Nearest bull used to decide this leg
-                </label>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-        <div style="margin-top:.9rem;">
-          <button class="btn-primary" style="width:100%;" onclick="submitMatch()">Submit Match Result</button>
-        </div>
-
-        <div id="msg" class="message message-info"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div>
-            <div class="card-title">Ladder Rules</div>
-            <div class="card-sub">Enforced by honour, witnessed scoring, and this dashboard</div>
-          </div>
-        </div>
-
-        <ul style="line-height:1.6; padding-left:1.1rem; margin:.6rem 0 0 0; font-size:.8rem; color:#d1d5db;">
-          <li><strong>Best of 3 legs</strong> – first to 2 wins.</li>
-          <li><strong>Leg 3 only played</strong> if the first two legs are 1–1.</li>
-          <li><strong>45‑dart rule:</strong> after 45 darts each, decide by one dart nearest the bull.</li>
-          <li><strong>Challenge rule:</strong> you may challenge up to 3 positions above you.</li>
-          <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position; others shift down.</li>
-          <li><strong>New players</strong> always join at the bottom.</li>
-        </ul>
+  <!-- MATCH ENTRY -->
+  <div class="card" style="margin-top:1rem;">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Record Match</div>
+        <div class="card-sub">Best of 3 • Challenge up to 3 places above</div>
       </div>
     </div>
+
+    <div class="flex" style="margin-top:.7rem;">
+      <select id="challenger" style="flex:1;"></select>
+      <select id="opponent" style="flex:1;"></select>
+    </div>
+
+    <div id="legs-area" style="margin-top:1rem;"></div>
+
+    <button class="btn-primary" style="width:100%; margin-top:1rem;" onclick="submitMatch()">Submit</button>
+    <div id="msg" class="small" style="margin-top:.5rem;"></div>
   </div>
 </div>
 
-<!-- PAGE: MATCH HISTORY -->
+<!-- HISTORY PAGE -->
 <div id="page-history" style="display:none;">
   <div class="card">
     <div class="card-header">
       <div>
         <div class="card-title">Match History</div>
-        <div class="card-sub">Chronological log of recorded ladder matches</div>
-      </div>
-      <div class="chip chip-info">
-        <span>Newest First</span>
+        <div class="card-sub">Newest first</div>
       </div>
     </div>
-
-    <div id="history-list" style="margin-top:.8rem;"></div>
+    <div id="history-list" style="margin-top:1rem;"></div>
   </div>
 </div>
 
-<!-- ADMIN SLIDE-IN PANEL -->
+<!-- ADMIN PANEL -->
 <div id="admin-panel" class="admin-panel">
   <div class="admin-header">
     <div class="admin-title">Admin</div>
     <div class="admin-close" onclick="toggleAdminPanel()">✕</div>
   </div>
   <div class="admin-body">
-    <div class="admin-section-title">Resets</div>
-    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetLadderOnly()">Reset Ladder Only</button>
-    <button class="btn-danger" style="width:100%; margin-bottom:.4rem;" onclick="resetHistoryOnly()">Reset Match History Only</button>
-    <button class="btn-danger" style="width:100%;" onclick="resetLadderAndHistory()">Reset Ladder & History</button>
+    <div class="admin-section-title">Reset</div>
+    <button class="btn-secondary" style="width:100%;" onclick="resetLadderOnly()">Reset Ladder</button>
+    <button class="btn-secondary" style="width:100%; margin-top:.4rem;" onclick="resetHistoryOnly()">Reset History</button>
+    <button class="btn-secondary" style="width:100%; margin-top:.4rem;" onclick="resetAll()">Reset All</button>
 
-    <div class="admin-section-title">Backup & Restore</div>
-    <button class="btn-secondary" style="width:100%; margin-bottom:.4rem;" onclick="exportAll()">Export Ladder + History JSON</button>
+    <div class="admin-section-title">Backup</div>
+    <button class="btn-secondary" style="width:100%;" onclick="exportAll()">Export JSON</button>
 
-    <label for="importFile" class="btn-secondary" style="width:100%; text-align:center; cursor:pointer; display:inline-block; margin-bottom:.4rem;">
-      Import Ladder + History JSON
+    <label class="btn-secondary" style="width:100%; margin-top:.4rem; text-align:center; cursor:pointer;">
+      Import JSON
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
     </label>
-    <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
 
-    <div id="admin-msg" class="message message-info"></div>
+    <div id="admin-msg" class="small" style="margin-top:.5rem;"></div>
   </div>
-  <div class="admin-footer">
-    Changes here affect everyone using this ladder (shared Firebase backend).
-  </div>
+  <div class="admin-footer">Shared Firebase backend</div>
 </div>
 
 <!-- PLAYER PROFILE PANEL -->
-<div id="player-profile-panel" class="admin-panel" style="z-index:60; border-left:1px solid rgba(148,163,184,0.4);">
+<div id="player-profile-panel" class="admin-panel" style="z-index:60;">
   <div class="admin-header">
-    <div class="admin-title" id="pp-name">Player Profile</div>
+    <div class="admin-title" id="pp-name">Player</div>
     <div class="admin-close" onclick="closePlayerProfile()">✕</div>
   </div>
-
-  <div class="admin-body" id="pp-body">
-    <!-- Filled dynamically -->
-  </div>
-
-  <div class="admin-footer">
-    Player statistics generated from match history.
-  </div>
+  <div class="admin-body" id="pp-body"></div>
+  <div class="admin-footer">Stats generated from match history</div>
 </div>
-
-<!-- EDIT PLAYER MODAL -->
-<div id="edit-player-modal" style="
-  position:fixed; top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center;
-  z-index:9999;">
-  <div style="
-    background:#111827; padding:1.2rem; border-radius:12px; width:320px;
-    border:1px solid rgba(148,163,184,0.3); box-shadow:0 0 25px rgba(0,0,0,0.6);">
-    <h3 style="margin-top:0; margin-bottom:.8rem; font-size:1rem;">Edit Player</h3>
-
-    <label class="small">Full Name</label>
-    <input id="edit-player-name" style="margin-bottom:.6rem;">
-
-    <label class="small">Nickname</label>
-    <input id="edit-player-nick" style="margin-bottom:1rem;">
-
-    <div style="display:flex; gap:.6rem;">
-      <button class="btn-primary" style="flex:1;" onclick="savePlayerEdit()">Save</button>
-      <button class="btn-secondary" style="flex:1;" onclick="closeEditPlayer()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-</div> <!-- end .container -->
-
-<!-- FIREBASE (COMPAT) -->
+<!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
+/* -----------------------------------------------------------
+   FIREBASE INITIALISATION
+   ----------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
   authDomain: "fox-darts-ladder.firebaseapp.com",
@@ -848,66 +424,78 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
+/* -----------------------------------------------------------
+   GLOBAL STATE
+   ----------------------------------------------------------- */
 let ladder = [];
 let previousLadder = [];
 let historyCache = {};
 let editIndex = null;
 
+/* -----------------------------------------------------------
+   PAGE SWITCHING
+   ----------------------------------------------------------- */
 function showPage(page) {
   document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
 }
 
+/* -----------------------------------------------------------
+   ADMIN PANEL
+   ----------------------------------------------------------- */
 function toggleAdminPanel() {
-  const panel = document.getElementById("admin-panel");
-  panel.classList.toggle("open");
+  document.getElementById("admin-panel").classList.toggle("open");
 }
 
-/* Render ladder */
+/* -----------------------------------------------------------
+   RENDER LADDER
+   ----------------------------------------------------------- */
 function renderLadder() {
   const body = document.getElementById("ladder-body");
   body.innerHTML = "";
-  ladder.forEach((p,i)=>{
-    let arrow = "•";
-    let arrowClass = "pos-same";
-    if (p.delta > 0) { arrow = "▲"; arrowClass = "pos-up"; }
-    else if (p.delta < 0) { arrow = "▼"; arrowClass = "pos-down"; }
 
+  ladder.forEach((p, i) => {
     const nameDisplay = p.nick
       ? `${p.name} <span style="color:#9ca3af; font-size:.75rem;">“${p.nick}”</span>`
       : p.name;
 
+    // Achievement star (computed later in Part 3)
+    const stats = computeAdvancedStats(p.name);
+    const hasAch = computeAchievements(stats).length > 0;
+    const star = hasAch ? `<span class="ach-star">★</span>` : "";
+
     body.innerHTML += `
       <tr>
-        <td class="position">${String(i+1).padStart(2,"0")} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
-        <td class="player-name" style="cursor:pointer;" onclick="openPlayerProfile(${i})">
-          ${nameDisplay}
-          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;" onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
+        <td>${i+1}</td>
+        <td style="cursor:pointer;" onclick="openPlayerProfile(${i})">
+          ${nameDisplay}${star}
+          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;"
+                onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
         </td>
-        <td class="record">${p.w}</td>
-        <td class="record">${p.l}</td>
-        <td class="record">${p.lf}:${p.la}</td>
-        <td class="last">${p.last || "—"}</td>
-      </tr>`;
+        <td>${p.w}</td>
+        <td>${p.l}</td>
+        <td>${p.lf}:${p.la}</td>
+        <td>${p.last || "—"}</td>
+      </tr>
+    `;
   });
-
-  setTimeout(() => {
-    document.querySelectorAll(".pos-arrow").forEach(el => el.classList.add("fade-out"));
-  }, 5000);
 }
 
-/* Ladder listener */
-db.ref("ladder").on("value", snapshot => {
-  const newLadder = snapshot.val() || [];
+/* -----------------------------------------------------------
+   LADDER LISTENER
+   ----------------------------------------------------------- */
+db.ref("ladder").on("value", snap => {
+  const newLadder = snap.val() || [];
 
-  newLadder.forEach((player, newIndex) => {
-    const oldIndex = previousLadder.findIndex(p => p.name === player.name);
-    player.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;
-    if (player.w == null) player.w = 0;
-    if (player.l == null) player.l = 0;
-    if (player.lf == null) player.lf = 0;
-    if (player.la == null) player.la = 0;
-    if (player.nick === undefined) player.nick = null;
+  newLadder.forEach((p, newIndex) => {
+    const oldIndex = previousLadder.findIndex(x => x.name === p.name);
+    p.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;
+
+    p.w ??= 0;
+    p.l ??= 0;
+    p.lf ??= 0;
+    p.la ??= 0;
+    p.nick ??= null;
   });
 
   previousLadder = JSON.parse(JSON.stringify(newLadder));
@@ -917,90 +505,53 @@ db.ref("ladder").on("value", snapshot => {
   renderSelects();
 });
 
-/* History listener */
-db.ref("history").on("value", snapshot => {
-  historyCache = snapshot.val() || {};
+/* -----------------------------------------------------------
+   HISTORY LISTENER
+   ----------------------------------------------------------- */
+db.ref("history").on("value", snap => {
+  historyCache = snap.val() || {};
   const list = document.getElementById("history-list");
   list.innerHTML = "";
 
   const entries = Object.entries(historyCache);
   if (!entries.length) {
-    list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches recorded yet.</div>`;
+    list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches yet.</div>`;
     return;
   }
 
   entries.reverse().forEach(([id, m]) => {
-    const challengerLabel = m.challengerNick
-      ? `${m.challenger} “${m.challengerNick}”`
-      : m.challenger;
-    const opponentLabel = m.opponentNick
-      ? `${m.opponent} “${m.opponentNick}”`
-      : m.opponent;
+    const cName = m.challengerNick ? `${m.challenger} “${m.challengerNick}”` : m.challenger;
+    const oName = m.opponentNick ? `${m.opponent} “${m.opponentNick}”` : m.opponent;
 
-    const winnerLabel = m.winner === m.challenger ? challengerLabel : opponentLabel;
-    const loserLabel  = m.loser  === m.challenger ? challengerLabel : opponentLabel;
+    const winner = m.winner === m.challenger ? cName : oName;
+    const loser  = m.loser  === m.challenger ? cName : oName;
 
-    const legsSummary = (m.legs || []).map((l,idx) => {
-      if (!l.winner) return `Leg ${idx+1}: –`;
-      return `Leg ${idx+1}: ${l.winner === "challenger" ? challengerLabel : opponentLabel}`;
+    const legs = m.legs.map((l, i) => {
+      if (!l.winner) return `Leg ${i+1}: –`;
+      const w = l.winner === "challenger" ? cName : oName;
+      return `Leg ${i+1}: ${w}`;
     }).join(" • ");
 
     list.innerHTML += `
-      <div class="history-item">
-        <div class="history-header">
-          <div class="history-main">
-            <strong>${winnerLabel}</strong> beat <strong>${loserLabel}</strong>
-          </div>
-          <div class="chip chip-info">
-            <span>${m.movement || ""}</span>
-          </div>
-        </div>
-        <div class="history-meta">
-          <div>${m.timestamp || ""}</div>
-          <div style="margin-top:.2rem;">${legsSummary}</div>
-        </div>
+      <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px dashed rgba(55,65,81,0.7);">
+        <div><strong>${winner}</strong> beat <strong>${loser}</strong></div>
+        <div class="small" style="color:#9ca3af;">${m.timestamp}</div>
+        <div class="small" style="margin-top:.3rem;">${legs}</div>
       </div>
     `;
   });
 });
 
+/* -----------------------------------------------------------
+   SAVE LADDER
+   ----------------------------------------------------------- */
 function saveLadder() {
   db.ref("ladder").set(ladder);
 }
 
-/* Resets */
-function resetLadderOnly() {
-  if (!confirm("Reset ladder only? Match history will be kept.")) return;
-  ladder = [];
-  previousLadder = [];
-  db.ref("ladder").set([]);
-  renderLadder();
-  renderSelects();
-  document.getElementById("admin-msg").textContent = "Ladder reset.";
-}
-
-function resetHistoryOnly() {
-  if (!confirm("Reset match history only? Ladder positions will be kept.")) return;
-  historyCache = {};
-  db.ref("history").set({});
-  document.getElementById("history-list").innerHTML = "";
-  document.getElementById("admin-msg").textContent = "Match history reset.";
-}
-
-function resetLadderAndHistory() {
-  if (!confirm("Reset ladder AND match history for everyone?")) return;
-  ladder = [];
-  previousLadder = [];
-  historyCache = {};
-  db.ref("ladder").set([]);
-  db.ref("history").set({});
-  renderLadder();
-  renderSelects();
-  document.getElementById("history-list").innerHTML = "";
-  document.getElementById("admin-msg").textContent = "Ladder and history reset.";
-}
-
-/* Add player with nickname */
+/* -----------------------------------------------------------
+   ADD PLAYER
+   ----------------------------------------------------------- */
 function addPlayer() {
   const name = document.getElementById("new-player-name").value.trim();
   const nick = document.getElementById("new-player-nick").value.trim();
@@ -1025,27 +576,45 @@ function addPlayer() {
   renderSelects();
 }
 
-/* Edit player modal */
+/* -----------------------------------------------------------
+   EDIT PLAYER
+   ----------------------------------------------------------- */
 function openEditPlayer(i) {
   editIndex = i;
   const p = ladder[i];
 
-  document.getElementById("edit-player-name").value = p.name;
-  document.getElementById("edit-player-nick").value = p.nick || "";
+  const modal = document.createElement("div");
+  modal.id = "edit-modal";
+  modal.style = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
+    z-index:9999;
+  `;
 
-  document.getElementById("edit-player-modal").style.display = "flex";
+  modal.innerHTML = `
+    <div style="background:#111827; padding:1.2rem; border-radius:12px; width:320px;">
+      <h3 style="margin-top:0; margin-bottom:.8rem;">Edit Player</h3>
+      <input id="edit-name" value="${p.name}" style="width:100%; margin-bottom:.6rem;">
+      <input id="edit-nick" value="${p.nick || ""}" style="width:100%; margin-bottom:1rem;">
+      <button class="btn-primary" style="width:100%;" onclick="savePlayerEdit()">Save</button>
+      <button class="btn-secondary" style="width:100%; margin-top:.5rem;" onclick="closeEditPlayer()">Cancel</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
 }
 
 function closeEditPlayer() {
-  document.getElementById("edit-player-modal").style.display = "none";
+  const modal = document.getElementById("edit-modal");
+  if (modal) modal.remove();
   editIndex = null;
 }
 
 function savePlayerEdit() {
   if (editIndex === null) return;
 
-  const newName = document.getElementById("edit-player-name").value.trim();
-  const newNick = document.getElementById("edit-player-nick").value.trim();
+  const newName = document.getElementById("edit-name").value.trim();
+  const newNick = document.getElementById("edit-nick").value.trim();
 
   if (!newName) return;
 
@@ -1055,326 +624,296 @@ function savePlayerEdit() {
   saveLadder();
   renderLadder();
   renderSelects();
-
   closeEditPlayer();
 }
 
-/* Select options */
+/* -----------------------------------------------------------
+   SELECT OPTIONS
+   ----------------------------------------------------------- */
 function renderSelects() {
   const c = document.getElementById("challenger");
   const o = document.getElementById("opponent");
-  if (!c || !o) return;
 
-  const cVal = c.value;
-  const oVal = o.value;
+  c.innerHTML = `<option value="">Challenger</option>`;
+  o.innerHTML = `<option value="">Opponent</option>`;
 
-  c.innerHTML = `<option value="">Select challenger</option>`;
-  o.innerHTML = `<option value="">Select opponent</option>`;
-
-  ladder.forEach((p,i)=>{
+  ladder.forEach((p, i) => {
     const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
-    c.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
+    c.innerHTML += `<option value="${i}">${i+1} • ${label}</option>`;
   });
-
-  if (cVal) c.value = cVal;
-  if (oVal) o.value = oVal;
 }
 
-/* Opponent constrained to 3 above */
-document.getElementById("challenger").addEventListener("change", ()=>{
+/* Opponent limited to 3 places above */
+document.getElementById("challenger").addEventListener("change", () => {
   const idx = parseInt(document.getElementById("challenger").value);
   const o = document.getElementById("opponent");
-  o.innerHTML = `<option value="">Select opponent</option>`;
-  ladder.forEach((p,i)=>{
+
+  o.innerHTML = `<option value="">Opponent</option>`;
+
+  ladder.forEach((p, i) => {
     if (i < idx && idx - i <= 3) {
       const label = p.nick ? `${p.name} (“${p.nick}”)` : p.name;
-      o.innerHTML += `<option value="${i}">${String(i+1).padStart(2,"0")} • ${label}</option>`;
+      o.innerHTML += `<option value="${i}">${i+1} • ${label}</option>`;
     }
   });
 });
 
-/* Leg helpers */
-function getLegsFromDOM() {
-  return [1,2,3].map(n => {
-    const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;
-    const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;
-    const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);
-    const bull = bullEl ? bullEl.checked : false;
-    return { winner, reached45, bull };
+/* -----------------------------------------------------------
+   MATCH ENTRY — LEG UI
+   ----------------------------------------------------------- */
+function buildLegUI() {
+  const area = document.getElementById("legs-area");
+  area.innerHTML = "";
+
+  for (let n = 1; n <= 3; n++) {
+    area.innerHTML += `
+      <div style="background:#151b26; padding:.8rem; border-radius:10px; margin-bottom:.6rem;">
+        <div class="small" style="margin-bottom:.3rem;">Leg ${n}</div>
+        <select class="leg-winner" data-leg="${n}">
+          <option value="">Winner</option>
+          <option value="challenger">Challenger</option>
+          <option value="opponent">Opponent</option>
+        </select>
+
+        <label class="small" style="display:block; margin-top:.5rem;">
+          <input type="checkbox" class="leg-45" data-leg="${n}" style="width:auto; margin-right:.35rem;">
+          45 darts reached
+        </label>
+
+        <div id="bull-${n}" style="display:none; margin-top:.4rem;">
+          <div class="small" style="margin-bottom:.3rem;">Nearest bull used</div>
+          <input type="checkbox" class="leg-bull" data-leg="${n}">
+        </div>
+      </div>
+    `;
+  }
+
+  // Leg 3 disabled initially
+  document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-45[data-leg="3"]').disabled = true;
+  document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
+
+  // Show bull area when 45 darts checked
+  [1,2,3].forEach(n => {
+    const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const bullArea = document.getElementById(`bull-${n}`);
+    cb45.addEventListener("change", () => {
+      bullArea.style.display = cb45.checked ? "block" : "none";
+    });
+  });
+
+  // Recalc leg 3 enable/disable
+  document.querySelectorAll(".leg-winner").forEach(sel => {
+    sel.addEventListener("change", recalcLegState);
   });
 }
 
-/* Recalculate leg state – Leg 3 enabled only if Leg 1 & 2 are 1–1 */
 function recalcLegState() {
   const legs = getLegsFromDOM();
-
   const firstTwo = legs.slice(0,2);
-  const cLegsFirstTwo = firstTwo.filter(l => l.winner === "challenger").length;
-  const oLegsFirstTwo = firstTwo.filter(l => l.winner === "opponent").length;
 
-  const leg3Winner = document.querySelector('.leg-winner[data-leg="3"]');
-  const leg3_45 = document.querySelector('.leg-45[data-leg="3"]');
-  const leg3_bull = document.querySelector('.leg-bull[data-leg="3"]');
+  const cWins = firstTwo.filter(l => l.winner === "challenger").length;
+  const oWins = firstTwo.filter(l => l.winner === "opponent").length;
 
-  const enableLeg3 = (cLegsFirstTwo === 1 && oLegsFirstTwo === 1);
+  const enable = (cWins === 1 && oWins === 1);
 
-  [leg3Winner, leg3_45, leg3_bull].forEach(el => {
-    if (!el) return;
-    el.disabled = !enableLeg3;
-    if (!enableLeg3) {
+  const w3 = document.querySelector('.leg-winner[data-leg="3"]');
+  const c3 = document.querySelector('.leg-45[data-leg="3"]');
+  const b3 = document.querySelector('.leg-bull[data-leg="3"]');
+
+  [w3, c3, b3].forEach(el => {
+    el.disabled = !enable;
+    if (!enable) {
       if (el.type === "checkbox") el.checked = false;
       if (el.tagName === "SELECT") el.value = "";
     }
   });
+}
 
-  [1,2].forEach(n => {
-    const w = document.querySelector(`.leg-winner[data-leg="${n}"]`);
-    const c45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
-    const b = document.querySelector(`.leg-bull[data-leg="${n}"]`);
-    if (w) w.disabled = false;
-    if (c45) c45.disabled = false;
-    if (b) b.disabled = false;
+function getLegsFromDOM() {
+  return [1,2,3].map(n => {
+    const winner = document.querySelector(`.leg-winner[data-leg="${n}"]`).value;
+    const reached45 = document.querySelector(`.leg-45[data-leg="${n}"]`).checked;
+    const bull = document.querySelector(`.leg-bull[data-leg="${n}"]`).checked;
+    return { winner, reached45, bull };
   });
 }
 
-/* 45-dart -> nearest bull visibility */
-[1,2,3].forEach(n => {
-  const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
-  const bullArea = document.getElementById(`bull-${n}`);
-  if (cb45 && bullArea) {
-    cb45.addEventListener("change", () => {
-      bullArea.style.display = cb45.checked ? "block" : "none";
-    });
-  }
-});
-
-/* Leg winner change listeners */
-document.querySelectorAll(".leg-winner").forEach(sel => {
-  sel.addEventListener("change", recalcLegState);
-});
-
-/***** SUBMIT MATCH – with correct history mapping + nicknames *****/
+/* -----------------------------------------------------------
+   SUBMIT MATCH
+   ----------------------------------------------------------- */
 function submitMatch() {
   const msg = document.getElementById("msg");
   msg.textContent = "";
-  msg.className = "message message-info";
 
   const c = parseInt(document.getElementById("challenger").value);
   const o = parseInt(document.getElementById("opponent").value);
+
   if (isNaN(c) || isNaN(o)) {
     msg.textContent = "Select challenger and opponent.";
-    msg.className = "message message-error";
     return;
   }
 
-  // Capture names and nicknames BEFORE any ladder reordering
-  const challengerName = ladder[c].name;
-  const challengerNick = ladder[c].nick || null;
-  const opponentName = ladder[o].name;
-  const opponentNick = ladder[o].nick || null;
+  const challenger = ladder[c];
+  const opponent = ladder[o];
 
   const legs = getLegsFromDOM();
   const cLegs = legs.filter(l => l.winner === "challenger").length;
   const oLegs = legs.filter(l => l.winner === "opponent").length;
-  const totalPlayed = legs.filter(l => l.winner).length;
+  const total = legs.filter(l => l.winner).length;
 
-  // Validation: first to 2, max 3 legs
+  // Validate structure
   if (!(cLegs === 2 || oLegs === 2)) {
-    msg.textContent = "Match must end 2–0 or 2–1. One player must have exactly 2 legs.";
-    msg.className = "message message-error";
+    msg.textContent = "Match must end 2–0 or 2–1.";
     return;
   }
-
-  if (totalPlayed < 2 || totalPlayed > 3) {
-    msg.textContent = "Invalid leg structure. Must be 2–0 (2 legs) or 2–1 (3 legs).";
-    msg.className = "message message-error";
+  if (total < 2 || total > 3) {
+    msg.textContent = "Invalid number of legs.";
     return;
   }
-
-  if (totalPlayed === 3 && !((cLegs === 2 && oLegs === 1) || (cLegs === 1 && oLegs === 2))) {
+  if (total === 3 && !(cLegs === 2 || oLegs === 2)) {
     msg.textContent = "Invalid 2–1 structure.";
-    msg.className = "message message-error";
-    return;
-  }
-
-  if (totalPlayed === 2 && !((cLegs === 2 && oLegs === 0) || (cLegs === 0 && oLegs === 2))) {
-    msg.textContent = "Invalid 2–0 structure.";
-    msg.className = "message message-error";
     return;
   }
 
   // 45-dart rule
   for (let i = 0; i < legs.length; i++) {
-    const l = legs[i];
-    if (l.reached45 && !l.bull) {
-      msg.textContent = `Leg ${i+1} reached 45 darts but nearest bull not confirmed.`;
-      msg.className = "message message-error";
+    if (legs[i].reached45 && !legs[i].bull) {
+      msg.textContent = `Leg ${i+1} reached 45 darts but bull not confirmed.`;
       return;
     }
   }
 
-  // Winner / loser
-  const winnerIndex = cLegs > oLegs ? c : o;
-  const loserIndex  = cLegs > oLegs ? o : c;
-  const winnerName = ladder[winnerIndex].name;
-  const loserName  = ladder[loserIndex].name;
+  // Determine winner
+  const winner = cLegs > oLegs ? challenger : opponent;
+  const loser  = cLegs > oLegs ? opponent : challenger;
 
-  const winnerLegs = Math.max(cLegs, oLegs);
-  const loserLegs  = Math.min(cLegs, oLegs);
-
-  // Stats
-  ladder[winnerIndex].w++;
-  ladder[loserIndex].l++;
-  ladder[winnerIndex].lf += winnerLegs;
-  ladder[winnerIndex].la += loserLegs;
-  ladder[loserIndex].lf  += loserLegs;
-  ladder[loserIndex].la  += winnerLegs;
+  // Update stats
+  winner.w++;
+  loser.l++;
+  winner.lf += Math.max(cLegs, oLegs);
+  winner.la += Math.min(cLegs, oLegs);
+  loser.lf  += Math.min(cLegs, oLegs);
+  loser.la  += Math.max(cLegs, oLegs);
 
   const stamp = new Date().toLocaleString();
-  ladder[winnerIndex].last = `W vs ${loserName} (${stamp})`;
-  ladder[loserIndex].last  = `L vs ${winnerName} (${stamp})`;
+  winner.last = `W vs ${loser.name} (${stamp})`;
+  loser.last  = `L vs ${winner.name} (${stamp})`;
 
   // Movement
-  let movementText = "No movement";
-  if (winnerIndex > loserIndex) {
-    const oldPos = winnerIndex + 1;
-    const newPos = loserIndex + 1;
-    const moved = ladder.splice(winnerIndex,1)[0];
-    ladder.splice(loserIndex,0,moved);
-    movementText = `Moved from ${oldPos} to ${newPos}`;
+  let movement = "No movement";
+  const wIndex = ladder.indexOf(winner);
+  const lIndex = ladder.indexOf(loser);
+
+  if (wIndex > lIndex) {
+    const oldPos = wIndex + 1;
+    const newPos = lIndex + 1;
+    const moved = ladder.splice(wIndex, 1)[0];
+    ladder.splice(lIndex, 0, moved);
+    movement = `Moved from ${oldPos} to ${newPos}`;
   }
 
-  // Match record with correct challenger/opponent mapping + nicknames
-  const matchRecord = {
-    challenger: challengerName,
-    challengerNick: challengerNick,
-    opponent: opponentName,
-    opponentNick: opponentNick,
-    winner: winnerName,
-    loser: loserName,
-    legs: legs,
+  // Save match
+  db.ref("history").push({
+    challenger: challenger.name,
+    challengerNick: challenger.nick,
+    opponent: opponent.name,
+    opponentNick: opponent.nick,
+    winner: winner.name,
+    loser: loser.name,
+    legs,
     timestamp: stamp,
-    movement: movementText
-  };
+    movement
+  });
 
-  db.ref("history").push(matchRecord);
   saveLadder();
+  msg.textContent = "Match recorded.";
 
-  msg.textContent = "Match recorded and ladder updated.";
-  msg.className = "message message-info";
-
-  // Reset leg UI
-  document.querySelectorAll(".leg-winner").forEach(sel => {
-    sel.value = "";
-    sel.disabled = false;
-  });
-  document.querySelectorAll(".leg-45").forEach(cb => {
-    cb.checked = false;
-    cb.disabled = false;
-  });
-  document.querySelectorAll(".leg-bull").forEach(cb => {
-    cb.checked = false;
-    cb.disabled = false;
-  });
-  [1,2,3].forEach(n => {
-    const bullArea = document.getElementById(`bull-${n}`);
-    if (bullArea) bullArea.style.display = "none";
-  });
-
-  // Leg 3 should start disabled again
-  document.querySelector('.leg-winner[data-leg="3"]').disabled = true;
-  document.querySelector('.leg-45[data-leg="3"]').disabled = true;
-  document.querySelector('.leg-bull[data-leg="3"]').disabled = true;
-
+  buildLegUI();
   recalcLegState();
 }
 
-/* Export ladder + history */
+/* -----------------------------------------------------------
+   BACKUP / RESTORE
+   ----------------------------------------------------------- */
 function exportAll() {
-  const data = {
-    ladder: ladder,
-    history: historyCache
-  };
-  const dataStr = JSON.stringify(data, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
+  const data = { ladder, history: historyCache };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
   a.href = url;
-  a.download = "fox-darts-ladder-and-history-backup.json";
+  a.download = "fox-darts-ladder-backup.json";
   a.click();
 
   URL.revokeObjectURL(url);
-  document.getElementById("admin-msg").textContent = "Exported ladder + history.";
 }
 
-/* Import ladder + history */
-function importAll(event) {
-  const file = event.target.files[0];
-  const msg = document.getElementById("admin-msg");
-
-  if (!file) {
-    msg.textContent = "No file selected.";
-    return;
-  }
+function importAll(e) {
+  const file = e.target.files[0];
+  if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = evt => {
     try {
-      const imported = JSON.parse(e.target.result);
-
-      if (typeof imported !== "object" || imported === null) {
-        msg.textContent = "Invalid file format. Expected an object with ladder and history.";
-        return;
-      }
-
-      if (!Array.isArray(imported.ladder) || typeof imported.history !== "object") {
-        msg.textContent = "Invalid file format. Missing ladder or history.";
-        return;
-      }
-
-      if (!confirm("Importing will replace the current ladder and history for everyone. Continue?")) {
-        msg.textContent = "Import cancelled.";
-        return;
-      }
-
-      ladder = imported.ladder.map(p => ({
-        ...p,
-        nick: p.nick || null,
-        delta: 0
-      }));
-      previousLadder = JSON.parse(JSON.stringify(ladder));
-      historyCache = imported.history;
+      const data = JSON.parse(evt.target.result);
+      ladder = data.ladder || [];
+      historyCache = data.history || {};
 
       db.ref("ladder").set(ladder);
       db.ref("history").set(historyCache);
 
       renderLadder();
       renderSelects();
-
-      msg.textContent = "Ladder and history imported successfully.";
-    } catch (err) {
-      msg.textContent = "Error reading file. Ensure it is a valid JSON backup.";
+      document.getElementById("admin-msg").textContent = "Import successful.";
+    } catch {
+      document.getElementById("admin-msg").textContent = "Invalid file.";
     }
   };
-
   reader.readAsText(file);
 }
 
-/* ============================================================
-   ADVANCED STATS ENGINE (Stage 1)
-   ============================================================ */
+function resetLadderOnly() {
+  if (!confirm("Reset ladder?")) return;
+  ladder = [];
+  db.ref("ladder").set([]);
+  renderLadder();
+  renderSelects();
+}
 
+function resetHistoryOnly() {
+  if (!confirm("Reset match history?")) return;
+  historyCache = {};
+  db.ref("history").set({});
+  document.getElementById("history-list").innerHTML = "";
+}
+
+function resetAll() {
+  if (!confirm("Reset ladder AND history?")) return;
+  ladder = [];
+  historyCache = {};
+  db.ref("ladder").set([]);
+  db.ref("
+<!-- ===========================================================
+     PART 3 — ADVANCED STATS ENGINE + ACHIEVEMENTS + PROFILE PANEL
+     =========================================================== -->
+<script>
+/* -----------------------------------------------------------
+   GET MATCHES FOR PLAYER
+   ----------------------------------------------------------- */
 function getPlayerMatches(name) {
-  return Object.values(historyCache || {}).filter(m =>
-    m.challenger === name || m.opponent === name
-  ).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+  return Object.values(historyCache || {})
+    .filter(m => m.challenger === name || m.opponent === name)
+    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 }
 
 function getOpponentName(match, name) {
   return match.challenger === name ? match.opponent : match.challenger;
 }
 
+/* -----------------------------------------------------------
+   ADVANCED STATS ENGINE (Stage 1)
+   ----------------------------------------------------------- */
 function computeAdvancedStats(name) {
   const matches = getPlayerMatches(name);
   const position = ladder.findIndex(p => p.name === name) + 1;
@@ -1398,10 +937,10 @@ function computeAdvancedStats(name) {
     if (isWinner) wins++;
     else losses++;
 
-    const myLegs = m.legs.filter(l =>
-      l.winner === (m.challenger === name ? "challenger" : "opponent")
-    ).length;
+    const isChallenger = m.challenger === name;
+    const myKey = isChallenger ? "challenger" : "opponent";
 
+    const myLegs = m.legs.filter(l => l.winner === myKey).length;
     const oppLegs = m.legs.length - myLegs;
 
     legsFor += myLegs;
@@ -1414,10 +953,8 @@ function computeAdvancedStats(name) {
 
     m.legs.forEach(l => {
       if (l.bull) {
-        if (l.winner === (m.challenger === name ? "challenger" : "opponent"))
-          bullWins++;
-        else
-          bullLosses++;
+        if (l.winner === myKey) bullWins++;
+        else bullLosses++;
       }
     });
 
@@ -1443,7 +980,9 @@ function computeAdvancedStats(name) {
   const winRate = totalMatches ? (wins / totalMatches * 100).toFixed(1) : 0;
   const avgLegs = totalMatches ? ((legsFor + legsAgainst) / totalMatches).toFixed(2) : 0;
   const leg3Rate = totalMatches ? ((wins21 + losses21) / totalMatches * 100).toFixed(1) : 0;
-  const bullRate = (bullWins + bullLosses) ? (bullWins / (bullWins + bullLosses) * 100).toFixed(1) : 0;
+  const bullRate = (bullWins + bullLosses)
+    ? (bullWins / (bullWins + bullLosses) * 100).toFixed(1)
+    : 0;
 
   let bestOpponent = null;
   let worstOpponent = null;
@@ -1488,7 +1027,78 @@ function computeAdvancedStats(name) {
   };
 }
 
-/* PLAYER PROFILE PANEL USING ADVANCED STATS */
+/* -----------------------------------------------------------
+   ACHIEVEMENTS ENGINE (Stage 2)
+   Minimal & Clean ★ style
+   ----------------------------------------------------------- */
+function computeAchievements(stats) {
+  const ach = [];
+
+  // Sharpshooter – 10+ wins
+  if (stats.wins >= 10) {
+    ach.push({ label: "Sharpshooter", desc: "10+ ladder wins" });
+  }
+
+  // Marathon Man – 5+ matches in a single day
+  const matches = getPlayerMatches(stats.name);
+  const byDay = {};
+  matches.forEach(m => {
+    const d = (m.timestamp || "").split(",")[0].trim();
+    byDay[d] = (byDay[d] || 0) + 1;
+  });
+  if (Object.values(byDay).some(c => c >= 5)) {
+    ach.push({ label: "Marathon Man", desc: "5+ matches in one day" });
+  }
+
+  // Bull Master – 3+ bull-decided wins
+  if (stats.bullWins >= 3) {
+    ach.push({ label: "Bull Master", desc: "Won 3+ bull-decided legs" });
+  }
+
+  // Ice Cold – 3+ 2–0 wins
+  if (stats.wins20 >= 3) {
+    ach.push({ label: "Ice Cold", desc: "Won 3+ matches 2–0" });
+  }
+
+  // Never Say Die – 2+ comeback wins
+  let nsd = 0;
+  matches.forEach(m => {
+    const isChallenger = m.challenger === stats.name;
+    const myKey = isChallenger ? "challenger" : "opponent";
+
+    const leg1Winner = m.legs[0]?.winner;
+    const myLegs = m.legs.filter(l => l.winner === myKey).length;
+    const oppLegs = m.legs.length - myLegs;
+
+    if (m.winner === stats.name &&
+        leg1Winner !== myKey &&
+        myLegs === 2 && oppLegs === 1) {
+      nsd++;
+    }
+  });
+  if (nsd >= 2) {
+    ach.push({ label: "Never Say Die", desc: "Won 2+ matches 2–1 after losing Leg 1" });
+  }
+
+  // Giant Killer – beat someone 3+ places above
+  let giant = false;
+  matches.forEach(m => {
+    if (m.winner !== stats.name) return;
+    const opp = getOpponentName(m, stats.name);
+    const myPos = ladder.findIndex(p => p.name === stats.name);
+    const oppPos = ladder.findIndex(p => p.name === opp);
+    if (oppPos - myPos >= 3) giant = true;
+  });
+  if (giant) {
+    ach.push({ label: "Giant Killer", desc: "Beat someone 3+ places above" });
+  }
+
+  return ach;
+}
+
+/* -----------------------------------------------------------
+   PLAYER PROFILE PANEL
+   ----------------------------------------------------------- */
 function openPlayerProfile(index) {
   const p = ladder[index];
   const panel = document.getElementById("player-profile-panel");
@@ -1501,14 +1111,15 @@ function openPlayerProfile(index) {
   document.getElementById("pp-name").textContent = displayName;
 
   const stats = computeAdvancedStats(p.name);
+  const ach = computeAchievements(stats);
 
   const form = stats.totalMatches
-    ? `Win rate: ${stats.winRate}% • Avg legs: ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
+    ? `Win rate ${stats.winRate}% • Avg legs ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
     : "No matches yet";
 
   const bullLine = (stats.bullWins + stats.bullLosses)
-    ? `Bull-decided legs: ${stats.bullWins}–${stats.bullLosses} (${stats.bullRate}% won)`
-    : "No bull-decided legs yet";
+    ? `${stats.bullWins}–${stats.bullLosses} bull-decided (${stats.bullRate}% won)`
+    : "No bull-decided legs";
 
   const h2hHTML = Object.keys(stats.h2h).length
     ? Object.entries(stats.h2h).map(([opp,rec]) =>
@@ -1521,10 +1132,13 @@ function openPlayerProfile(index) {
     ? matches.map(m => {
         const opp = getOpponentName(m, p.name);
         const isWinner = m.winner === p.name;
-        const myLegs = m.legs.filter(l =>
-          l.winner === (m.challenger === p.name ? "challenger" : "opponent")
-        ).length;
+
+        const isChallenger = m.challenger === p.name;
+        const myKey = isChallenger ? "challenger" : "opponent";
+
+        const myLegs = m.legs.filter(l => l.winner === myKey).length;
         const oppLegs = m.legs.length - myLegs;
+
         return `
           <div style="margin-bottom:.6rem; padding-bottom:.5rem; border-bottom:1px dashed rgba(55,65,81,0.6);">
             <strong>${isWinner ? "Won" : "Lost"}</strong> vs ${opp}
@@ -1542,15 +1156,23 @@ function openPlayerProfile(index) {
     ? `${stats.worstOpponent.name} (${stats.worstOpponent.record.w}–${stats.worstOpponent.record.l})`
     : "—";
 
+  const achHTML = ach.length
+    ? ach.map(a => `
+        <div>
+          <span class="badge">★ ${a.label}</span>
+          <div class="small" style="margin-bottom:.4rem;">${a.desc}</div>
+        </div>
+      `).join("")
+    : `<div class="small" style="color:#9ca3af;">No achievements yet</div>`;
+
   body.innerHTML = `
     <div style="margin-bottom:1rem;">
-      <div class="small">Ladder Position</div>
-      <div style="font-size:1.4rem; margin-bottom:.6rem;">#${stats.position || "–"}</div>
+      <div class="small">Position</div>
+      <div style="font-size:1.4rem; margin-bottom:.6rem;">#${stats.position}</div>
 
       <div class="small">Record</div>
       <div style="font-size:1.1rem; margin-bottom:.6rem;">
         ${stats.wins}–${stats.losses}
-        <span style="color:#9ca3af; font-size:.85rem;">(W–L)</span>
       </div>
 
       <div class="small">Leg Difference</div>
@@ -1559,36 +1181,41 @@ function openPlayerProfile(index) {
       </div>
 
       <div class="small">Form</div>
-      <div style="font-size:.8rem; margin-bottom:.6rem;">
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
         ${form}
       </div>
 
       <div class="small">Bull Stats</div>
-      <div style="font-size:.8rem; margin-bottom:.6rem;">
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
         ${bullLine}
       </div>
 
-      <div class="small">Scoreline Breakdown</div>
-      <div style="font-size:.8rem; margin-bottom:.6rem;">
+      <div class="small">Scorelines</div>
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
         Wins 2–0: ${stats.wins20}, Wins 2–1: ${stats.wins21}<br>
         Losses 0–2: ${stats.losses20}, Losses 1–2: ${stats.losses21}
       </div>
 
       <div class="small">Streaks</div>
-      <div style="font-size:.8rem; margin-bottom:.6rem;">
-        Longest win streak: ${stats.longestWinStreak || 0}<br>
-        Longest losing streak: ${stats.longestLossStreak || 0}
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
+        Longest win streak: ${stats.longestWinStreak}<br>
+        Longest losing streak: ${stats.longestLossStreak}
       </div>
 
       <div class="small">Best Opponent</div>
-      <div style="font-size:.8rem; margin-bottom:.3rem;">
+      <div style="font-size:.85rem; margin-bottom:.3rem;">
         ${bestOpp}
       </div>
 
       <div class="small">Worst Opponent</div>
-      <div style="font-size:.8rem; margin-bottom:1rem;">
+      <div style="font-size:.85rem; margin-bottom:1rem;">
         ${worstOpp}
       </div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Achievements</div>
+      ${achHTML}
     </div>
 
     <div style="margin-bottom:1rem;">
@@ -1609,10 +1236,12 @@ function closePlayerProfile() {
   document.getElementById("player-profile-panel").classList.remove("open");
 }
 
-/* Init */
+/* -----------------------------------------------------------
+   INIT
+   ----------------------------------------------------------- */
 window.addEventListener("load", () => {
+  buildLegUI();
   renderSelects();
-  recalcLegState();
 });
 </script>
 
