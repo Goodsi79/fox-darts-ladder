@@ -471,7 +471,7 @@ input:focus, select:focus {
   color: #fecaca;
 }
 
-/* Admin slide-in panel */
+/* Admin / profile slide-in panel */
 .admin-panel {
   position: fixed;
   top: 0;
@@ -788,6 +788,23 @@ input:focus, select:focus {
     Changes here affect everyone using this ladder (shared Firebase backend).
   </div>
 </div>
+
+<!-- PLAYER PROFILE PANEL -->
+<div id="player-profile-panel" class="admin-panel" style="z-index:60; border-left:1px solid rgba(148,163,184,0.4);">
+  <div class="admin-header">
+    <div class="admin-title" id="pp-name">Player Profile</div>
+    <div class="admin-close" onclick="closePlayerProfile()">✕</div>
+  </div>
+
+  <div class="admin-body" id="pp-body">
+    <!-- Filled dynamically -->
+  </div>
+
+  <div class="admin-footer">
+    Player statistics generated from match history.
+  </div>
+</div>
+
 <!-- EDIT PLAYER MODAL -->
 <div id="edit-player-modal" style="
   position:fixed; top:0; left:0; width:100%; height:100%;
@@ -835,9 +852,7 @@ let ladder = [];
 let previousLadder = [];
 let historyCache = {};
 let editIndex = null;
-</script>
 
-<script>
 function showPage(page) {
   document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
@@ -865,9 +880,9 @@ function renderLadder() {
     body.innerHTML += `
       <tr>
         <td class="position">${String(i+1).padStart(2,"0")} <span class="pos-arrow ${arrowClass}">${arrow}</span></td>
-        <td class="player-name">
+        <td class="player-name" style="cursor:pointer;" onclick="openPlayerProfile(${i})">
           ${nameDisplay}
-          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;" onclick="openEditPlayer(${i})">✎</span>
+          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;" onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
         </td>
         <td class="record">${p.w}</td>
         <td class="record">${p.l}</td>
@@ -1137,6 +1152,7 @@ function recalcLegState() {
 document.querySelectorAll(".leg-winner").forEach(sel => {
   sel.addEventListener("change", recalcLegState);
 });
+
 /***** SUBMIT MATCH – with correct history mapping + nicknames *****/
 function submitMatch() {
   const msg = document.getElementById("msg");
@@ -1343,6 +1359,254 @@ function importAll(event) {
   };
 
   reader.readAsText(file);
+}
+
+/* ============================================================
+   ADVANCED STATS ENGINE (Stage 1)
+   ============================================================ */
+
+function getPlayerMatches(name) {
+  return Object.values(historyCache || {}).filter(m =>
+    m.challenger === name || m.opponent === name
+  ).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+function getOpponentName(match, name) {
+  return match.challenger === name ? match.opponent : match.challenger;
+}
+
+function computeAdvancedStats(name) {
+  const matches = getPlayerMatches(name);
+  const position = ladder.findIndex(p => p.name === name) + 1;
+
+  let wins = 0, losses = 0;
+  let legsFor = 0, legsAgainst = 0;
+  let bullWins = 0, bullLosses = 0;
+  let wins20 = 0, wins21 = 0, losses20 = 0, losses21 = 0;
+
+  let currentStreak = 0;
+  let longestWinStreak = 0;
+  let longestLossStreak = 0;
+
+  const h2h = {};
+  const positionHistory = [];
+
+  matches.forEach((m, idx) => {
+    const opp = getOpponentName(m, name);
+    const isWinner = m.winner === name;
+
+    if (isWinner) wins++;
+    else losses++;
+
+    const myLegs = m.legs.filter(l =>
+      l.winner === (m.challenger === name ? "challenger" : "opponent")
+    ).length;
+
+    const oppLegs = m.legs.length - myLegs;
+
+    legsFor += myLegs;
+    legsAgainst += oppLegs;
+
+    if (isWinner && myLegs === 2 && oppLegs === 0) wins20++;
+    if (isWinner && myLegs === 2 && oppLegs === 1) wins21++;
+    if (!isWinner && myLegs === 0 && oppLegs === 2) losses20++;
+    if (!isWinner && myLegs === 1 && oppLegs === 2) losses21++;
+
+    m.legs.forEach(l => {
+      if (l.bull) {
+        if (l.winner === (m.challenger === name ? "challenger" : "opponent"))
+          bullWins++;
+        else
+          bullLosses++;
+      }
+    });
+
+    if (isWinner) {
+      currentStreak = currentStreak >= 0 ? currentStreak + 1 : 1;
+      longestWinStreak = Math.max(longestWinStreak, currentStreak);
+    } else {
+      currentStreak = currentStreak <= 0 ? currentStreak - 1 : -1;
+      longestLossStreak = Math.min(longestLossStreak, currentStreak);
+    }
+
+    if (!h2h[opp]) h2h[opp] = { w:0, l:0 };
+    if (isWinner) h2h[opp].w++;
+    else h2h[opp].l++;
+
+    positionHistory.push({
+      matchIndex: idx,
+      position: ladder.findIndex(p => p.name === name) + 1
+    });
+  });
+
+  const totalMatches = wins + losses;
+  const winRate = totalMatches ? (wins / totalMatches * 100).toFixed(1) : 0;
+  const avgLegs = totalMatches ? ((legsFor + legsAgainst) / totalMatches).toFixed(2) : 0;
+  const leg3Rate = totalMatches ? ((wins21 + losses21) / totalMatches * 100).toFixed(1) : 0;
+  const bullRate = (bullWins + bullLosses) ? (bullWins / (bullWins + bullLosses) * 100).toFixed(1) : 0;
+
+  let bestOpponent = null;
+  let worstOpponent = null;
+
+  Object.entries(h2h).forEach(([opp, rec]) => {
+    if (rec.w > rec.l) {
+      if (!bestOpponent || rec.w - rec.l > bestOpponent.margin) {
+        bestOpponent = { name: opp, margin: rec.w - rec.l, record: rec };
+      }
+    }
+    if (rec.l > rec.w) {
+      if (!worstOpponent || rec.l - rec.w > worstOpponent.margin) {
+        worstOpponent = { name: opp, margin: rec.l - rec.w, record: rec };
+      }
+    }
+  });
+
+  return {
+    name,
+    position,
+    totalMatches,
+    wins,
+    losses,
+    winRate,
+    legsFor,
+    legsAgainst,
+    avgLegs,
+    leg3Rate,
+    bullWins,
+    bullLosses,
+    bullRate,
+    wins20,
+    wins21,
+    losses20,
+    losses21,
+    longestWinStreak,
+    longestLossStreak: Math.abs(longestLossStreak),
+    h2h,
+    bestOpponent,
+    worstOpponent,
+    positionHistory
+  };
+}
+
+/* PLAYER PROFILE PANEL USING ADVANCED STATS */
+function openPlayerProfile(index) {
+  const p = ladder[index];
+  const panel = document.getElementById("player-profile-panel");
+  const body = document.getElementById("pp-body");
+
+  const displayName = p.nick
+    ? `${p.name} “${p.nick}”`
+    : p.name;
+
+  document.getElementById("pp-name").textContent = displayName;
+
+  const stats = computeAdvancedStats(p.name);
+
+  const form = stats.totalMatches
+    ? `Win rate: ${stats.winRate}% • Avg legs: ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
+    : "No matches yet";
+
+  const bullLine = (stats.bullWins + stats.bullLosses)
+    ? `Bull-decided legs: ${stats.bullWins}–${stats.bullLosses} (${stats.bullRate}% won)`
+    : "No bull-decided legs yet";
+
+  const h2hHTML = Object.keys(stats.h2h).length
+    ? Object.entries(stats.h2h).map(([opp,rec]) =>
+        `<div>${opp}: ${rec.w}–${rec.l}</div>`
+      ).join("")
+    : `<div class="small" style="color:#9ca3af;">No opponents yet</div>`;
+
+  const matches = getPlayerMatches(p.name);
+  const historyHTML = matches.length
+    ? matches.map(m => {
+        const opp = getOpponentName(m, p.name);
+        const isWinner = m.winner === p.name;
+        const myLegs = m.legs.filter(l =>
+          l.winner === (m.challenger === p.name ? "challenger" : "opponent")
+        ).length;
+        const oppLegs = m.legs.length - myLegs;
+        return `
+          <div style="margin-bottom:.6rem; padding-bottom:.5rem; border-bottom:1px dashed rgba(55,65,81,0.6);">
+            <strong>${isWinner ? "Won" : "Lost"}</strong> vs ${opp}
+            <span style="color:#9ca3af;"> (${myLegs}–${oppLegs})</span><br>
+            <span class="small">${m.timestamp}</span>
+          </div>
+        `;
+      }).join("")
+    : `<div class="small" style="color:#9ca3af;">No matches recorded</div>`;
+
+  const bestOpp = stats.bestOpponent
+    ? `${stats.bestOpponent.name} (${stats.bestOpponent.record.w}–${stats.bestOpponent.record.l})`
+    : "—";
+  const worstOpp = stats.worstOpponent
+    ? `${stats.worstOpponent.name} (${stats.worstOpponent.record.w}–${stats.worstOpponent.record.l})`
+    : "—";
+
+  body.innerHTML = `
+    <div style="margin-bottom:1rem;">
+      <div class="small">Ladder Position</div>
+      <div style="font-size:1.4rem; margin-bottom:.6rem;">#${stats.position || "–"}</div>
+
+      <div class="small">Record</div>
+      <div style="font-size:1.1rem; margin-bottom:.6rem;">
+        ${stats.wins}–${stats.losses}
+        <span style="color:#9ca3af; font-size:.85rem;">(W–L)</span>
+      </div>
+
+      <div class="small">Leg Difference</div>
+      <div style="font-size:1.1rem; margin-bottom:.6rem;">
+        ${stats.legsFor}:${stats.legsAgainst}
+      </div>
+
+      <div class="small">Form</div>
+      <div style="font-size:.8rem; margin-bottom:.6rem;">
+        ${form}
+      </div>
+
+      <div class="small">Bull Stats</div>
+      <div style="font-size:.8rem; margin-bottom:.6rem;">
+        ${bullLine}
+      </div>
+
+      <div class="small">Scoreline Breakdown</div>
+      <div style="font-size:.8rem; margin-bottom:.6rem;">
+        Wins 2–0: ${stats.wins20}, Wins 2–1: ${stats.wins21}<br>
+        Losses 0–2: ${stats.losses20}, Losses 1–2: ${stats.losses21}
+      </div>
+
+      <div class="small">Streaks</div>
+      <div style="font-size:.8rem; margin-bottom:.6rem;">
+        Longest win streak: ${stats.longestWinStreak || 0}<br>
+        Longest losing streak: ${stats.longestLossStreak || 0}
+      </div>
+
+      <div class="small">Best Opponent</div>
+      <div style="font-size:.8rem; margin-bottom:.3rem;">
+        ${bestOpp}
+      </div>
+
+      <div class="small">Worst Opponent</div>
+      <div style="font-size:.8rem; margin-bottom:1rem;">
+        ${worstOpp}
+      </div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Head‑to‑Head</div>
+      ${h2hHTML}
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Match History</div>
+      ${historyHTML}
+    </div>
+  `;
+
+  panel.classList.add("open");
+}
+
+function closePlayerProfile() {
+  document.getElementById("player-profile-panel").classList.remove("open");
 }
 
 /* Init */
