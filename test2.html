@@ -188,10 +188,16 @@ tbody tr:hover {
   background: rgba(30,64,175,0.55);
 }
 
-/* ACHIEVEMENT STAR */
+/* ACHIEVEMENT STAR + RIVALRY FLAME */
 .ach-star {
   color: #fbbf24;
   margin-left: 6px;
+  font-size: .8rem;
+}
+
+.rival-flame {
+  color: #f87171;
+  margin-left: 4px;
   font-size: .8rem;
 }
 
@@ -445,6 +451,15 @@ input, select {
     <div class="admin-close" onclick="closePlayerProfile()">✕</div>
   </div>
   <div class="admin-body" id="pp-body"></div>
+
+  <!-- CHARTS -->
+  <div style="margin-top:.8rem;">
+    <div class="admin-section-title">Analytics</div>
+    <canvas id="pp-chart-position" height="120" style="width:100%; margin-bottom:.6rem;"></canvas>
+    <canvas id="pp-chart-winrate" height="120" style="width:100%; margin-bottom:.6rem;"></canvas>
+    <canvas id="pp-chart-scorelines" height="120" style="width:100%;"></canvas>
+  </div>
+
   <div class="admin-footer">Stats generated from match history</div>
 </div>
 <!-- FIREBASE -->
@@ -505,13 +520,16 @@ function renderLadder() {
 
     const stats = computeAdvancedStats(p.name);
     const hasAch = computeAchievements(stats).length > 0;
+    const hasRival = computeRivalries(p.name).length > 0;
+
     const star = hasAch ? `<span class="ach-star">★</span>` : "";
+    const flame = hasRival ? `<span class="rival-flame">🔥</span>` : "";
 
     body.innerHTML += `
       <tr>
         <td>${i+1}</td>
         <td style="cursor:pointer;" onclick="openPlayerProfile(${i})">
-          ${nameDisplay}${star}
+          ${nameDisplay}${star}${flame}
           <span style="cursor:pointer; margin-left:8px; color:#60a5fa;"
                 onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
         </td>
@@ -934,9 +952,98 @@ function resetAll() {
 }
 </script>
 <!-- ===========================================================
-     PART 3 — ADVANCED STATS ENGINE + ACHIEVEMENTS + PROFILE PANEL
+     PART 3 — ADVANCED STATS + ACHIEVEMENTS + RIVALRIES + CHARTS
      =========================================================== -->
 <script>
+/* -----------------------------------------------------------
+   SIMPLE CHART HELPERS (Stage 4)
+   ----------------------------------------------------------- */
+function drawLineChart(canvasId, labels, values, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!labels.length || !values.length) {
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "12px Inter";
+    ctx.fillText("No data", 10, 20);
+    return;
+  }
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const padding = 20;
+
+  const maxVal = Math.max(...values);
+  const minVal = Math.min(...values);
+  const range = maxVal - minVal || 1;
+
+  ctx.strokeStyle = "#374151";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, h - padding);
+  ctx.lineTo(w - padding, h - padding);
+  ctx.stroke();
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+
+  values.forEach((v, i) => {
+    const x = padding + (i / Math.max(1, values.length - 1)) * (w - 2 * padding);
+    const y = h - padding - ((v - minVal) / range) * (h - 2 * padding);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  });
+
+  ctx.stroke();
+}
+
+function drawBarChart(canvasId, labels, values, color) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!labels.length || !values.length) {
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "12px Inter";
+    ctx.fillText("No data", 10, 20);
+    return;
+  }
+
+  const w = canvas.width;
+  const h = canvas.height;
+  const padding = 20;
+
+  const maxVal = Math.max(...values) || 1;
+  const barWidth = (w - 2 * padding) / labels.length * 0.7;
+  const gap = (w - 2 * padding) / labels.length * 0.3;
+
+  ctx.strokeStyle = "#374151";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padding, padding);
+  ctx.lineTo(padding, h - padding);
+  ctx.lineTo(w - padding, h - padding);
+  ctx.stroke();
+
+  labels.forEach((label, i) => {
+    const x = padding + i * (barWidth + gap);
+    const barHeight = (values[i] / maxVal) * (h - 2 * padding);
+    const y = h - padding - barHeight;
+
+    ctx.fillStyle = color;
+    ctx.fillRect(x, y, barWidth, barHeight);
+  });
+}
+
 /* -----------------------------------------------------------
    GET MATCHES FOR PLAYER
    ----------------------------------------------------------- */
@@ -968,6 +1075,7 @@ function computeAdvancedStats(name) {
 
   const h2h = {};
   const positionHistory = [];
+  const statsTimeline = [];
 
   matches.forEach((m, idx) => {
     const opp = getOpponentName(m, name);
@@ -1012,6 +1120,13 @@ function computeAdvancedStats(name) {
     positionHistory.push({
       matchIndex: idx,
       position: ladder.findIndex(p => p.name === name) + 1
+    });
+
+    statsTimeline.push({
+      matchIndex: idx,
+      isWinner,
+      myLegs,
+      oppLegs
     });
   });
 
@@ -1062,21 +1177,22 @@ function computeAdvancedStats(name) {
     h2h,
     bestOpponent,
     worstOpponent,
-    positionHistory
+    positionHistory,
+    statsTimeline
   };
 }
-
 /* -----------------------------------------------------------
    ACHIEVEMENTS ENGINE (Stage 2)
-   Minimal & Clean ★ style
    ----------------------------------------------------------- */
 function computeAchievements(stats) {
   const ach = [];
 
+  // 10+ wins
   if (stats.wins >= 10) {
     ach.push({ label: "Sharpshooter", desc: "10+ ladder wins" });
   }
 
+  // 5+ matches in one day
   const matches = getPlayerMatches(stats.name);
   const byDay = {};
   matches.forEach(m => {
@@ -1087,14 +1203,17 @@ function computeAchievements(stats) {
     ach.push({ label: "Marathon Man", desc: "5+ matches in one day" });
   }
 
+  // Bull Master
   if (stats.bullWins >= 3) {
     ach.push({ label: "Bull Master", desc: "Won 3+ bull-decided legs" });
   }
 
+  // Ice Cold (3+ wins 2–0)
   if (stats.wins20 >= 3) {
     ach.push({ label: "Ice Cold", desc: "Won 3+ matches 2–0" });
   }
 
+  // Never Say Die (won 2–1 after losing leg 1)
   let nsd = 0;
   matches.forEach(m => {
     const isChallenger = m.challenger === stats.name;
@@ -1104,9 +1223,12 @@ function computeAchievements(stats) {
     const myLegs = m.legs.filter(l => l.winner === myKey).length;
     const oppLegs = m.legs.length - myLegs;
 
-    if (m.winner === stats.name &&
-        leg1Winner !== myKey &&
-        myLegs === 2 && oppLegs === 1) {
+    if (
+      m.winner === stats.name &&
+      leg1Winner !== myKey &&
+      myLegs === 2 &&
+      oppLegs === 1
+    ) {
       nsd++;
     }
   });
@@ -1114,6 +1236,7 @@ function computeAchievements(stats) {
     ach.push({ label: "Never Say Die", desc: "Won 2+ matches 2–1 after losing Leg 1" });
   }
 
+  // Giant Killer (beat someone 3+ places above)
   let giant = false;
   matches.forEach(m => {
     if (m.winner !== stats.name) return;
@@ -1130,7 +1253,29 @@ function computeAchievements(stats) {
 }
 
 /* -----------------------------------------------------------
-   PLAYER PROFILE PANEL
+   RIVALRY ENGINE (Stage 3)
+   ----------------------------------------------------------- */
+function computeRivalries(name) {
+  const stats = computeAdvancedStats(name);
+  const rivalries = [];
+
+  Object.entries(stats.h2h).forEach(([opp, rec]) => {
+    const total = rec.w + rec.l;
+
+    // Rivalry = 5+ matches AND record within ±1
+    if (total >= 5 && Math.abs(rec.w - rec.l) <= 1) {
+      rivalries.push({
+        opponent: opp,
+        record: `${rec.w}–${rec.l}`,
+        total
+      });
+    }
+  });
+
+  return rivalries;
+}
+/* -----------------------------------------------------------
+   PLAYER PROFILE PANEL (FULLY FIXED)
    ----------------------------------------------------------- */
 function openPlayerProfile(index) {
   const p = ladder[index];
@@ -1145,6 +1290,24 @@ function openPlayerProfile(index) {
 
   const stats = computeAdvancedStats(p.name);
   const ach = computeAchievements(stats);
+  const rivalries = computeRivalries(p.name);
+
+  const timeline = stats.statsTimeline || [];
+  const labels = timeline.map((t, i) => `M${i+1}`);
+  const positions = stats.positionHistory.map(ph => ph.position);
+  const winRateSeries = timeline.map((t, i) => {
+    const slice = timeline.slice(0, i+1);
+    const w = slice.filter(s => s.isWinner).length;
+    return (w / slice.length * 100).toFixed(1);
+  });
+
+  const scoreLabels = ["W 2–0", "W 2–1", "L 0–2", "L 1–2"];
+  const scoreValues = [
+    stats.wins20,
+    stats.wins21,
+    stats.losses20,
+    stats.losses21
+  ];
 
   const form = stats.totalMatches
     ? `Win rate ${stats.winRate}% • Avg legs ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
@@ -1198,6 +1361,20 @@ function openPlayerProfile(index) {
       `).join("")
     : `<div class="small" style="color:#9ca3af;">No achievements yet</div>`;
 
+  const rivalryHTML = rivalries.length
+    ? rivalries.map(r => `
+        <div>
+          <span class="badge" style="border-color:#f87171; background:rgba(248,113,113,0.12);">
+            🔥 Rivalry
+          </span>
+          <div class="small">${r.opponent} — ${r.record} (across ${r.total} matches)</div>
+        </div>
+      `).join("")
+    : `<div class="small" style="color:#9ca3af;">No rivalries detected</div>`;
+
+  /* -----------------------------------------------------------
+     FIXED TEMPLATE LITERAL — ALL DIVS MATCHED
+     ----------------------------------------------------------- */
   body.innerHTML = `
     <div style="margin-bottom:1rem;">
       <div class="small">Position</div>
@@ -1252,6 +1429,11 @@ function openPlayerProfile(index) {
     </div>
 
     <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Rivalries</div>
+      ${rivalryHTML}
+    </div>
+
+    <div style="margin-bottom:1rem;">
       <div class="admin-section-title">Head‑to‑Head</div>
       ${h2hHTML}
     </div>
@@ -1263,8 +1445,15 @@ function openPlayerProfile(index) {
   `;
 
   panel.classList.add("open");
-}
 
+  // Draw charts
+  drawLineChart("pp-chart-position", labels, positions, "#00e5ff");
+  drawLineChart("pp-chart-winrate", labels, winRateSeries, "#22c55e");
+  drawBarChart("pp-chart-scorelines", scoreLabels, scoreValues, "#ff8a1f");
+}
+/* -----------------------------------------------------------
+   CLOSE PROFILE PANEL
+   ----------------------------------------------------------- */
 function closePlayerProfile() {
   document.getElementById("player-profile-panel").classList.remove("open");
 }
