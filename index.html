@@ -31,6 +31,8 @@
   --font: "Inter", system-ui, sans-serif;
 }
 
+/* inline expansion function removed from <style> block; it's implemented in the script section */
+
 body {
   margin: 0;
   font-family: var(--font);
@@ -55,6 +57,8 @@ header {
 
 header img {
   height: 70px;
+  max-height: 70px;
+  width: auto;
   border-radius: 14px;
   box-shadow: 0 0 25px rgba(0,0,0,0.7);
 }
@@ -160,7 +164,7 @@ button {
 .table-wrapper {
   margin-top: .6rem;
   border-radius: 10px;
-  overflow: hidden;
+  overflow: auto; /* allow horizontal scrolling on small screens */
   border: 1px solid rgba(55,65,81,0.8);
   background: rgba(15,23,42,0.95);
 }
@@ -320,6 +324,104 @@ input, select {
   padding: .4rem .7rem;
   font-size: .8rem;
 }
+
+/* Rules list styling */
+.rules-list {
+  margin: 0;
+  padding-left: 1.05rem;
+}
+.rules-list li {
+  margin-bottom: .55rem;
+  line-height: 1.35;
+}
+
+/* Larger rule text for readability */
+.rule-text {
+  font-size: 1.05rem; /* slightly larger than .small */
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* INLINE EXPANSION: player details shown as an expandable row under the ladder row */
+.player-expanded-row td {
+  background: rgba(15,23,42,0.96);
+  padding: .6rem;
+  border-bottom: 1px solid rgba(31,41,55,0.9);
+}
+.player-card {
+  padding: .8rem;
+  border-radius: 10px;
+}
+@media (max-width:640px) {
+  .player-expanded-row td { padding: .45rem; }
+  .player-card { padding:.6rem; }
+}
+
+  /* Enhanced badges and stat layout for inline expansion */
+  .badge-ach { display:inline-flex; align-items:center; gap:.5rem; padding:.3rem .6rem; border-radius:999px; background:linear-gradient(90deg,#fff7ed,#fff1e6); color:#92400e; border:1px solid rgba(249,115,22,0.12); font-weight:700; }
+  .badge-rival { display:inline-flex; align-items:center; gap:.5rem; padding:.3rem .6rem; border-radius:999px; background:linear-gradient(90deg,#fff1f2,#fff7f8); color:#7f1d1d; border:1px solid rgba(248,113,113,0.12); font-weight:700; }
+  .stat-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: .6rem; }
+  .stat-item { background: rgba(11,17,32,0.6); padding:.55rem; border-radius:8px; border:1px solid rgba(55,65,81,0.6); }
+  .stat-item .label { font-size:.72rem; color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; }
+  .stat-item .value { font-size:1.05rem; margin-top:.25rem; }
+
+  /* expansion layout root - switches to column on small screens */
+  .expansion-root { display:flex; gap:1rem; flex-wrap:wrap; }
+  .player-card { width:100%; box-sizing:border-box; }
+
+  @media (max-width:640px) {
+    .stat-grid { grid-template-columns: 1fr; }
+    .badge-ach, .badge-rival { font-size:.95rem; padding:.35rem .5rem; }
+    .stat-item { padding:.5rem; }
+    .expansion-root { flex-direction:column; }
+  }
+
+/* Mobile-first responsive tweaks */
+@media (max-width: 640px) {
+  body { padding: .6rem; }
+
+  header img { height: 56px; }
+  h1 { font-size: 1.2rem; }
+  .header-sub { font-size: .72rem; }
+
+  /* Stack nav on small screens */
+  .nav-card { flex-direction: column; align-items: stretch; gap: .6rem; }
+  .nav-left { width: 100%; }
+  .nav-buttons { width: 100%; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
+  .nav-buttons button, .nav-buttons .admin-icon { flex: 1 1 auto; min-width: 0; }
+
+  /* Make table scrollable and preserve layout by allowing a minimum width */
+  .table-wrapper { overflow-x: auto; }
+  table { min-width: 640px; }
+
+  /* Stack forms/controls vertically for touch */
+  .flex { display: flex; flex-direction: column; gap: .6rem; }
+  .flex input, .flex select, .flex button { width: 100%; }
+
+  input, select { font-size: 1rem; padding: .6rem .9rem; }
+  button { padding: .75rem 1rem; font-size: .95rem; }
+
+  /* Transform admin and player panels into bottom sheets */
+  .admin-panel {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: 60vh; max-width: none;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(100%);
+    transition: transform .25s ease-out;
+  }
+  .admin-panel.open { transform: translateY(0); }
+
+  #player-profile-panel {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: 70vh; max-width: none;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(100%);
+  }
+  #player-profile-panel.open { transform: translateY(0); }
+
+  .admin-close { font-size: 1.4rem; }
+  .container { padding: 0; }
+}
 </style>
 </head>
 
@@ -327,27 +429,26 @@ input, select {
 <div class="container">
 
 <header>
-  <img src="https://www.foxatpeasemore.co.uk/assets/img/the-fox-at-peasemore-logo.jpg?=v2" alt="The Fox at Peasemore">
+  <img src="https://www.foxatpeasemore.co.uk/assets/img/the-fox-at-peasemore-logo.jpg?=v2 alt="The Fox at Peasemore">
   <div>
-    <h1>The Fox at Peasemore</h1>
-    <div class="header-sub">Live Darts Ladder Alpha</div>
+    <h1>The Fox at Peasemore Darts Ladder</h1>
     <div style="margin-top:.35rem;">
-      <span class="badge-live">
-        <span class="badge-live-dot"></span>
-        Live Standings
-      </span>
+    
     </div>
   </div>
 </header>
 
 <div class="nav-card">
   <div class="nav-left">
-    <span class="nav-dot"></span>
-    <span>Ladder • Match history</span>
+    <span class="badge-live">
+        <span class="badge-live-dot"></span>
+        Live Ladder Database
+      </span>
   </div>
   <div class="nav-buttons">
     <button class="btn-primary" onclick="showPage('ladder')">Ladder</button>
     <button class="btn-secondary" onclick="showPage('history')">History</button>
+    <button class="btn-secondary" onclick="showPage('rules')">Rules</button>
     <div class="admin-icon" onclick="toggleAdminPanel()" title="Admin">⚙</div>
   </div>
 </div>
@@ -405,26 +506,6 @@ input, select {
     <div id="msg" class="small" style="margin-top:.5rem;"></div>
   </div>
 </div>
-<div class="card">
-  <h2>Ladder Rules</h2>
-
-  <ul style="line-height:1.55; padding-left:1.1rem; margin:0;">
-    <li><strong>Normal darts rules apply</strong> – straight in, double out.</li>
-    <li><strong>Matches must be scored and witnessed</strong> by a third member of the ladder.</li>
-    <li><strong>Players must declare</strong> to the scorer/witness that the match is a ladder match before starting.</li>
-    <li><strong>Format:</strong> Best of 3 legs. Default 501 start, or 301 if both players agree.</li>
-    <li><strong>45‑dart rule:</strong> After each player has thrown 45 darts (15 visits), if neither has checked out, the leg is decided by <strong>one dart nearest the bull</strong>.</li>
-    <li><strong>No remaining‑score comparison</strong> is used after 45 darts — nearest‑bull only.</li>
-    <li><strong>Challenge rule:</strong> A player may challenge up to <strong>3 positions above</strong> them in the ladder.</li>
-    <li><strong>If the lower‑ranked player wins</strong>, they take the higher player’s position and everyone below shifts down one.</li>
-    <li><strong>New players join at the bottom</strong> of the ladder.</li>
-    <li><strong>The ladder runs continuously</strong> — inactive players naturally drift downward as others challenge above them.</li>
-  </ul>
-
-  <div class="small" style="margin-top:.8rem;">
-    These rules are enforced automatically by the dashboard where applicable.
-  </div>
-</div>
 
 <!-- HISTORY PAGE -->
 <div id="page-history" style="display:none;">
@@ -454,10 +535,10 @@ input, select {
     <div class="admin-section-title">Backup</div>
     <button class="btn-secondary" style="width:100%;" onclick="exportAll()">Export JSON</button>
 
-    <label class="btn-secondary" style="width:100%; margin-top:.4rem; text-align:center; cursor:pointer;">
-      Import JSON
+    <div style="width:100%; margin-top:.4rem;">
+      <button class="btn-secondary" style="width:100%;" id="import-btn">Import JSON</button>
       <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
-    </label>
+    </div>
 
     <div id="admin-msg" class="small" style="margin-top:.5rem;"></div>
   </div>
@@ -474,6 +555,19 @@ input, select {
 
 
   <div class="admin-footer">Stats generated from match history</div>
+</div>
+
+<!-- RULES PAGE (inline like history) -->
+<div id="page-rules" style="display:none;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Ladder Rules</div>
+        <div class="card-sub">Read before recording a match</div>
+      </div>
+    </div>
+    <div id="rules-list" style="margin-top:1rem;"></div>
+  </div>
 </div>
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
@@ -510,6 +604,7 @@ let editIndex = null;
 function showPage(page) {
   document.getElementById("page-ladder").style.display = page === "ladder" ? "block" : "none";
   document.getElementById("page-history").style.display = page === "history" ? "block" : "none";
+  document.getElementById("page-rules").style.display = page === "rules" ? "block" : "none";
 }
 
 /* -----------------------------------------------------------
@@ -517,6 +612,133 @@ function showPage(page) {
    ----------------------------------------------------------- */
 function toggleAdminPanel() {
   document.getElementById("admin-panel").classList.toggle("open");
+}
+
+/* -----------------------------------------------------------
+   RENDER RULES (match history styling)
+   ----------------------------------------------------------- */
+function renderRules() {
+  const rules = [
+    "Normal darts rules apply – straight in, double out.",
+    "Matches must be scored and witnessed by a third member of the ladder.",
+    "Players must declare to the scorer/witness that the match is a ladder match before starting.",
+    "Format: Best of 3 legs. Default 501 start, or 301 if both players agree.",
+    "45‑dart rule: After each player has thrown 45 darts (15 visits), if neither has checked out, the leg is decided by one dart nearest the bull.",
+    "No remaining‑score comparison is used after 45 darts — nearest‑bull only.",
+    "Challenge rule: A player may challenge up to 3 positions above them in the ladder.",
+    "If the lower‑ranked player wins, they take the higher player’s position and everyone below shifts down one.",
+    "New players join at the bottom of the ladder.",
+    "The ladder runs continuously — inactive players naturally drift downward as others challenge above them."
+  ];
+
+  const container = document.getElementById('rules-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  rules.forEach(rule => {
+    container.innerHTML += `
+      <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px dashed rgba(55,65,81,0.7);">
+        <div class="rule-text">${rule}</div>
+      </div>
+    `;
+  });
+}
+
+/* -----------------------------------------------------------
+   INLINE EXPANSION: insert a row directly under clicked player
+   ----------------------------------------------------------- */
+function togglePlayerExpansion(index) {
+  const tbody = document.getElementById('ladder-body');
+  if (!tbody) return;
+
+  // close any open expansion
+  const open = tbody.querySelector('.player-expanded-row');
+  const prevIndex = tbody.getAttribute('data-open-index');
+  if (open) open.remove();
+
+  // if clicking the same row, just close it
+  if (prevIndex && Number(prevIndex) === index) {
+    tbody.removeAttribute('data-open-index');
+    const btnCell = tbody.children[index]?.querySelector('td[aria-expanded]');
+    if (btnCell) btnCell.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  const row = tbody.children[index];
+  if (!row) return;
+
+  const cols = row.children.length;
+  const tr = document.createElement('tr');
+  tr.className = 'player-expanded-row';
+  const td = document.createElement('td');
+  td.colSpan = cols;
+  td.innerHTML = `<div class="player-card card" id="player-expanded-${index}">Loading…</div>`;
+  tr.appendChild(td);
+
+  // insert expansion after clicked row
+  row.parentNode.insertBefore(tr, row.nextSibling);
+  tbody.setAttribute('data-open-index', index);
+
+  // set aria-expanded on clickable cell
+  const btnCell = row.querySelector('td[onclick]');
+  if (btnCell) btnCell.setAttribute('aria-expanded', 'true');
+
+  // render profile-style content into the expansion (reuse existing stat engines)
+  const container = document.getElementById(`player-expanded-${index}`);
+  const p = ladder[index];
+  const stats = computeAdvancedStats(p.name);
+  const ach = computeAchievements(stats);
+  const rivalries = computeRivalries(p.name);
+
+  container.innerHTML = `
+    <div class="expansion-root">
+      <div style="flex:1 1 220px; min-width:180px;">
+        <div class="small">Position</div>
+        <div style="font-size:1.2rem; margin-bottom:.45rem;">#${stats.position}</div>
+
+        <div class="small">Record</div>
+        <div style="font-size:1.05rem; margin-bottom:.45rem;">${stats.wins}–${stats.losses}</div>
+
+        <div class="small">Legs</div>
+        <div style="font-size:1.05rem; margin-bottom:.45rem;">${stats.legsFor}:${stats.legsAgainst}</div>
+
+        <div class="small">Form</div>
+        <div style="font-size:.95rem; margin-bottom:.45rem;">${stats.totalMatches ? `Win rate ${stats.winRate}% • Avg legs ${stats.avgLegs}` : 'No matches yet'}</div>
+      </div>
+
+      <div style="flex:2 1 360px; min-width:260px;">
+        <div class="admin-section-title">Statistics</div>
+        <div class="stat-grid" style="margin-top:.5rem;">
+          <div class="stat-item"><div class="label">Matches</div><div class="value">${stats.totalMatches}</div></div>
+          <div class="stat-item"><div class="label">Win rate</div><div class="value">${stats.winRate}%</div></div>
+          <div class="stat-item"><div class="label">Avg legs</div><div class="value">${stats.avgLegs}</div></div>
+          <div class="stat-item"><div class="label">Leg 3 rate</div><div class="value">${stats.leg3Rate}%</div></div>
+          <div class="stat-item"><div class="label">Bull decided</div><div class="value">${stats.bullWins}:${stats.bullLosses} (${stats.bullRate}%)</div></div>
+          <div class="stat-item"><div class="label">Scorelines</div><div class="value">W 2–0: ${stats.wins20} • W 2–1: ${stats.wins21}<br>L 0–2: ${stats.losses20} • L 1–2: ${stats.losses21}</div></div>
+        </div>
+
+        <div class="admin-section-title" style="margin-top:.7rem;">Achievements</div>
+        <div style="margin-top:.45rem;">
+          ${ ach.length ? ach.map(a => `
+            <div style="margin-bottom:.5rem; display:flex; gap:.5rem; align-items:center;">
+              <span class="badge-ach">★ ${a.label}</span>
+              <div class="small">${a.desc}</div>
+            </div>
+          `).join('') : `<div class="small" style="color:#9ca3af;">No achievements yet</div>` }
+        </div>
+
+        <div class="admin-section-title" style="margin-top:.6rem;">Rivalries</div>
+        <div style="margin-top:.45rem;">
+          ${ rivalries.length ? rivalries.map(r => `
+            <div style="margin-bottom:.4rem; display:flex; gap:.6rem; align-items:center;">
+              <span class="badge-rival">🔥 Rivalry</span>
+              <div class="small">${r.opponent} — ${r.record} (across ${r.total} matches)</div>
+            </div>
+          `).join('') : `<div class="small" style="color:#9ca3af;">No rivalries detected</div>` }
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 /* -----------------------------------------------------------
@@ -541,7 +763,7 @@ function renderLadder() {
     body.innerHTML += `
       <tr>
         <td>${i+1}</td>
-        <td style="cursor:pointer;" onclick="openPlayerProfile(${i})">
+        <td style="cursor:pointer;" onclick="togglePlayerExpansion(${i})" aria-expanded="false">
           ${nameDisplay}${star}${flame}
           <span style="cursor:pointer; margin-left:8px; color:#60a5fa;"
                 onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
@@ -614,6 +836,9 @@ db.ref("history").on("value", snap => {
       </div>
     `;
   });
+
+  // History changed — re-render ladder so achievements/rivalries update
+  renderLadder();
 });
 
 /* -----------------------------------------------------------
@@ -906,12 +1131,14 @@ function exportAll() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
   const a = document.createElement("a");
   a.href = url;
-  a.download = "fox-darts-ladder-backup.json";
+  a.download = `fox-darts-ladder-backup-${ts}.json`;
   a.click();
 
-  URL.revokeObjectURL(url);
+  // Revoke after a short delay to ensure download starts
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function importAll(e) {
@@ -922,8 +1149,21 @@ function importAll(e) {
   reader.onload = evt => {
     try {
       const data = JSON.parse(evt.target.result);
-      ladder = data.ladder || [];
-      historyCache = data.history || {};
+
+      // Accept alternate shapes for convenience
+      const maybeLadder = data.ladder ?? data.players ?? data.teams ?? [];
+      const maybeHistory = data.history ?? data.matches ?? data.games ?? {};
+
+      // Basic validation: ladder should be an array, history should be an object or array
+      if (!Array.isArray(maybeLadder) || !(Array.isArray(maybeHistory) || typeof maybeHistory === 'object')) {
+        document.getElementById("admin-msg").textContent = "Invalid backup format. Expect { ladder: [], history: {} }.";
+        // clear file input
+        e.target.value = "";
+        return;
+      }
+
+      ladder = maybeLadder;
+      historyCache = Array.isArray(maybeHistory) ? Object.fromEntries(maybeHistory.map((m, i) => [i, m])) : maybeHistory;
 
       db.ref("ladder").set(ladder);
       db.ref("history").set(historyCache);
@@ -931,8 +1171,12 @@ function importAll(e) {
       renderLadder();
       renderSelects();
       document.getElementById("admin-msg").textContent = "Import successful.";
-    } catch {
-      document.getElementById("admin-msg").textContent = "Invalid file.";
+    } catch (err) {
+      console.error(err);
+      document.getElementById("admin-msg").textContent = "Invalid JSON file.";
+    } finally {
+      // clear file input so the same file can be re-selected if needed
+      e.target.value = "";
     }
   };
   reader.readAsText(file);
@@ -1390,6 +1634,16 @@ function closePlayerProfile() {
 window.addEventListener("load", () => {
   buildLegUI();
   renderSelects();
+  renderRules();
+});
+
+// Wire the Import JSON button to trigger the hidden file input
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('import-btn');
+  const fileInput = document.getElementById('importFile');
+  if (btn && fileInput) {
+    btn.addEventListener('click', () => fileInput.click());
+  }
 });
 </script>
 
