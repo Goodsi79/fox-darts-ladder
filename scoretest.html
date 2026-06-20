@@ -1,0 +1,3769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Fox at Peasemore – Darts Ladder</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #05070a;
+  --panel: #0f141d;
+  --panel-soft: #151b26;
+  --border: #1f2933;
+  --text: #e5e7eb;
+  --muted: #6b7280;
+  --accent: #ff8a1f;
+  --accent-soft: rgba(255,138,31,0.18);
+  --cyan: #00e5ff;
+  --success: #22c55e;
+  --danger: #ff4b5c;
+  --radius: 12px;
+  --shadow: 0 18px 45px rgba(0,0,0,0.65);
+  --font: "Inter", system-ui, sans-serif;
+}
+
+/* Hide scoring submit button visually but keep it in the DOM for JS handlers */
+#sc-submit { display: none !important; }
+
+/* inline expansion function removed from <style> block; it's implemented in the script section */
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: radial-gradient(circle at top, #141b2a 0, #05070a 55%);
+  color: var(--text);
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* HEADER */
+header {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+header img {
+  height: 70px;
+  max-height: 70px;
+  width: auto;
+  border-radius: 14px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.7);
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.header-sub {
+  font-size: .85rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .15rem .55rem;
+  border-radius: 999px;
+  background: rgba(220,38,38,0.12);
+  color: #fecaca;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.badge-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #f97373;
+  box-shadow: 0 0 10px #f97373;
+}
+
+/* NAV */
+.nav-card {
+  background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.85));
+  border-radius: var(--radius);
+  border: 1px solid rgba(148,163,184,0.25);
+  box-shadow: var(--shadow);
+  padding: .6rem .8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .8rem;
+  margin-bottom: 1rem;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .8rem;
+  color: var(--muted);
+}
+
+.nav-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan);
+}
+
+.nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.nav-buttons .active {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+  transform: translateY(-2px);
+  border-color: rgba(99,102,241,0.9);
+  background: linear-gradient(90deg,#6366f1,#4f46e5);
+  color: white;
+}
+
+/* admin icon styling: make it obviously clickable and keyboard accessible */
+.admin-icon {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .45rem .6rem;
+  border-radius: 10px;
+  font-size: 1.05rem;
+}
+.admin-icon:hover { background: rgba(255,255,255,0.02); }
+.admin-icon:focus { outline: 2px solid rgba(99,102,241,0.15); }
+
+/* BUTTONS */
+button {
+  padding: .55rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: .85rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  transition: all .16s ease-out;
+}
+
+.btn-primary {
+  background: radial-gradient(circle at top, var(--accent), #ff7a00);
+  color: #111827;
+  box-shadow: 0 0 18px rgba(255,138,31,0.55);
+}
+
+.btn-admin {
+  background: linear-gradient(90deg, rgba(220,38,38,0.95), rgba(220,38,38,0.8));
+  color: #fff;
+  border: 1px solid rgba(220,38,38,0.9);
+  box-shadow: 0 6px 18px rgba(220,38,38,0.15);
+}
+
+/* Truncate long player names on small buttons and show full name on hover */
+.truncate-btn {
+  display: inline-block;
+  max-width: 120px; /* matches inline width used for buttons */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Closest-to-bull responsive layout */
+.closest-block {
+  display: flex;
+  gap: .6rem;
+  align-items: center;
+  justify-content: center;
+}
+.closest-center {
+  flex: 0 0 260px;
+  text-align: center;
+}
+
+/* muted versus separator in banner */
+.vs-muted {
+  color: #9ca3af;
+  font-size: .85em;
+  margin: 0 .45rem;
+  font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .closest-block { flex-direction: column; }
+  .closest-center { flex: none; width: 100%; margin: .4rem 0; }
+  .closest-block .truncate-btn { width: 100%; max-width: none; }
+}
+
+.btn-secondary {
+  background: rgba(15,23,42,0.9);
+  color: var(--text);
+  border-color: rgba(148,163,184,0.4);
+}
+
+/* TABLE */
+.table-wrapper {
+  margin-top: .6rem;
+  border-radius: 10px;
+  overflow: auto; /* allow horizontal scrolling on small screens */
+  border: 1px solid rgba(55,65,81,0.8);
+  background: rgba(15,23,42,0.95);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+th, td {
+  padding: .45rem .55rem;
+  border-bottom: 1px solid rgba(31,41,55,0.9);
+}
+
+th {
+  text-align: left;
+  color: #9ca3af;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+tbody tr:hover {
+  background: rgba(30,64,175,0.55);
+}
+
+/* ACHIEVEMENT STAR + RIVALRY FLAME */
+.ach-star {
+  color: #fbbf24;
+  margin-left: 6px;
+  font-size: .8rem;
+}
+
+.rival-flame {
+  color: #f87171;
+  margin-left: 4px;
+  font-size: .8rem;
+}
+
+/* SLIDE-IN PANELS */
+.admin-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  max-width: 90vw;
+  height: 100vh;
+  background: #0f141d;
+  border-left: 1px solid rgba(148,163,184,0.4);
+  box-shadow: -18px 0 45px rgba(0,0,0,0.8);
+  transform: translateX(100%);
+  transition: transform .25s ease-out;
+  z-index: 50;
+  padding: 1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-panel.open {
+  transform: translateX(0);
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: .8rem;
+}
+
+.admin-title {
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.admin-close {
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: #9ca3af;
+}
+
+.admin-body {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: .3rem;
+}
+
+.admin-section-title {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  color: #9ca3af;
+  margin-top: .8rem;
+  margin-bottom: .3rem;
+}
+
+.admin-footer {
+  margin-top: .8rem;
+  font-size: .7rem;
+  color: #6b7280;
+}
+
+/* PROFILE PANEL */
+#player-profile-panel .badge {
+  display: inline-block;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  background: rgba(251,191,36,0.12);
+  border: 1px solid rgba(251,191,36,0.6);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  margin-bottom: .2rem;
+}
+
+/* Simple card + small text helpers */
+.card {
+  background: rgba(15,23,42,0.95);
+  border-radius: 12px;
+  border: 1px solid rgba(55,65,81,0.9);
+  box-shadow: var(--shadow);
+  padding: .9rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-title {
+  font-size: .95rem;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+}
+
+.card-sub {
+  font-size: .75rem;
+  color: var(--muted);
+}
+
+.small {
+  font-size: .75rem;
+}
+
+.flex {
+  display: flex;
+  gap: .5rem;
+}
+
+input, select {
+  background: #0b1120;
+  border-radius: 999px;
+  border: 1px solid rgba(55,65,81,0.9);
+  color: var(--text);
+  padding: .4rem .7rem;
+  font-size: .8rem;
+}
+
+/* Rules list styling */
+.rules-list {
+  margin: 0;
+  padding-left: 1.05rem;
+}
+.rules-list li {
+  margin-bottom: .55rem;
+  line-height: 1.35;
+}
+
+/* Larger rule text for readability */
+.rule-text {
+  font-size: 1.05rem; /* slightly larger than .small */
+  line-height: 1.5;
+  color: var(--text);
+}
+
+/* INLINE EXPANSION: player details shown as an expandable row under the ladder row */
+.player-expanded-row td {
+  background: rgba(15,23,42,0.96);
+  padding: .6rem;
+  border-bottom: 1px solid rgba(31,41,55,0.9);
+}
+.player-card {
+  padding: .8rem;
+  border-radius: 10px;
+}
+@media (max-width:640px) {
+  .player-expanded-row td { padding: .45rem; }
+  .player-card { padding:.6rem; }
+}
+
+  /* Enhanced badges and stat layout for inline expansion */
+  .badge-ach { display:inline-flex; align-items:center; gap:.5rem; padding:.3rem .6rem; border-radius:999px; background:linear-gradient(90deg,#fff7ed,#fff1e6); color:#92400e; border:1px solid rgba(249,115,22,0.12); font-weight:700; }
+  .badge-rival { display:inline-flex; align-items:center; gap:.5rem; padding:.3rem .6rem; border-radius:999px; background:linear-gradient(90deg,#fff1f2,#fff7f8); color:#7f1d1d; border:1px solid rgba(248,113,113,0.12); font-weight:700; }
+  .stat-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap: .6rem; }
+  .stat-item { background: rgba(11,17,32,0.6); padding:.55rem; border-radius:8px; border:1px solid rgba(55,65,81,0.6); }
+  .stat-item .label { font-size:.72rem; color:#9ca3af; text-transform:uppercase; letter-spacing:.12em; }
+  .stat-item .value { font-size:1.05rem; margin-top:.25rem; }
+
+  /* expansion layout root - switches to column on small screens */
+  .expansion-root { display:flex; gap:1rem; flex-wrap:wrap; }
+  .player-card { width:100%; box-sizing:border-box; }
+
+  @media (max-width:640px) {
+    .stat-grid { grid-template-columns: 1fr; }
+    .badge-ach, .badge-rival { font-size:.95rem; padding:.35rem .5rem; }
+    .stat-item { padding:.5rem; }
+    .expansion-root { flex-direction:column; }
+  }
+
+  /* --- Scoring page: improved layout & touch targets (mobile/tablet) --- */
+  #page-scoring .card { padding: 1rem; }
+
+  /* Banner / match meta */
+  #sc-match-banner { margin-top:.6rem; }
+  #sc-match-banner > div { display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; }
+  #sc-match-title { font-weight:800; font-size:1rem; }
+  #sc-match-meta { font-size:.85rem; color:#9ca3af; }
+
+  /* Scoring board columns stack responsively */
+  #scoring-board > div { display:flex; gap:1rem; align-items:flex-start; flex-wrap:wrap; }
+  #scoring-board > div > div { min-width:160px; flex:1 1 180px; }
+
+  /* Current visit / big numbers */
+  #sc-current { font-size:1.6rem; font-weight:800; letter-spacing:0.02em; }
+  #sc-ch-rem, #sc-op-rem { font-size:1.6rem; font-weight:800; }
+
+  /* Legs panel: keep a reasonable height on small screens */
+  #sc-legs-panel { max-height: 22vh; overflow:auto; padding-right:.25rem; }
+
+  /* Keypad: larger buttons, better spacing and full-width Enter on narrow screens */
+  #keypad { margin-top:1rem; display:grid; grid-template-columns: repeat(3, 1fr); gap:.5rem; }
+  #keypad button { padding:1rem; font-size:1.1rem; border-radius:10px; min-height:52px; }
+  #keypad .btn-primary { background: linear-gradient(90deg,#ff8a1f,#ff7a00); color:#111827; box-shadow:0 6px 18px rgba(255,138,31,0.24); }
+
+  /* Controls row: increase tap targets */
+  #page-scoring [id^="sc-"] { touch-action: manipulation; }
+  #page-scoring .btn-secondary, #page-scoring .btn-primary { min-height:44px; padding: .65rem 1rem; }
+
+  /* Closest selector buttons should be wide and easy to tap */
+  .closest-block button { padding:.75rem 0.9rem; min-width:120px; font-weight:700; }
+
+  /* Small screens: stack layout and enlarge keypad buttons */
+  @media (max-width: 640px) {
+    #scoring-board > div { flex-direction:column; }
+    #keypad { grid-template-columns: repeat(3, 1fr); }
+    #keypad button { padding:1.15rem; font-size:1.25rem; min-height:56px; }
+    #keypad .btn-primary { grid-column: span 3; font-size:1.05rem; padding:1rem; }
+    #sc-legs-panel { max-height: 28vh; }
+    .closest-center { order: 2; width:100%; text-align:center; }
+    .closest-block > div { width:100%; text-align:center; }
+    #sc-match-banner > div { flex-direction:column; align-items:flex-start; gap:.4rem; }
+  }
+
+  /* Tablet: slightly larger keypad and preserved 3-column layout */
+  @media (min-width: 641px) and (max-width: 1024px) {
+    #keypad button { padding:1.1rem; font-size:1.15rem; min-height:56px; }
+    #sc-legs-panel { max-height: 28vh; }
+  }
+
+  /* Visual helpers */
+  #sc-bust { font-weight:900; letter-spacing:0.06em; }
+  #sc-history { font-weight:600; color:#9ca3af; }
+
+  /* Bust visit marker */
+  .visit-bust { color: var(--danger); font-weight:800; margin-left:0.45rem; }
+
+  /* Hide 'View in History' on scoring page but keep it in DOM for script compatibility */
+  #page-scoring #sc-results-view-history {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+  }
+
+/* Mobile-first responsive tweaks */
+@media (max-width: 640px) {
+  body { padding: .6rem; }
+
+  header img { height: 56px; }
+  h1 { font-size: 1.2rem; }
+  .header-sub { font-size: .72rem; }
+
+  /* Stack nav on small screens */
+  .nav-card { flex-direction: column; align-items: stretch; gap: .6rem; }
+  .nav-left { width: 100%; }
+  .nav-buttons { width: 100%; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
+  .nav-buttons button, .nav-buttons .admin-icon { flex: 1 1 auto; min-width: 0; }
+
+  /* Make table scrollable and preserve layout by allowing a minimum width */
+  .table-wrapper { overflow-x: auto; }
+  table { min-width: 640px; }
+
+  /* Stack forms/controls vertically for touch */
+  .flex { display: flex; flex-direction: column; gap: .6rem; }
+  .flex input, .flex select, .flex button { width: 100%; }
+
+  input, select { font-size: 1rem; padding: .6rem .9rem; }
+  button { padding: .75rem 1rem; font-size: .95rem; }
+
+  /* Transform admin and player panels into bottom sheets */
+  .admin-panel {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: 60vh; max-width: none;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(100%);
+    transition: transform .25s ease-out;
+  }
+  .admin-panel.open { transform: translateY(0); }
+
+  #player-profile-panel {
+    top: auto; bottom: 0; left: 0; right: 0;
+    width: 100%; height: 70vh; max-width: none;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(100%);
+  }
+  #player-profile-panel.open { transform: translateY(0); }
+
+  .admin-close { font-size: 1.4rem; }
+  .container { padding: 0; }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <img src="https://www.foxatpeasemore.co.uk/assets/img/the-fox-at-peasemore-logo.jpg?v=2" alt="The Fox at Peasemore" title="Open Admin" style="cursor:pointer;" onclick="toggleAdminPanel()">
+  <div>
+    <h1>The Fox at Peasemore Darts Ladder</h1>
+  </div>
+</header>
+
+<div class="nav-card">
+  <div class="nav-left">
+    <span class="badge-live">
+        <span class="badge-live-dot"></span>
+        Live
+      </span>
+  </div>
+    <div class="nav-buttons">
+  <button id="nav-ladder" class="btn-primary" onclick="showPage('ladder')">Ladder</button>
+  <button id="nav-scoring" class="btn-primary" onclick="showPage('scoring')">Scoring</button>
+  <button id="nav-rules" class="btn-primary" onclick="showPage('rules')">Rules</button>
+  <button id="nav-history" class="btn-primary" onclick="showPage('history')">History</button>
+    <button id="nav-player-stats" class="btn-primary" onclick="showPage('player-stats')">Stats</button>
+  </div>
+</div>
+
+<!-- LADDER PAGE -->
+<!-- HISTORY PAGE -->
+<div id="page-history" style="display:none; margin-top:.8rem;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Match History</div>
+        <div class="card-sub">Newest first</div>
+      </div>
+    </div>
+
+    <div id="history-list" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+<div id="page-ladder">
+    <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Ladder Standings</div>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>W</th>
+            <th>L</th>
+            <th>Legs</th>
+            <th>Last</th>
+          </tr>
+        </thead>
+        <tbody id="ladder-body"></tbody>
+      </table>
+    </div>
+
+    <div class="flex" style="margin-top:.8rem; align-items:center;">
+      <input id="new-player-name" placeholder="Full name" style="flex:1;">
+      <input id="new-player-nick" placeholder="Nickname (optional)" style="flex:1;">
+      <button class="btn-primary" onclick="addPlayer()">Add</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ADMIN PANEL -->
+<!-- SCORING PAGE -->
+<div id="page-scoring" style="display:none; margin-top:.6rem;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Scoring</div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:.6rem; align-items:center;">
+      <!-- Match selectors -->
+      <select id="match-challenger" style="flex:1;"></select>
+      <select id="match-opponent" style="flex:1;"></select>
+      <select id="match-best-of" style="width:100px;">
+        <option value="1">1</option>
+        <option value="3" selected>3</option>
+        <option value="5">5</option>
+      </select>
+
+      <select id="score-start" style="width:140px;">
+        <option value="501">501</option>
+        <option value="301">301</option>
+      </select>
+      <button class="btn-secondary" id="scoring-start-btn">Start Game</button>
+    </div>
+
+    <!-- Match banner: shows current participants and match meta -->
+    <div id="sc-match-banner" style="display:none; margin-top:.6rem;">
+      <div style="background:var(--panel-soft); padding:.6rem; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+        <div id="sc-match-title" style="font-weight:700;">Match</div>
+        <div id="sc-match-meta" class="small" style="color:#9ca3af;">Best of</div>
+      </div>
+    </div>
+
+      <!-- Closest-to-bull starter selector (simplified) -->
+      <div id="sc-closest" style="display:none; margin-top:.6rem;">
+        <div class="closest-block" style="background:var(--panel); padding:.6rem; border-radius:8px;">
+          <div style="flex:1; text-align:center;">
+            <button id="sc-closest-ch" class="btn-primary truncate-btn" style="margin-top:.45rem; width:120px;">Challenger</button>
+          </div>
+          <div class="closest-center">
+            <div class="small"><strong>Who was closest to the bull?</strong></div>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <button id="sc-closest-op" class="btn-primary truncate-btn" style="margin-top:.45rem; width:120px;">Opponent</button>
+          </div>
+        </div>
+      </div>
+
+    <div id="scoring-board" style="margin-top:1rem; display:none;">
+      <div style="display:flex; gap:1rem; align-items:center;">
+        <div style="flex:1; display:flex; gap:.6rem; align-items:center;">
+          <div style="flex:1;">
+            <div class="small">Challenger <span id="sc-ch-name" class="small" style="color:#9ca3af; font-weight:600;">—</span></div>
+            <div id="sc-ch-rem" style="font-size:1.6rem; font-weight:700;">501</div>
+            <div id="sc-ch-checkouts" class="small" style="color:#9ca3af; margin-top:.35rem;">—</div>
+            <div class="small" style="margin-top:.35rem;">3-dart avg: <span id="sc-ch-avg" style="font-weight:700;">—</span></div>
+          </div>
+          <div style="flex:1;">
+            <div class="small">Opponent <span id="sc-op-name" class="small" style="color:#9ca3af; font-weight:600;">—</span></div>
+            <div id="sc-op-rem" style="font-size:1.6rem; font-weight:700;">501</div>
+            <div id="sc-op-checkouts" class="small" style="color:#9ca3af; margin-top:.35rem;">—</div>
+            <div class="small" style="margin-top:.35rem;">3-dart avg: <span id="sc-op-avg" style="font-weight:700;">—</span></div>
+          </div>
+        </div>
+
+        <div style="flex:1;">
+          <div class="small">Current Visit</div>
+          <div id="sc-current" style="font-size:1.4rem;">0</div>
+          <div class="small" id="sc-bust" style="color:var(--danger); display:none;">BUST</div>
+        </div>
+
+        <div style="flex:1;">
+          <div class="small">Visits</div>
+          <div id="sc-history" class="small" style="max-height:6.5rem; overflow:auto;">C:0 • O:0</div>
+        </div>
+      </div>
+
+      <!-- Per-leg details panel -->
+      <div id="sc-legs-panel" style="margin-top:.8rem;"></div>
+
+      <div id="keypad" style="margin-top:1rem; display:grid; grid-template-columns: repeat(3,1fr); gap:.5rem;">
+        <!-- numeric buttons inserted by JS -->
+      </div>
+
+      <div style="display:flex; gap:.5rem; margin-top:.6rem;">
+        <button class="btn-secondary" id="sc-undo">Undo</button>
+        <button class="btn-primary" id="sc-submit">Submit Visit</button>
+        <button class="btn-secondary" id="sc-end">End Game</button>
+      </div>
+
+      <!-- Match results panel shown after a multi-leg match completes -->
+      <div id="sc-match-results" style="display:none; margin-top:.8rem;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="admin-panel" class="admin-panel">
+  <div class="admin-header">
+    <div class="admin-title">Admin</div>
+    <div class="admin-close" onclick="toggleAdminPanel()">✕</div>
+  </div>
+  <div class="admin-body">
+    <div class="admin-section-title">Reset</div>
+    <button class="btn-secondary" style="width:100%;" onclick="resetLadderOnly()">Reset Ladder</button>
+    <button class="btn-secondary" style="width:100%; margin-top:.4rem;" onclick="resetHistoryOnly()">Reset History</button>
+    <button class="btn-secondary" style="width:100%; margin-top:.4rem;" onclick="resetAll()">Reset All</button>
+
+    <div class="admin-section-title">Backup</div>
+    <button class="btn-secondary" style="width:100%;" onclick="exportAll()">Export JSON</button>
+
+    <div style="width:100%; margin-top:.4rem;">
+      <button class="btn-secondary" style="width:100%;" id="import-btn">Import JSON</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAll(event)">
+    </div>
+
+    <div id="admin-msg" class="small" style="margin-top:.5rem;"></div>
+  </div>
+  <div class="admin-footer">Shared Firebase backend</div>
+</div>
+
+<!-- PLAYER PROFILE PANEL -->
+<div id="player-profile-panel" class="admin-panel" style="z-index:60;">
+  <div class="admin-header">
+    <div class="admin-title" id="pp-name">Player</div>
+    <div class="admin-close" onclick="closePlayerProfile()">✕</div>
+  </div>
+  <div class="admin-body" id="pp-body"></div>
+
+
+  <div class="admin-footer">Stats generated from match history</div>
+</div>
+
+<!-- RULES PAGE (inline like history) -->
+<div id="page-rules" style="display:none;">
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Ladder Rules</div>
+        <div class="card-sub">Read before recording a match</div>
+      </div>
+    </div>
+    <div id="rules-list" style="margin-top:1rem;"></div>
+  </div>
+</div>
+  <!-- PLAYER STATS PAGE -->
+  <div id="page-player-stats" style="display:none; margin-top:.8rem;">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Player Stats</div>
+          <div class="card-sub">Select a player to view their performance dashboard</div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:1rem; margin-top:.8rem; flex-wrap:wrap;">
+        <div style="flex:1 1 280px; min-width:220px;">
+          <div class="small" style="margin-bottom:.4rem;">Players</div>
+          <div id="players-list" style="display:flex; flex-direction:column; gap:.35rem; max-height:60vh; overflow:auto;"></div>
+        </div>
+
+        <div id="player-dashboard" style="flex:3 1 640px; min-width:320px; display:none;">
+          <!-- Dashboard cards will be rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+/* -----------------------------------------------------------
+   FIREBASE INITIALISATION
+   ----------------------------------------------------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
+  authDomain: "fox-darts-ladder.firebaseapp.com",
+  databaseURL: "https://fox-darts-ladder-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "fox-darts-ladder",
+  storageBucket: "fox-darts-ladder.firebasestorage.app",
+  messagingSenderId: "1028079521201",
+  appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* -----------------------------------------------------------
+   GLOBAL STATE
+   ----------------------------------------------------------- */
+let ladder = [];
+let previousLadder = [];
+let historyCache = {};
+let editIndex = null;
+
+/* -----------------------------------------------------------
+   PAGE SWITCHING
+   ----------------------------------------------------------- */
+function showPage(page) {
+  // page switch requested
+
+  // Dynamically find all top-level pages (ids starting with "page-") that are direct children of .container
+  const container = document.querySelector('.container') || document.body;
+  const pageEls = Array.from(container.querySelectorAll(':scope > [id^="page-"]'));
+  pageEls.forEach(el => { try { el.style.display = 'none'; } catch(e) {} });
+
+  // show target if present
+  const targetId = page === 'player-stats' ? 'page-player-stats' : (page === 'history' ? 'page-history' : (page === 'rules' ? 'page-rules' : (page === 'scoring' ? 'page-scoring' : 'page-ladder')));
+  let target = document.getElementById(targetId);
+  if (!target) {
+  console.error('showPage target not found:', targetId, 'falling back to first available page');
+    target = pageEls.length ? pageEls[0] : null;
+  }
+  if (target) {
+    try { target.style.display = 'block'; target.style.visibility = 'visible'; target.style.opacity = '1'; target.style.setProperty('min-height','220px','important'); target.style.zIndex = '20'; } catch(e) {}
+    // ensure inner card visible
+    const card = target.querySelector('.card');
+    if (card) { try { card.style.display = 'block'; card.style.visibility = 'visible'; card.style.opacity = '1'; card.style.setProperty('min-height','180px','important'); } catch(e) {} }
+  // target shown; size will be validated below
+  }
+  // If the shown target is collapsed (0x0), walk its ancestor chain and dump diagnostics to help find the collapsed parent
+  try {
+    const t = document.getElementById(targetId);
+    if (t) {
+      const r = t.getBoundingClientRect();
+      if ((r.width === 0 && r.height === 0) || r.width === 0 || r.height === 0) {
+  // target has zero size; run ancestor inspection in debug builds only
+        (function inspectAncestors(el) {
+          let cur = el.parentElement; let depth = 0; const rows = [];
+          let firstCollapsed = null;
+          while (cur && depth < 12) {
+            try {
+              const cs = getComputedStyle(cur);
+              const br = cur.getBoundingClientRect();
+              const info = {
+                depth,
+                tag: cur.tagName,
+                id: cur.id || null,
+                classes: cur.className || null,
+                display: cs.display,
+                position: cs.position,
+                visibility: cs.visibility,
+                opacity: cs.opacity,
+                overflow: cs.overflow,
+                transform: cs.transform,
+                offsetWidth: cur.offsetWidth,
+                offsetHeight: cur.offsetHeight,
+                clientWidth: cur.clientWidth,
+                clientHeight: cur.clientHeight,
+                scrollHeight: cur.scrollHeight,
+                rect: { w: br.width, h: br.height, top: br.top, left: br.left }
+              };
+              rows.push(info);
+              if (!firstCollapsed && (info.offsetWidth === 0 || info.offsetHeight === 0 || info.rect.w === 0 || info.rect.h === 0 || info.display === 'none')) firstCollapsed = info;
+            } catch(e) { rows.push({ depth, tag: cur.tagName, error: e && e.message }); }
+            cur = cur.parentElement; depth++;
+          }
+          // ancestor inspection collected
+          if (firstCollapsed) try { console.error('Collapsed ancestor detected:', firstCollapsed); } catch(e) { console.error('Collapsed ancestor', firstCollapsed); }
+        })(t);
+      }
+    }
+  } catch(e) { console.error('ancestor inspection failed', e); }
+  // debug: report computed styles and parent chain for the target (helps detect hidden parents)
+  try {
+    const t = document.getElementById(targetId);
+    if (t) {
+      const cs = getComputedStyle(t);
+  // showPage debug suppressed in production
+      let el = t.parentElement; let depth = 0; const parents = [];
+      while (el && depth < 6) { parents.push({ tag: el.tagName, id: el.id || null, display: getComputedStyle(el).display }); el = el.parentElement; depth++; }
+  // parent chain available for diagnostics if needed
+    }
+  } catch(e) { console.error('showPage debug error', e); }
+  if (page === 'scoring' && typeof openScoring === 'function') {
+    try { openScoring(); } catch (e) { console.error('openScoring error', e); }
+  }
+
+  // when leaving the scoring page, persist any active scoring state
+  try {
+    if (page !== 'scoring' && typeof window.saveScoringStateToStorage === 'function') {
+      try { window.saveScoringStateToStorage(); } catch (e) {}
+    }
+  } catch (e) {}
+
+  // Ensure visible card children for whichever page is active
+  ['page-ladder','page-scoring','page-history','page-rules','page-player-stats'].forEach(pid => {
+    const el = document.getElementById(pid);
+    if (!el) return;
+    const card = el.querySelector('.card');
+    if (!card) return;
+    const isVisible = getComputedStyle(el).display !== 'none';
+    if (isVisible) {
+      try {
+        card.style.display = 'block';
+        card.style.visibility = 'visible';
+        card.style.opacity = '1';
+        // defensive: ensure the card has reasonable min height so it is visible
+        // stronger override using !important to override any CSS rules that collapse height
+        try {
+          card.style.setProperty('min-height', '180px', 'important');
+          card.style.setProperty('height', 'auto', 'important');
+          el.style.setProperty('min-height', '200px', 'important');
+          el.style.setProperty('height', 'auto', 'important');
+          el.style.setProperty('overflow', 'visible', 'important');
+        } catch(e) { }
+        // also nudge container root
+        try { document.querySelector('.container')?.style.setProperty('min-height','320px','important'); } catch(e) {}
+      } catch (e) {}
+    }
+  });
+
+  // Diagnostics removed for production: no debug banners or console logs
+
+  // toggle active state on nav buttons
+  try {
+  ['ladder','scoring','history','rules','player-stats'].forEach(p => {
+      const el = document.getElementById('nav-' + p);
+      if (!el) return;
+      if (p === page) el.classList.add('active'); else el.classList.remove('active');
+    });
+  } catch (e) { }
+
+  // Ensure rules are rendered when the rules page is shown
+  if (page === 'rules' && typeof renderRules === 'function') {
+    try { renderRules(); } catch (e) {}
+  }
+  if (page === 'player-stats' && typeof renderPlayerStatsList === 'function') {
+    try { renderPlayerStatsList(); } catch (e) {}
+  }
+}
+
+// Debug reveal removed: no temporary outlines or highlights applied on page show
+
+  // Defensive: ensure nav buttons and admin icon have working click handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    const pages = ['ladder','scoring','history','rules','player-stats'];
+    pages.forEach(p => {
+      const el = document.getElementById('nav-' + p);
+      if (!el) return;
+      el.addEventListener('click', () => { try { showPage(p); } catch (e) {} });
+    });
+
+    // admin icon removed from header; header logo still toggles admin panel if needed
+    // ensure nav-admin reliably toggles admin panel (some browsers may ignore inline onclick under delegated handlers)
+    try {
+      const adminBtn = document.getElementById('nav-admin');
+      if (adminBtn) {
+    adminBtn.addEventListener('click', (ev) => { ev.preventDefault(); ev.stopPropagation(); try { toggleAdminPanel(); } catch(e) { console.error(e); } });
+      }
+  } catch(e) { console.error('failed to attach nav-admin listener', e); }
+
+    // ensure admin-panel has expected initial transform/z-index so toggle works
+    try {
+      const panel = document.getElementById('admin-panel');
+      if (panel) { panel.style.transform = panel.classList.contains('open') ? 'translateX(0)' : 'translateX(100%)'; panel.style.zIndex = panel.style.zIndex || '50'; }
+    } catch(e) {}
+  });
+
+// Defensive attach: ensure the nav scoring button always triggers showPage
+(() => {
+  const nav = document.getElementById('nav-scoring');
+  if (nav) {
+    nav.addEventListener('click', (e) => {
+      try { showPage('scoring'); } catch (err) { }
+    });
+  }
+})();
+
+/* -----------------------------------------------------------
+   ADMIN PANEL
+   ----------------------------------------------------------- */
+function toggleAdminPanel() {
+  try {
+  // toggling admin panel
+    const panel = document.getElementById('admin-panel');
+  if (!panel) { console.error('toggleAdminPanel: admin-panel element not found'); return; }
+    const nowOpen = panel.classList.toggle('open');
+    // ensure panel is visually on top and the transform is applied; fallback to inline styles if CSS didn't catch
+    try { panel.style.zIndex = nowOpen ? '9999' : '50'; } catch(e) {}
+    try {
+      if (nowOpen) {
+        panel.style.transform = 'translateX(0)';
+        panel.style.display = 'flex';
+      } else {
+        panel.style.transform = 'translateX(100%)';
+      }
+    } catch(e) {}
+  // admin panel state toggled
+  } catch (e) { console.error('toggleAdminPanel error', e); }
+}
+
+/* -----------------------------------------------------------
+   RENDER RULES (match history styling)
+   ----------------------------------------------------------- */
+function renderRules() {
+  const rules = [
+    "Normal darts rules apply – straight in, double out.",
+    "Matches must be scored and witnessed by a third member of the ladder.",
+    "Players must declare to the scorer/witness that the match is a ladder match before starting.",
+    "Format: Best of 3 legs. Default 501 start, or 301 if both players agree.",
+    "45‑dart rule: After each player has thrown 45 darts (15 visits), if neither has checked out, the leg is decided by one dart nearest the bull.",
+    "No remaining‑score comparison is used after 45 darts — nearest‑bull only.",
+    "Challenge rule: A player may challenge up to 3 positions above them in the ladder.",
+    "If the lower‑ranked player wins, they take the higher player’s position and everyone below shifts down one.",
+    "New players join at the bottom of the ladder.",
+    "The ladder runs continuously — inactive players naturally drift downward as others challenge above them."
+  ];
+
+  const container = document.getElementById('rules-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  rules.forEach(rule => {
+    container.innerHTML += `
+      <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px dashed rgba(55,65,81,0.7);">
+        <div class="rule-text">${rule}</div>
+      </div>
+    `;
+  });
+}
+
+/* -----------------------------------------------------------
+   INLINE EXPANSION: insert a row directly under clicked player
+   ----------------------------------------------------------- */
+function togglePlayerExpansion(index) {
+  const tbody = document.getElementById('ladder-body');
+  if (!tbody) return;
+
+  // close any open expansion
+  const open = tbody.querySelector('.player-expanded-row');
+  const prevIndex = tbody.getAttribute('data-open-index');
+  if (open) open.remove();
+
+  // if clicking the same row, just close it
+  if (prevIndex && Number(prevIndex) === index) {
+    tbody.removeAttribute('data-open-index');
+    const btnCell = tbody.children[index]?.querySelector('td[aria-expanded]');
+    if (btnCell) btnCell.setAttribute('aria-expanded', 'false');
+    return;
+  }
+
+  const row = tbody.children[index];
+  if (!row) return;
+
+  const cols = row.children.length;
+  const tr = document.createElement('tr');
+  tr.className = 'player-expanded-row';
+  const td = document.createElement('td');
+  td.colSpan = cols;
+  td.innerHTML = `<div class="player-card card" id="player-expanded-${index}">Loading…</div>`;
+  tr.appendChild(td);
+
+  // insert expansion after clicked row
+  row.parentNode.insertBefore(tr, row.nextSibling);
+  tbody.setAttribute('data-open-index', index);
+
+  // set aria-expanded on clickable cell
+  const btnCell = row.querySelector('td[onclick]');
+  if (btnCell) btnCell.setAttribute('aria-expanded', 'true');
+
+  // render profile-style content into the expansion (reuse existing stat engines)
+  const container = document.getElementById(`player-expanded-${index}`);
+  const p = ladder[index];
+  const stats = computeAdvancedStats(p.name);
+  const ach = computeAchievements(stats);
+  const rivalries = computeRivalries(p.name);
+
+  container.innerHTML = `
+    <div class="expansion-root">
+      <div style="flex:1 1 220px; min-width:180px;">
+        <div style="font-weight:700; margin-bottom:.4rem;">${p.nick || p.name}</div>
+        <div class="small" style="color:#9ca3af;">Player</div>
+      </div>
+
+      <div style="flex:2 1 360px; min-width:260px;">
+        <div class="admin-section-title" style="margin-top:.7rem;">Achievements</div>
+        <div style="margin-top:.45rem;">
+          ${ ach.length ? ach.map(a => `
+            <div style="margin-bottom:.5rem; display:flex; gap:.5rem; align-items:center;">
+              <span class="badge-ach">★ ${a.label}</span>
+              <div class="small">${a.desc}</div>
+            </div>
+          `).join('') : `<div class="small" style="color:#9ca3af;">No achievements yet</div>` }
+        </div>
+
+        <div class="admin-section-title" style="margin-top:.6rem;">Rivalries</div>
+        <div style="margin-top:.45rem;">
+          ${ rivalries.length ? rivalries.map(r => `
+            <div style="margin-bottom:.4rem; display:flex; gap:.6rem; align-items:center;">
+              <span class="badge-rival">🔥 Rivalry</span>
+              <div class="small">${r.opponent} — ${r.record} (across ${r.total} matches)</div>
+            </div>
+          `).join('') : `<div class="small" style="color:#9ca3af;">No rivalries detected</div>` }
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* -----------------------------------------------------------
+   RENDER LADDER
+   ----------------------------------------------------------- */
+function renderLadder() {
+  const body = document.getElementById("ladder-body");
+  body.innerHTML = "";
+
+  ladder.forEach((p, i) => {
+    const nameDisplay = p.nick
+      ? `${p.name} <span style="color:#9ca3af; font-size:.75rem;">“${p.nick}”</span>`
+      : p.name;
+
+    const stats = computeAdvancedStats(p.name);
+    const hasAch = computeAchievements(stats).length > 0;
+    const hasRival = computeRivalries(p.name).length > 0;
+
+    const star = hasAch ? `<span class="ach-star">★</span>` : "";
+    const flame = hasRival ? `<span class="rival-flame">🔥</span>` : "";
+
+    body.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td style="cursor:pointer;" onclick="togglePlayerExpansion(${i})" aria-expanded="false">
+          ${nameDisplay}${star}${flame}
+          <span style="cursor:pointer; margin-left:8px; color:#60a5fa;"
+                onclick="event.stopPropagation(); openEditPlayer(${i})">✎</span>
+        </td>
+        <td>${p.w}</td>
+        <td>${p.l}</td>
+        <td>${p.lf}:${p.la}</td>
+        <td>${p.last || "—"}</td>
+      </tr>
+    `;
+  });
+}
+
+/* -----------------------------------------------------------
+   LADDER LISTENER
+   ----------------------------------------------------------- */
+db.ref("ladder").on("value", snap => {
+  const newLadder = snap.val() || [];
+
+  newLadder.forEach((p, newIndex) => {
+    const oldIndex = previousLadder.findIndex(x => x.name === p.name);
+    p.delta = oldIndex === -1 ? 0 : oldIndex - newIndex;
+
+    p.w ??= 0;
+    p.l ??= 0;
+    p.lf ??= 0;
+    p.la ??= 0;
+    p.nick ??= null;
+  });
+
+  previousLadder = JSON.parse(JSON.stringify(newLadder));
+  ladder = newLadder;
+
+  renderLadder();
+  renderSelects();
+});
+
+/* -----------------------------------------------------------
+   HISTORY LISTENER
+   ----------------------------------------------------------- */
+db.ref("history").on("value", snap => {
+  historyCache = snap.val() || {};
+  // history listener loaded entries
+  const list = document.getElementById("history-list");
+  if (list) {
+    list.innerHTML = "";
+
+    const entries = Object.entries(historyCache);
+    if (!entries.length) {
+      list.innerHTML = `<div class="small" style="color:#9ca3af;">No matches yet.</div>`;
+    } else {
+      entries.reverse().forEach(([id, m]) => {
+        const cName = m.challengerNick ? `${m.challenger} “${m.challengerNick}”` : m.challenger;
+        const oName = m.opponentNick ? `${m.opponent} “${m.opponentNick}”` : m.opponent;
+
+        const winner = m.winner === m.challenger ? cName : oName;
+        const loser  = m.loser  === m.challenger ? cName : oName;
+
+        const legs = m.legs.map((l, i) => {
+          if (!l.winner) return `Leg ${i+1}: –`;
+          const w = l.winner === "challenger" ? cName : oName;
+          return `Leg ${i+1}: ${w}`;
+        }).join(" • ");
+
+        list.innerHTML += `
+          <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px dashed rgba(55,65,81,0.7);">
+            <div><strong>${winner}</strong> beat <strong>${loser}</strong></div>
+            <div class="small" style="color:#9ca3af;">${m.timestamp}</div>
+            <div class="small" style="margin-top:.3rem;">${legs}</div>
+          </div>
+        `;
+      });
+    }
+  }
+
+  // History changed — re-render ladder so achievements/rivalries update
+  renderLadder();
+});
+
+/* -----------------------------------------------------------
+   SAVE LADDER
+   ----------------------------------------------------------- */
+function saveLadder() {
+  db.ref("ladder").set(ladder);
+}
+
+/* -----------------------------------------------------------
+   ADD PLAYER
+   ----------------------------------------------------------- */
+function addPlayer() {
+  const name = document.getElementById("new-player-name").value.trim();
+  const nick = document.getElementById("new-player-nick").value.trim();
+
+  if (!name) return;
+
+  ladder.push({
+    name,
+    nick: nick || null,
+    w: 0,
+    l: 0,
+    lf: 0,
+    la: 0,
+    last: null,
+    delta: 0
+  });
+
+  document.getElementById("new-player-name").value = "";
+  document.getElementById("new-player-nick").value = "";
+
+  saveLadder();
+  renderSelects();
+}
+
+/* -----------------------------------------------------------
+   EDIT PLAYER
+   ----------------------------------------------------------- */
+function openEditPlayer(i) {
+  editIndex = i;
+  const p = ladder[i];
+
+  const modal = document.createElement("div");
+  modal.id = "edit-modal";
+  modal.style = `
+    position:fixed; top:0; left:0; width:100%; height:100%;
+    background:rgba(0,0,0,0.6); display:flex; align-items:center; justify-content:center;
+    z-index:9999;
+  `;
+
+  modal.innerHTML = `
+    <div style="background:#111827; padding:1.2rem; border-radius:12px; width:320px;">
+      <h3 style="margin-top:0; margin-bottom:.8rem;">Edit Player</h3>
+      <input id="edit-name" value="${p.name}" style="width:100%; margin-bottom:.6rem;">
+      <input id="edit-nick" value="${p.nick || ""}" style="width:100%; margin-bottom:1rem;">
+      <button class="btn-primary" style="width:100%;" onclick="savePlayerEdit()">Save</button>
+      <button class="btn-secondary" style="width:100%; margin-top:.5rem;" onclick="closeEditPlayer()">Cancel</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+function closeEditPlayer() {
+  const modal = document.getElementById("edit-modal");
+  if (modal) modal.remove();
+  editIndex = null;
+}
+
+function savePlayerEdit() {
+  if (editIndex === null) return;
+
+  const newName = document.getElementById("edit-name").value.trim();
+  const newNick = document.getElementById("edit-nick").value.trim();
+
+  if (!newName) return;
+
+  ladder[editIndex].name = newName;
+  ladder[editIndex].nick = newNick || null;
+
+  saveLadder();
+  renderLadder();
+  renderSelects();
+  closeEditPlayer();
+}
+
+/* -----------------------------------------------------------
+   SELECT OPTIONS
+   ----------------------------------------------------------- */
+function renderSelects() {
+  // Populate scoring player select and any other selects that need the ladder
+  // refresh match selectors in scoring page when ladder updates
+  if (typeof renderScoringPlayers === 'function') renderScoringPlayers();
+  // refresh player stats list when ladder updates
+  if (typeof renderPlayerStatsList === 'function') renderPlayerStatsList();
+}
+
+/* -----------------------------------------------------------
+   MATCH ENTRY — LEG UI (updated: per-visit inputs + double-out)
+   ----------------------------------------------------------- */
+function buildLegUI() {
+  const area = document.getElementById("legs-area");
+  if (!area) return; // defensive: legacy Record Match UI may be removed
+  area.innerHTML = "";
+
+  const maxLegs = parseInt(document.getElementById("best-of").value || "3");
+  const startScore = parseInt(document.getElementById("start-score").value || "501");
+
+  for (let n = 1; n <= maxLegs; n++) {
+    area.innerHTML += `
+      <div id="leg-${n}" style="background:#151b26; padding:.8rem; border-radius:10px; margin-bottom:.6rem;">
+        <div class="small" style="margin-bottom:.3rem;">Leg ${n}</div>
+
+        <div style="display:flex; gap:.6rem; flex-wrap:wrap; align-items:center;">
+          <select class="leg-winner" data-leg="${n}">
+            <option value="">Winner</option>
+            <option value="challenger">Challenger</option>
+            <option value="opponent">Opponent</option>
+          </select>
+
+          <div style="display:flex; gap:.6rem; align-items:center;">
+            <div class="small">Challenger remaining</div>
+            <div id="rem-ch-${n}" class="small" style="min-width:64px;">${startScore}</div>
+          </div>
+
+          <div style="display:flex; gap:.6rem; align-items:center;">
+            <div class="small">Opponent remaining</div>
+            <div id="rem-op-${n}" class="small" style="min-width:64px;">${startScore}</div>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:1rem; margin-top:.6rem; flex-wrap:wrap;">
+          <div style="flex:1; min-width:220px;">
+            <div class="small" style="margin-bottom:.3rem;">Challenger visits</div>
+            <div class="visits-ch" data-leg="${n}"></div>
+            <button class="btn-secondary" onclick="addVisit(${n}, 'challenger')" style="margin-top:.5rem;">+ Add visit</button>
+          </div>
+
+          <div style="flex:1; min-width:220px;">
+            <div class="small" style="margin-bottom:.3rem;">Opponent visits</div>
+            <div class="visits-op" data-leg="${n}"></div>
+            <button class="btn-secondary" onclick="addVisit(${n}, 'opponent')" style="margin-top:.5rem;">+ Add visit</button>
+          </div>
+        </div>
+
+        <label class="small" style="display:block; margin-top:.6rem;">
+          <input type="checkbox" class="leg-45" data-leg="${n}" style="width:auto; margin-right:.35rem;">
+          45 darts reached
+        </label>
+
+        <div id="bull-${n}" style="display:none; margin-top:.4rem;">
+          <div class="small" style="margin-bottom:.3rem;">Nearest bull used</div>
+          <input type="checkbox" class="leg-bull" data-leg="${n}">
+        </div>
+      </div>
+    `;
+  }
+
+  // initialize one visit per player per leg
+  for (let n = 1; n <= maxLegs; n++) {
+    addVisit(n, 'challenger');
+    addVisit(n, 'opponent');
+  }
+
+  // wire up 45-dart -> bull area toggles and leg winner changes
+  for (let n = 1; n <= maxLegs; n++) {
+    const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const bullArea = document.getElementById(`bull-${n}`);
+    cb45.addEventListener("change", () => {
+      bullArea.style.display = cb45.checked ? "block" : "none";
+    });
+  }
+
+  document.querySelectorAll(".leg-winner").forEach(sel => {
+    sel.addEventListener("change", recalcLegState);
+  });
+}
+
+// add a visit row: three-dart visit score input + optional "double out confirmed" when reaching 0
+function addVisit(leg, player) {
+  const container = document.querySelector(`.visits-${player === 'challenger' ? 'ch' : 'op'}[data-leg="${leg}"]`);
+  if (!container) return;
+
+  const idx = container.children.length + 1;
+  const row = document.createElement('div');
+  row.style = "display:flex; gap:.4rem; align-items:center; margin-bottom:.35rem;";
+  row.innerHTML = `
+    <div class="small" style="min-width:44px;">V${idx}</div>
+    <input type="number" min="0" max="180" step="1" class="visit-score" data-leg="${leg}" data-player="${player}" data-visit="${idx}" placeholder="0" style="width:90px;">
+    <label class="small" style="display:flex; gap:.35rem; align-items:center;">
+      <input type="checkbox" class="double-confirm" data-leg="${leg}" data-player="${player}" data-visit="${idx}" style="width:auto; display:none;">
+      <span class="double-label" style="display:none;">Double out</span>
+    </label>
+  `;
+  container.appendChild(row);
+
+  const input = row.querySelector('.visit-score');
+  const dbl = row.querySelector('.double-confirm');
+  const dblLabel = row.querySelector('.double-label');
+
+  input.addEventListener('input', () => updateRemaining(leg));
+
+  // show double checkbox when this visit brings remaining to zero
+  input.addEventListener('blur', () => {
+    updateRemaining(leg);
+    const rem = getRemainingForPlayer(leg, player);
+    if (rem === 0) {
+      dbl.style.display = "inline-block";
+      dblLabel.style.display = "inline-block";
+    }
+  });
+}
+
+function getRemainingForPlayer(leg, player) {
+  const start = parseInt(document.getElementById("start-score").value || "501");
+  const scores = Array.from(document.querySelectorAll(`.visit-score[data-leg="${leg}"][data-player="${player}"]`))
+    .map(i => i.value === "" ? 0 : parseInt(i.value, 10) || 0);
+  const spent = scores.reduce((s, v) => s + v, 0);
+  return Math.max(0, start - spent);
+}
+
+function updateRemaining(leg) {
+  const remCh = document.getElementById(`rem-ch-${leg}`);
+  const remOp = document.getElementById(`rem-op-${leg}`);
+  remCh.textContent = getRemainingForPlayer(leg, 'challenger');
+  remOp.textContent = getRemainingForPlayer(leg, 'opponent');
+}
+
+function recalcLegState() {
+  const maxLegs = parseInt(document.getElementById("best-of").value || "3");
+  const legs = getLegsFromDOM();
+  const requiredToWin = Math.ceil(maxLegs / 2);
+
+  let cWins = legs.filter(l => l.winner === "challenger").length;
+  let oWins = legs.filter(l => l.winner === "opponent").length;
+
+  // disable further legs when someone has already won best-of
+  for (let n = 1; n <= maxLegs; n++) {
+    const sel = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+    const addCh = document.querySelector(`.visits-ch[data-leg="${n}"]`);
+    const addOp = document.querySelector(`.visits-op[data-leg="${n}"]`);
+    const cb45 = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const bull = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+
+    const playedSoFar = (n <= legs.length) && legs[n-1] && legs[n-1].winner;
+    const someoneWon = (cWins >= requiredToWin || oWins >= requiredToWin);
+
+    if (someoneWon && !playedSoFar) {
+      if (sel) sel.disabled = true;
+      if (addCh) addCh.querySelectorAll('input, button').forEach(i => i.disabled = true);
+      if (addOp) addOp.querySelectorAll('input, button').forEach(i => i.disabled = true);
+      if (cb45) cb45.disabled = true;
+      if (bull) bull.disabled = true;
+    } else {
+      if (sel) sel.disabled = false;
+      if (addCh) addCh.querySelectorAll('input, button').forEach(i => i.disabled = false);
+      if (addOp) addOp.querySelectorAll('input, button').forEach(i => i.disabled = false);
+      if (cb45) cb45.disabled = false;
+      if (bull) bull.disabled = false;
+    }
+  }
+}
+
+function getLegsFromDOM() {
+  const maxLegs = parseInt(document.getElementById("best-of").value || "3");
+  const startScore = parseInt(document.getElementById("start-score").value || "501");
+  const legs = [];
+  for (let n = 1; n <= maxLegs; n++) {
+    const winnerEl = document.querySelector(`.leg-winner[data-leg="${n}"]`);
+    const winner = winnerEl ? winnerEl.value : "";
+    const reached45El = document.querySelector(`.leg-45[data-leg="${n}"]`);
+    const bullEl = document.querySelector(`.leg-bull[data-leg="${n}"]`);
+
+    // collect visits
+    const visitsCh = Array.from(document.querySelectorAll(`.visit-score[data-leg="${n}"][data-player="challenger"]`))
+      .map(i => ({ score: i.value === "" ? 0 : parseInt(i.value,10) || 0, visit: parseInt(i.getAttribute('data-visit'),10) }));
+    const doubleCh = Array.from(document.querySelectorAll(`.double-confirm[data-leg="${n}"][data-player="challenger"]`))
+      .map(i => i.checked);
+
+    const visitsOp = Array.from(document.querySelectorAll(`.visit-score[data-leg="${n}"][data-player="opponent"]`))
+      .map(i => ({ score: i.value === "" ? 0 : parseInt(i.value,10) || 0, visit: parseInt(i.getAttribute('data-visit'),10) }));
+    const doubleOp = Array.from(document.querySelectorAll(`.double-confirm[data-leg="${n}"][data-player="opponent"]`))
+      .map(i => i.checked);
+
+    const remCh = getRemainingForPlayer(n, 'challenger');
+    const remOp = getRemainingForPlayer(n, 'opponent');
+
+    legs.push({
+      winner,
+      reached45: reached45El ? reached45El.checked : false,
+      bull: bullEl ? bullEl.checked : false,
+      visits: {
+        challenger: visitsCh,
+        challengerDoubleFlags: doubleCh,
+        opponent: visitsOp,
+        opponentDoubleFlags: doubleOp
+      },
+      finalCh: remCh,
+      finalOp: remOp,
+      startingScore: startScore
+    });
+  }
+  return legs;
+}
+
+/* -----------------------------------------------------------
+   SUBMIT MATCH
+   ----------------------------------------------------------- */
+function submitMatch() {
+  const msg = document.getElementById("msg");
+  msg.textContent = "";
+
+  const challengerEl = document.getElementById("challenger");
+  const opponentEl = document.getElementById("opponent");
+  if (!challengerEl || !opponentEl) {
+    msg.textContent = "Record Match UI is not available. Use the Scoring page to record matches.";
+    return;
+  }
+
+  const c = parseInt(challengerEl.value);
+  const o = parseInt(opponentEl.value);
+
+  if (isNaN(c) || isNaN(o)) {
+    msg.textContent = "Select challenger and opponent.";
+    return;
+  }
+
+  const challenger = ladder[c];
+  const opponent = ladder[o];
+
+  const legs = getLegsFromDOM();
+  const maxLegs = parseInt(document.getElementById("best-of").value || "3");
+  const requiredToWin = Math.ceil(maxLegs / 2);
+  const cLegs = legs.filter(l => l.winner === "challenger").length;
+  const oLegs = legs.filter(l => l.winner === "opponent").length;
+
+  if (!(cLegs >= requiredToWin || oLegs >= requiredToWin)) {
+    msg.textContent = `Match must finish best‑of ${maxLegs} (first to ${requiredToWin}).`;
+    return;
+  }
+
+  // Validate per-leg finishes: either checkout (remaining 0) with a confirmed double-out
+  // or a 45-dart bull-decided leg
+  for (let i = 0; i < legs.length; i++) {
+    const l = legs[i];
+    if (!l.winner) continue;
+    if (l.reached45) {
+      if (!l.bull) {
+        msg.textContent = `Leg ${i+1} reached 45 darts but bull not confirmed.`;
+        return;
+      }
+      continue;
+    }
+
+    const winnerKey = l.winner === "challenger" ? "challenger" : "opponent";
+    const winnerRem = l.winner === "challenger" ? l.finalCh : l.finalOp;
+
+    if (winnerRem !== 0) {
+      msg.textContent = `Leg ${i+1}: winner must have completed to 0 or use 45‑dart bull rule.`;
+      return;
+    }
+
+    // check double-out was confirmed on the visit that reached 0
+    const visits = l.visits[winnerKey];
+    const dblFlags = l.visits[`${winnerKey}DoubleFlags`];
+    const start = l.startingScore ?? parseInt(document.getElementById("start-score").value || "501");
+
+    // find the visit index where cumulative brought remaining to zero
+    let cum = 0;
+    let zeroVisitIdx = -1;
+    for (let vi = 0; vi < visits.length; vi++) {
+      cum += visits[vi].score;
+      if (start - cum <= 0) { zeroVisitIdx = vi; break; }
+    }
+    if (zeroVisitIdx === -1) zeroVisitIdx = visits.length - 1;
+
+    const confirmed = !!dblFlags[zeroVisitIdx];
+    if (!confirmed) {
+      msg.textContent = `Leg ${i+1}: winner checkout must be double‑out — confirm the double on the visit that completed the leg.`;
+      return;
+    }
+  }
+
+  const winner = cLegs > oLegs ? challenger : opponent;
+  const loser  = cLegs > oLegs ? opponent : challenger;
+
+  winner.w++;
+  loser.l++;
+  winner.lf += Math.max(cLegs, oLegs);
+  winner.la += Math.min(cLegs, oLegs);
+  loser.lf  += Math.min(cLegs, oLegs);
+  loser.la  += Math.max(cLegs, oLegs);
+
+  const stamp = new Date().toLocaleString();
+  winner.last = `W vs ${loser.name} (${stamp})`;
+  loser.last  = `L vs ${winner.name} (${stamp})`;
+
+  let movement = "No movement";
+  const wIndex = ladder.indexOf(winner);
+  const lIndex = ladder.indexOf(loser);
+
+  if (wIndex > lIndex) {
+    const oldPos = wIndex + 1;
+    const newPos = lIndex + 1;
+    const moved = ladder.splice(wIndex, 1)[0];
+    ladder.splice(lIndex, 0, moved);
+    movement = `Moved from ${oldPos} to ${newPos}`;
+  }
+
+  db.ref("history").push({
+    challenger: challenger.name,
+    challengerNick: challenger.nick,
+    opponent: opponent.name,
+    opponentNick: opponent.nick,
+    winner: winner.name,
+    loser: loser.name,
+    legs,
+    // compute and store per-match stats for richer player profiles
+    stats: computeMatchStats({ challenger: challenger.name, opponent: opponent.name, legs }),
+    timestamp: stamp,
+    movement
+  });
+
+  saveLadder();
+  msg.textContent = "Match recorded.";
+
+  buildLegUI();
+  recalcLegState();
+}
+
+/* -----------------------------------------------------------
+   BACKUP / RESTORE
+   ----------------------------------------------------------- */
+function exportAll() {
+  const data = { ladder, history: historyCache };
+  try {
+    document.getElementById('admin-msg').textContent = 'Preparing export...';
+  } catch(e) {}
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const ts = new Date().toISOString().replace(/[:.]/g, '-');
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `fox-darts-ladder-backup-${ts}.json`;
+  a.click();
+  try {
+    document.getElementById('admin-msg').textContent = 'Export started.';
+  } catch(e) {}
+  // Revoke after a short delay to ensure download starts
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function importAll(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const data = JSON.parse(evt.target.result);
+
+      // Accept alternate shapes for convenience
+      const maybeLadder = data.ladder ?? data.players ?? data.teams ?? [];
+      const maybeHistory = data.history ?? data.matches ?? data.games ?? {};
+
+      // Basic validation: ladder should be an array, history should be an object or array
+      if (!Array.isArray(maybeLadder) || !(Array.isArray(maybeHistory) || typeof maybeHistory === 'object')) {
+        document.getElementById("admin-msg").textContent = "Invalid backup format. Expect { ladder: [], history: {} }.";
+        return;
+      }
+
+      // lightweight ladder validation: ensure each entry has a name
+      const ladderValid = Array.isArray(maybeLadder) && maybeLadder.every(p => p && typeof p.name === 'string');
+      const historyValid = Array.isArray(maybeHistory) || (maybeHistory && typeof maybeHistory === 'object');
+      if (!ladderValid || !historyValid) {
+        document.getElementById("admin-msg").textContent = "Import failed: invalid ladder or history entries.";
+        return;
+      }
+
+      ladder = maybeLadder;
+      historyCache = Array.isArray(maybeHistory) ? Object.fromEntries(maybeHistory.map((m, i) => [i, m])) : maybeHistory;
+
+      // write to Firebase and surface errors to the admin UI
+      document.getElementById("admin-msg").textContent = "Importing...";
+      Promise.all([
+        db.ref("ladder").set(ladder),
+        db.ref("history").set(historyCache)
+      ]).then(() => {
+        renderLadder();
+        renderSelects();
+        document.getElementById("admin-msg").textContent = "Import successful.";
+      }).catch(err => {
+        console.error('Import failed', err);
+        document.getElementById("admin-msg").textContent = `Import failed: ${err && err.message ? err.message : 'unknown error'}`;
+      });
+    } catch (err) {
+      console.error(err);
+      document.getElementById("admin-msg").textContent = "Invalid JSON file.";
+    } finally {
+      // clear file input so the same file can be re-selected if needed
+      try { e.target.value = ""; } catch(e) {}
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetLadderOnly() {
+  if (!confirm("Reset ladder?")) return;
+  ladder = [];
+  db.ref("ladder").set([]);
+  renderLadder();
+  renderSelects();
+}
+
+function resetHistoryOnly() {
+  if (!confirm("Reset match history?")) return;
+  historyCache = {};
+  db.ref("history").set({});
+  // history-list removed
+}
+
+function resetAll() {
+  if (!confirm("Reset ladder AND history?")) return;
+  ladder = [];
+  historyCache = {};
+  db.ref("ladder").set([]);
+  db.ref("history").set({});
+  renderLadder();
+  renderSelects();
+  // history-list removed
+}
+</script>
+
+<!-- Fullscreen fireworks canvas (hidden until triggered) -->
+<canvas id="fw-canvas" style="position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;display:none;z-index:9999;"></canvas>
+
+<script>
+// Lightweight fireworks animation — non-blocking, auto-clears after a short duration
+(() => {
+  const canvas = document.getElementById('fw-canvas');
+  if (!canvas) return;
+  let ctx = canvas.getContext('2d');
+  let raf;
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  function random(a, b) { return a + Math.random() * (b - a); }
+
+  function launchFireworks(opts) {
+    // opts: { duration, bursts, particlesMin, particlesMax }
+    if (typeof opts === 'number') opts = { duration: opts };
+    opts = opts || {};
+    const duration = opts.duration || 1600;
+    const bursts = opts.bursts || 12;
+    const pMin = opts.pMin || opts.particlesMin || 18;
+    const pMax = opts.pMax || opts.particlesMax || opts.particlesMax || 32;
+
+    canvas.style.display = 'block';
+    const particles = [];
+    const start = performance.now();
+
+    // create bursts across the width
+    for (let i = 0; i < bursts; i++) {
+      const x = random(0.05, 0.95) * canvas.width;
+      const y = random(0.08, 0.45) * canvas.height;
+      const count = Math.floor(random(pMin, pMax));
+      const hue = Math.floor(random(0, 360));
+      for (let j = 0; j < count; j++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = random(1.5, 6) * (1 + Math.random() * 0.6);
+        particles.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: random(700, 1600),
+          start: start + random(0, 240),
+          hue,
+          alpha: 1,
+        });
+      }
+    }
+
+    function tick(t) {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for (let p of particles) {
+        const dt = t - p.start;
+        if (dt <= 0) continue;
+        const life = p.life;
+        const progress = dt / life;
+        if (progress >= 1) continue;
+        const gy = 0.0125;
+        p.vy += gy * 16;
+        p.x += p.vx * 1.25;
+        p.y += p.vy * 1.25;
+        p.alpha = 1 - progress;
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(${p.hue}, 100%, 60%, ${p.alpha})`;
+        ctx.arc(p.x, p.y, 2.2 + (1 - progress) * 2.4, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (t - start < duration + 1600) raf = requestAnimationFrame(tick);
+      else { canvas.style.display = 'none'; cancelAnimationFrame(raf); }
+    }
+
+    raf = requestAnimationFrame(tick);
+  }
+
+  // expose to global scope so scoring logic can call it
+  window.showFireworks = launchFireworks;
+})();
+</script>
+<!-- ===========================================================
+     PART 3 — ADVANCED STATS + ACHIEVEMENTS + RIVALRIES + CHARTS
+     =========================================================== -->
+<script>
+/* -----------------------------------------------------------
+   SIMPLE CHART HELPERS (Stage 4)
+   ----------------------------------------------------------- */
+
+
+
+/* -----------------------------------------------------------
+   GET MATCHES FOR PLAYER
+   ----------------------------------------------------------- */
+function getPlayerMatches(name) {
+  return Object.values(historyCache || {})
+    .filter(m => m.challenger === name || m.opponent === name)
+    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+function getOpponentName(match, name) {
+  return match.challenger === name ? match.opponent : match.challenger;
+}
+
+// Compute per-match stats for storage: visits, avg, highest, checkouts, leg wins
+function computeMatchStats({ challenger, opponent, legs }) {
+  const players = [challenger, opponent];
+  const result = {};
+  players.forEach((pl, idx) => {
+    const visits = [];
+    let highest = 0;
+    let legsWon = 0;
+    legs.forEach(l => {
+      const key = idx === 0 ? 'challenger' : 'opponent';
+      // support two leg shapes:
+      // 1) record UI: l.visits = { challenger: [...], opponent: [...], challengerDoubleFlags: [...], ... }
+      // 2) scoring flow: l.visits = [[], []] (arrays) and l.winner may be player name
+      let arr = [];
+      if (l.visits) {
+        if (Array.isArray(l.visits)) {
+          arr = l.visits[idx] || [];
+        } else if (l.visits[key]) {
+          arr = l.visits[key];
+        }
+      }
+      arr.forEach(v => {
+        const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
+        visits.push(val);
+        if (val > highest) highest = val;
+      });
+      // winner may be stored as 'challenger'/'opponent' or as player name
+      if (l.winner === key || l.winner === players[idx]) legsWon++;
+    });
+    const total = visits.reduce((s, v) => s + v, 0);
+    const avg = visits.length ? Math.round((total / visits.length) * 10) / 10 : 0;
+    // Compute first-9 sum per leg for this player
+    let first9Total = 0; let first9Legs = 0;
+    // Compute checkout attempts/hits and double confirmation hits
+    let checkoutAttempts = 0; let checkoutHits = 0; let doubleConfirmedHits = 0;
+
+    legs.forEach(l => {
+      const key = idx === 0 ? 'challenger' : 'opponent';
+      let arr = [];
+      if (l.visits) {
+        if (Array.isArray(l.visits)) arr = l.visits[idx] || [];
+        else if (l.visits[key]) arr = l.visits[key];
+      }
+      // compute first 3 visits sum
+      const firstThree = arr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
+      if (firstThree.length) {
+        const s = firstThree.reduce((a,b) => a+b, 0);
+        first9Total += s;
+        first9Legs += 1;
+      }
+
+      // compute checkout attempts/hits: iterate visits tracking remaining
+      let remaining = l.startingScore ?? 501;
+      // dblFlags may be stored as separate arrays (challenge/opponent) or embedded on visit objects
+      let dblFlags = null;
+      if (l.visits) {
+        if (Array.isArray(l.visits)) {
+          // scoring flow: no named dblFlags; visits may be plain numbers or objects
+          dblFlags = null;
+        } else {
+          dblFlags = l.visits[`${key}DoubleFlags`] || null;
+        }
+      }
+      for (let vi = 0; vi < arr.length; vi++) {
+        const v = arr[vi];
+        const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
+        // an attempt is when remaining before visit <= 170 and val > 0
+        if (remaining <= 170 && val > 0) checkoutAttempts++;
+        remaining -= val;
+        if (remaining <= 0) {
+          // a hit
+          checkoutHits++;
+          // check for double confirmation: either stored on visit object or via dblFlags
+          const doubleConfirmed = (typeof v === 'object' && v.doubleConfirmed) || (Array.isArray(dblFlags) && !!dblFlags[vi]);
+          if (doubleConfirmed) doubleConfirmedHits++;
+          break; // leg finished
+        }
+      }
+    });
+
+    const checkoutPercent = checkoutAttempts ? Math.round((checkoutHits / checkoutAttempts) * 100) : 0;
+    const doublesPct = checkoutHits ? Math.round((doubleConfirmedHits / checkoutHits) * 100) : 0;
+
+    result[pl] = {
+      visitsCount: visits.length,
+      visits,
+      avg,
+      highest,
+      legsWon,
+      first9Total,
+      first9Legs,
+      checkoutAttempts,
+      checkoutHits,
+      checkoutPercent,
+      doubleConfirmedHits,
+      doublesPct
+    };
+  });
+  return result;
+}
+
+/* -----------------------------------------------------------
+   ADVANCED STATS ENGINE (Stage 1)
+   ----------------------------------------------------------- */
+function computeAdvancedStats(name) {
+  const matches = getPlayerMatches(name);
+  const position = ladder.findIndex(p => p.name === name) + 1;
+
+  let wins = 0, losses = 0;
+  let legsFor = 0, legsAgainst = 0;
+  let bullWins = 0, bullLosses = 0;
+  let wins20 = 0, wins21 = 0, losses20 = 0, losses21 = 0;
+
+  let currentStreak = 0;
+  let longestWinStreak = 0;
+  let longestLossStreak = 0;
+
+  // accumulate for 3-dart average
+  let totalVisits = 0;
+  let totalPoints = 0;
+  // aggregate checkout/first9/doubles across matches
+  let aggCheckoutAttempts = 0;
+  let aggCheckoutHits = 0;
+  let aggDoubleHits = 0;
+  let aggFirst9Total = 0;
+  let aggFirst9Legs = 0;
+
+  const h2h = {};
+  const positionHistory = [];
+  const statsTimeline = [];
+
+  matches.forEach((m, idx) => {
+    const opp = getOpponentName(m, name);
+    const isWinner = m.winner === name;
+
+    if (isWinner) wins++;
+    else losses++;
+
+    const isChallenger = m.challenger === name;
+    const myKey = isChallenger ? "challenger" : "opponent";
+
+    const myLegs = m.legs.filter(l => l.winner === myKey).length;
+    const oppLegs = m.legs.length - myLegs;
+
+    legsFor += myLegs;
+    legsAgainst += oppLegs;
+
+    if (isWinner && myLegs === 2 && oppLegs === 0) wins20++;
+    if (isWinner && myLegs === 2 && oppLegs === 1) wins21++;
+    if (!isWinner && myLegs === 0 && oppLegs === 2) losses20++;
+    if (!isWinner && myLegs === 1 && oppLegs === 2) losses21++;
+
+    m.legs.forEach(l => {
+      if (l.bull) {
+        if (l.winner === myKey) bullWins++;
+        else bullLosses++;
+      }
+    });
+
+    // accumulate visit totals for 3-dart average
+    try {
+        if (m.stats && m.stats[name]) {
+          const s = m.stats[name];
+          totalVisits += s.visitsCount || 0;
+          totalPoints += (s.visits || []).reduce((a,b) => a + (Number(b)||0), 0);
+          // aggregate checkout/doubles/first9
+          aggCheckoutAttempts += s.checkoutAttempts || 0;
+          aggCheckoutHits += s.checkoutHits || 0;
+          aggDoubleHits += s.doubleConfirmedHits || 0;
+          aggFirst9Total += s.first9Total || 0;
+          aggFirst9Legs += s.first9Legs || 0;
+        } else {
+          // fallback: derive from legs structure
+          m.legs.forEach(l => {
+            const arr = l.visits && l.visits[myKey] ? l.visits[myKey] : [];
+            arr.forEach(v => {
+              const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
+              totalVisits += 1;
+              totalPoints += val;
+            });
+            // first9
+            const firstThree = arr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
+            if (firstThree.length) { aggFirst9Total += firstThree.reduce((a,b)=>a+b,0); aggFirst9Legs += 1; }
+            // checkout/doubles: simplified scan
+            let remaining = l.startingScore ?? 501;
+            const dblFlags = (l.visits && l.visits[myKey]) ? l.visits[`${myKey}DoubleFlags`] : null;
+            for (let vi=0; vi<arr.length; vi++) {
+              const v = arr[vi];
+              const val = typeof v === 'object' ? (v.score||0) : (Number(v)||0);
+              if (remaining <= 170 && val > 0) aggCheckoutAttempts++;
+              remaining -= val;
+              if (remaining <= 0) {
+                aggCheckoutHits++;
+                const doubleConfirmed = (typeof v === 'object' && v.doubleConfirmed) || (Array.isArray(dblFlags) && !!dblFlags[vi]);
+                if (doubleConfirmed) aggDoubleHits++;
+                break;
+              }
+            }
+          });
+        }
+    } catch(e) {}
+
+    if (isWinner) {
+      currentStreak = currentStreak >= 0 ? currentStreak + 1 : 1;
+      longestWinStreak = Math.max(longestWinStreak, currentStreak);
+    } else {
+      currentStreak = currentStreak <= 0 ? currentStreak - 1 : -1;
+      longestLossStreak = Math.min(longestLossStreak, currentStreak);
+    }
+
+    if (!h2h[opp]) h2h[opp] = { w:0, l:0 };
+    if (isWinner) h2h[opp].w++;
+    else h2h[opp].l++;
+
+    positionHistory.push({
+      matchIndex: idx,
+      position: ladder.findIndex(p => p.name === name) + 1
+    });
+
+    statsTimeline.push({
+      matchIndex: idx,
+      isWinner,
+      myLegs,
+      oppLegs
+    });
+  });
+
+  const totalMatches = wins + losses;
+  const winRate = totalMatches ? (wins / totalMatches * 100).toFixed(1) : 0;
+  const avgLegs = totalMatches ? ((legsFor + legsAgainst) / totalMatches).toFixed(2) : 0;
+  const leg3Rate = totalMatches ? ((wins21 + losses21) / totalMatches * 100).toFixed(1) : 0;
+  const bullRate = (bullWins + bullLosses)
+    ? (bullWins / (bullWins + bullLosses) * 100).toFixed(1)
+    : 0;
+
+  // overall 3-dart average (use totalPoints / totalVisits)
+  const threeDartAvg = totalVisits ? (Math.round((totalPoints / totalVisits) * 10) / 10) : '—';
+
+  const firstNineAvg = aggFirst9Legs ? (Math.round((aggFirst9Total / aggFirst9Legs) * 10) / 10) : '—';
+  const aggregateCheckoutPercent = aggCheckoutAttempts ? Math.round((aggCheckoutHits / aggCheckoutAttempts) * 100) : '—';
+  const aggregateDoublesPct = aggCheckoutHits ? Math.round((aggDoubleHits / aggCheckoutHits) * 100) : '—';
+
+  let bestOpponent = null;
+  let worstOpponent = null;
+
+  Object.entries(h2h).forEach(([opp, rec]) => {
+    if (rec.w > rec.l) {
+      if (!bestOpponent || rec.w - rec.l > bestOpponent.margin) {
+        bestOpponent = { name: opp, margin: rec.w - rec.l, record: rec };
+      }
+    }
+    if (rec.l > rec.w) {
+      if (!worstOpponent || rec.l - rec.w > worstOpponent.margin) {
+        worstOpponent = { name: opp, margin: rec.l - rec.w, record: rec };
+      }
+    }
+  });
+
+  return {
+    name,
+    position,
+    totalMatches,
+    wins,
+    losses,
+    winRate,
+    legsFor,
+    legsAgainst,
+    avgLegs,
+    leg3Rate,
+    bullWins,
+    bullLosses,
+    bullRate,
+    wins20,
+    wins21,
+    losses20,
+    losses21,
+    longestWinStreak,
+    longestLossStreak: Math.abs(longestLossStreak),
+    h2h,
+    bestOpponent,
+    worstOpponent,
+    positionHistory,
+    statsTimeline,
+    threeDartAvg,
+    totalVisits,
+    totalPoints
+    ,
+    firstNineAvg,
+    aggregateCheckoutPercent,
+    aggregateDoublesPct
+  };
+}
+/* -----------------------------------------------------------
+   ACHIEVEMENTS ENGINE (Stage 2)
+   ----------------------------------------------------------- */
+function computeAchievements(stats) {
+  const ach = [];
+
+  // 10+ wins
+  if (stats.wins >= 10) {
+    ach.push({ label: "Sharpshooter", desc: "10+ ladder wins" });
+  }
+
+  // 5+ matches in one day
+  const matches = getPlayerMatches(stats.name);
+  const byDay = {};
+  matches.forEach(m => {
+    const d = (m.timestamp || "").split(",")[0].trim();
+    byDay[d] = (byDay[d] || 0) + 1;
+  });
+  if (Object.values(byDay).some(c => c >= 5)) {
+    ach.push({ label: "Marathon Man", desc: "5+ matches in one day" });
+  }
+
+  // Bull Master
+  if (stats.bullWins >= 3) {
+    ach.push({ label: "Bull Master", desc: "Won 3+ bull-decided legs" });
+  }
+
+  // Ice Cold (3+ wins 2–0)
+  if (stats.wins20 >= 3) {
+    ach.push({ label: "Ice Cold", desc: "Won 3+ matches 2–0" });
+  }
+
+  // Never Say Die (won 2–1 after losing leg 1)
+  let nsd = 0;
+  matches.forEach(m => {
+    const isChallenger = m.challenger === stats.name;
+    const myKey = isChallenger ? "challenger" : "opponent";
+
+    const leg1Winner = m.legs[0]?.winner;
+    const myLegs = m.legs.filter(l => l.winner === myKey).length;
+    const oppLegs = m.legs.length - myLegs;
+
+    if (
+      m.winner === stats.name &&
+      leg1Winner !== myKey &&
+      myLegs === 2 &&
+      oppLegs === 1
+    ) {
+      nsd++;
+    }
+  });
+  if (nsd >= 2) {
+    ach.push({ label: "Never Say Die", desc: "Won 2+ matches 2–1 after losing Leg 1" });
+  }
+
+  // Giant Killer (beat someone 3+ places above)
+  let giant = false;
+  matches.forEach(m => {
+    if (m.winner !== stats.name) return;
+    const opp = getOpponentName(m, stats.name);
+    const myPos = ladder.findIndex(p => p.name === stats.name);
+    const oppPos = ladder.findIndex(p => p.name === opp);
+    if (oppPos - myPos >= 3) giant = true;
+  });
+  if (giant) {
+    ach.push({ label: "Giant Killer", desc: "Beat someone 3+ places above" });
+  }
+
+  return ach;
+}
+
+/* -----------------------------------------------------------
+   RIVALRY ENGINE (Stage 3)
+   ----------------------------------------------------------- */
+function computeRivalries(name) {
+  const stats = computeAdvancedStats(name);
+  const rivalries = [];
+
+  Object.entries(stats.h2h).forEach(([opp, rec]) => {
+    const total = rec.w + rec.l;
+
+    // Rivalry = 5+ matches AND record within ±1
+    if (total >= 5 && Math.abs(rec.w - rec.l) <= 1) {
+      rivalries.push({
+        opponent: opp,
+        record: `${rec.w}–${rec.l}`,
+        total
+      });
+    }
+  });
+
+  return rivalries;
+}
+
+/* -----------------------------------------------------------
+   PLAYER STATS DASHBOARD
+   ----------------------------------------------------------- */
+function renderPlayerStatsList() {
+  const list = document.getElementById('players-list');
+  if (!list) return;
+  list.innerHTML = '';
+  ladder.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style = 'padding:.5rem; cursor:pointer;';
+    card.addEventListener('click', () => renderPlayerDashboard(i));
+    const nick = document.createElement('div');
+    nick.style = 'font-weight:700;';
+    nick.textContent = p.nick || p.name;
+    const full = document.createElement('div');
+    full.className = 'small';
+    full.style = 'color:#9ca3af; margin-top:.15rem;';
+    full.textContent = p.nick ? p.name : '';
+    card.appendChild(nick);
+    if (p.nick) card.appendChild(full);
+    list.appendChild(card);
+  });
+}
+
+function renderPlayerDashboard(index) {
+  const p = ladder[index];
+  const dash = document.getElementById('player-dashboard');
+  if (!dash) return;
+  dash.style.display = 'block';
+  dash.innerHTML = '';
+
+  const stats = computeAdvancedStats(p.name);
+
+  // Top card: Three-dart average with sparkline and trend
+  const topCard = document.createElement('div');
+  topCard.className = 'card';
+  topCard.style = 'margin-bottom:.8rem; padding:1rem; display:flex; align-items:center; gap:1rem;';
+  const trend = (() => {
+    const recent = getPlayerMatches(p.name).slice(0,5).reverse();
+    if (recent.length < 2) return '–';
+    const vals = recent.map(m => (m.stats && m.stats[p.name]) ? m.stats[p.name].avg : 0);
+    const dif = vals[vals.length-1] - vals[0];
+    return dif > 0 ? '▲' : (dif < 0 ? '▼' : '–');
+  })();
+
+  topCard.innerHTML = `
+    <div style="flex:1;">
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-size:1.05rem; font-weight:800;">${p.nick || p.name}</div>
+          ${p.nick ? `<div class="small" style="color:#9ca3af; margin-top:.15rem;">${p.name}</div>` : ''}
+        </div>
+        <div class="small" style="color:#9ca3af;">Trend ${trend}</div>
+      </div>
+      <div style="margin-top:.6rem; font-size:2.4rem; font-weight:800;">${stats.threeDartAvg}</div>
+    </div>
+    <div style="width:160px; height:56px;">
+      <canvas id="sparkline-${index}" width="160" height="56"></canvas>
+    </div>
+  `;
+  dash.appendChild(topCard);
+
+  // Secondary cards row
+  const row = document.createElement('div');
+  row.style = 'display:flex; gap:.6rem; flex-wrap:wrap;';
+  // First 9 avg card
+  const f9 = document.createElement('div');
+  f9.className = 'card';
+  f9.style = 'flex:1; min-width:180px; padding:.8rem;';
+  f9.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div class="small">First 9 Average</div>
+        <div style="font-size:1.4rem; font-weight:700;">${stats.firstNineAvg || '—'}</div>
+        <div class="small" style="color:#9ca3af; margin-top:.35rem;">Compared to 3‑dart avg: ${stats.threeDartAvg}</div>
+      </div>
+      <div style="width:64px; height:64px;">
+        <svg id="f9-ring-${index}" viewBox="0 0 36 36" style="width:64px;height:64px;"></svg>
+      </div>
+    </div>
+  `;
+  row.appendChild(f9);
+
+  // Checkout percentage (placeholder computed)
+  const co = document.createElement('div');
+  co.className = 'card';
+  co.style = 'flex:1; min-width:180px; padding:.8rem;';
+  co.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <div>
+        <div class="small">Checkout %</div>
+        <div style="font-size:1.6rem; font-weight:800;">${stats.aggregateCheckoutPercent || '—'}%</div>
+        <div class="small" style="color:#9ca3af; margin-top:.35rem;">Attempts: ${stats.totalMatches ? (stats.legsFor+stats.legsAgainst) : (stats.checkoutAttempts || 0)} • Hits: ${stats.checkoutHits || 0}</div>
+      </div>
+      <div style="width:88px; height:88px;">
+        <svg id="co-circle-${index}" viewBox="0 0 36 36" style="width:88px;height:88px;"></svg>
+      </div>
+    </div>
+  `;
+  row.appendChild(co);
+
+  // Doubles hit pct
+  const dbl = document.createElement('div');
+  dbl.className = 'card';
+  dbl.style = 'flex:1; min-width:180px; padding:.8rem;';
+  dbl.innerHTML = `
+    <div class="small">Doubles Hit %</div>
+    <div style="margin-top:.5rem;">
+      <div style="font-size:1.4rem; font-weight:700; display:inline-block; margin-right:.6rem;">${stats.aggregateDoublesPct || '—'}%</div>
+      <div class="small" style="color:#9ca3af; display:inline-block;">Hits: ${stats.checkoutHits || 0}</div>
+    </div>
+    <div style="margin-top:.6rem;">
+      <div id="dbl-bar-${index}" style="width:100%; height:12px; background:rgba(255,255,255,0.06); border-radius:999px; overflow:hidden;"></div>
+    </div>
+  `;
+  row.appendChild(dbl);
+
+  dash.appendChild(row);
+
+  // Legs donut / segmented bar
+  const legsCard = document.createElement('div');
+  legsCard.className = 'card';
+  legsCard.style = 'margin-top:.6rem; padding:1rem;';
+  legsCard.innerHTML = `
+    <div class="small">Legs Won vs Lost</div>
+    <div style="font-size:1.2rem; font-weight:700; margin-top:.3rem;">${stats.legsFor} – ${stats.legsAgainst}</div>
+    <div class="small" style="color:#9ca3af; margin-top:.5rem;">Win rate: ${stats.winRate}% • Avg leg diff: ${stats.avgLegs}</div>
+  `;
+  dash.appendChild(legsCard);
+
+  // Achievements card
+  try {
+    const ach = computeAchievements(stats);
+    const achCard = document.createElement('div');
+    achCard.className = 'card';
+    achCard.style = 'margin-top:.6rem; padding:.8rem;';
+    achCard.innerHTML = `
+      <div class="admin-section-title">Achievements</div>
+      ${ ach.length ? ach.map(a => `<div style="margin-top:.45rem;"><span class="badge-ach">★ ${a.label}</span><div class="small" style="margin-top:.25rem;">${a.desc}</div></div>`).join('') : `<div class="small" style="color:#9ca3af; margin-top:.4rem;">No achievements yet</div>` }
+    `;
+    dash.appendChild(achCard);
+  } catch(e) {}
+
+  // Rivalries card
+  try {
+    const rvals = computeRivalries(p.name);
+    const rCard = document.createElement('div');
+    rCard.className = 'card';
+    rCard.style = 'margin-top:.6rem; padding:.8rem;';
+    rCard.innerHTML = `
+      <div class="admin-section-title">Rivalries</div>
+      ${ rvals.length ? rvals.map(r => `<div style="margin-top:.45rem;"><span class="badge-rival">🔥 Rivalry</span><div class="small" style="margin-top:.25rem;">${r.opponent} — ${r.record} (across ${r.total} matches)</div></div>`).join('') : `<div class="small" style="color:#9ca3af; margin-top:.4rem;">No rivalries detected</div>` }
+    `;
+    dash.appendChild(rCard);
+  } catch(e) {}
+
+  // draw sparkline
+  try { drawSparkline(`sparkline-${index}`, p.name); } catch(e) {}
+  // draw f9 ring
+  try { drawConsistencyRing(`f9-ring-${index}`, p.name); } catch(e) {}
+  // draw checkout circular progress
+  try { drawCircularProgress(`co-circle-${index}`, stats.aggregateCheckoutPercent || 0); } catch(e) {}
+  // draw doubles horizontal bar
+  try { drawDoublesBar(`dbl-bar-${index}`, stats.aggregateDoublesPct || 0); } catch(e) {}
+}
+
+function drawCircularProgress(id, pct) {
+  const svg = document.getElementById(id);
+  if (!svg) return;
+  const val = Math.max(0, Math.min(100, Number(pct) || 0));
+  svg.innerHTML = `
+    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#1f2933" stroke-width="4"></circle>
+    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#10b981" stroke-width="4" stroke-dasharray="${val},100" stroke-linecap="round"></circle>
+    <text x="18" y="21" text-anchor="middle" font-size="6" fill="#fff">${val}%</text>
+  `;
+}
+
+function drawDoublesBar(id, pct) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const val = Math.max(0, Math.min(100, Number(pct) || 0));
+  el.innerHTML = '';
+  const fill = document.createElement('div');
+  fill.style = `height:100%; width:${val}%; background:linear-gradient(90deg,#60a5fa,#4f46e5); border-radius:999px;`;
+  el.appendChild(fill);
+}
+
+function drawConsistencyRing(id, playerName) {
+  const svg = document.getElementById(id);
+  if (!svg) return;
+  // compute per-match first9 avgs to estimate variance
+  const matches = getPlayerMatches(playerName).slice(0, 40);
+  const vals = [];
+  matches.forEach(m => {
+    const s = (m.stats && m.stats[playerName]) ? m.stats[playerName] : null;
+    if (s && s.first9Legs) {
+      vals.push((s.first9Total || 0) / s.first9Legs);
+    } else {
+      // derive from legs
+      let legTotals = 0, legCount = 0;
+      m.legs.forEach(l => {
+        const key = (m.challenger === playerName) ? 'challenger' : 'opponent';
+        const arr = l.visits && l.visits[key] ? l.visits[key] : [];
+        const firstThree = arr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
+        if (firstThree.length) { legTotals += firstThree.reduce((a,b)=>a+b,0); legCount++; }
+      });
+      if (legCount) vals.push(legTotals / legCount);
+    }
+  });
+  if (!vals.length) { svg.innerHTML = `<circle cx="18" cy="18" r="15.9" fill="none" stroke="#334155" stroke-width="4"></circle>`; return; }
+  const mean = vals.reduce((a,b)=>a+b,0)/vals.length;
+  const variance = vals.reduce((a,b)=>a+(b-mean)*(b-mean),0)/vals.length;
+  const std = Math.sqrt(variance);
+  // consistency score: smaller std relative to mean is better
+  const cv = mean ? Math.max(0, Math.min(1, 1 - (std / mean))) : 0.5;
+  const pct = Math.round(cv * 100);
+  svg.innerHTML = `
+    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#0f1724" stroke-width="4"></circle>
+    <circle cx="18" cy="18" r="15.9" fill="none" stroke="#f59e0b" stroke-width="4" stroke-dasharray="${pct},100" stroke-linecap="round"></circle>
+    <text x="18" y="21" text-anchor="middle" font-size="6" fill="#fff">${pct}%</text>
+  `;
+}
+
+function drawSparkline(canvasId, playerName) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const matches = getPlayerMatches(playerName).slice(0, 20).reverse();
+  const vals = matches.map(m => (m.stats && m.stats[playerName]) ? m.stats[playerName].avg : 0);
+  const w = canvas.width; const h = canvas.height;
+  ctx.clearRect(0,0,w,h);
+  if (!vals.length) return;
+  const max = Math.max(...vals); const min = Math.min(...vals);
+  ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.beginPath();
+  vals.forEach((v,i) => {
+    const x = i / (vals.length-1 || 1) * w;
+    const y = h - ((v - min) / (max - min || 1) * h);
+    if (i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+/* -----------------------------------------------------------
+   PLAYER PROFILE PANEL (FULLY FIXED)
+   ----------------------------------------------------------- */
+function openPlayerProfile(index) {
+  const p = ladder[index];
+  const panel = document.getElementById("player-profile-panel");
+  const body = document.getElementById("pp-body");
+
+  const displayName = p.nick
+    ? `${p.name} “${p.nick}”`
+    : p.name;
+
+  document.getElementById("pp-name").textContent = displayName;
+
+  const stats = computeAdvancedStats(p.name);
+  const ach = computeAchievements(stats);
+  const rivalries = computeRivalries(p.name);
+
+  const timeline = stats.statsTimeline || [];
+  const labels = timeline.map((t, i) => `M${i+1}`);
+  const positions = stats.positionHistory.map(ph => ph.position);
+  const winRateSeries = timeline.map((t, i) => {
+    const slice = timeline.slice(0, i+1);
+    const w = slice.filter(s => s.isWinner).length;
+    return (w / slice.length * 100).toFixed(1);
+  });
+
+  const scoreLabels = ["W 2–0", "W 2–1", "L 0–2", "L 1–2"];
+  const scoreValues = [
+    stats.wins20,
+    stats.wins21,
+    stats.losses20,
+    stats.losses21
+  ];
+
+  const form = stats.totalMatches
+    ? `Win rate ${stats.winRate}% • Avg legs ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
+    : "No matches yet";
+
+  const threeDartLine = (stats.threeDartAvg && stats.threeDartAvg !== '—') ? `3‑dart avg: ${stats.threeDartAvg}` : `3‑dart avg: —`;
+
+  const bullLine = (stats.bullWins + stats.bullLosses)
+    ? `${stats.bullWins}–${stats.bullLosses} bull-decided (${stats.bullRate}% won)`
+    : "No bull-decided legs";
+
+  const h2hHTML = Object.keys(stats.h2h).length
+    ? Object.entries(stats.h2h).map(([opp,rec]) =>
+        `<div>${opp}: ${rec.w}–${rec.l}</div>`
+      ).join("")
+    : `<div class="small" style="color:#9ca3af;">No opponents yet</div>`;
+
+  const matches = getPlayerMatches(p.name);
+  const historyHTML = matches.length
+    ? matches.map(m => {
+        const opp = getOpponentName(m, p.name);
+        const isWinner = m.winner === p.name;
+        const isChallenger = m.challenger === p.name;
+        const myKey = isChallenger ? "challenger" : "opponent";
+        const myLegs = m.legs.filter(l => l.winner === myKey).length;
+        const oppLegs = m.legs.length - myLegs;
+
+        // per-match computed stats (if available)
+        const stats = m.stats && m.stats[p.name] ? m.stats[p.name] : null;
+        const statsLine = stats
+          ? ` • Avg: ${stats.avg} • High: ${stats.highest} • Visits: ${stats.visitsCount}`
+          : '';
+
+        return `
+          <div style="margin-bottom:.6rem; padding-bottom:.5rem; border-bottom:1px dashed rgba(55,65,81,0.6);">
+            <strong>${isWinner ? "Won" : "Lost"}</strong> vs ${opp}
+            <span style="color:#9ca3af;"> (${myLegs}–${oppLegs})</span>
+            <span class="small" style="color:#9ca3af;">${statsLine}</span><br>
+            <span class="small">${m.timestamp}</span>
+          </div>
+        `;
+      }).join("")
+    : `<div class="small" style="color:#9ca3af;">No matches recorded</div>`;
+
+  const bestOpp = stats.bestOpponent
+    ? `${stats.bestOpponent.name} (${stats.bestOpponent.record.w}–${stats.bestOpponent.record.l})`
+    : "—";
+  const worstOpp = stats.worstOpponent
+    ? `${stats.worstOpponent.name} (${stats.worstOpponent.record.w}–${stats.worstOpponent.record.l})`
+    : "—";
+
+  const achHTML = ach.length
+    ? ach.map(a => `
+        <div>
+          <span class="badge">★ ${a.label}</span>
+          <div class="small" style="margin-bottom:.4rem;">${a.desc}</div>
+        </div>
+      `).join("")
+    : `<div class="small" style="color:#9ca3af;">No achievements yet</div>`;
+
+  const rivalryHTML = rivalries.length
+    ? rivalries.map(r => `
+        <div>
+          <span class="badge" style="border-color:#f87171; background:rgba(248,113,113,0.12);">
+            🔥 Rivalry
+          </span>
+          <div class="small">${r.opponent} — ${r.record} (across ${r.total} matches)</div>
+        </div>
+      `).join("")
+    : `<div class="small" style="color:#9ca3af;">No rivalries detected</div>`;
+
+  /* -----------------------------------------------------------
+     FIXED TEMPLATE LITERAL — ALL DIVS MATCHED
+     ----------------------------------------------------------- */
+  body.innerHTML = `
+    <div style="margin-bottom:1rem;">
+      <div class="small">Position</div>
+      <div style="font-size:1.4rem; margin-bottom:.6rem;">#${stats.position}</div>
+
+      <div class="small">Record</div>
+      <div style="font-size:1.1rem; margin-bottom:.6rem;">
+        ${stats.wins}–${stats.losses}
+      </div>
+
+      <div class="small">Leg Difference</div>
+      <div style="font-size:1.1rem; margin-bottom:.6rem;">
+        ${stats.legsFor}:${stats.legsAgainst}
+      </div>
+
+      <div class="small">Form</div>
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
+        ${form}
+        <div class="small" style="margin-top:.4rem;">${threeDartLine}</div>
+      </div>
+
+      <div class="small">Bull Stats</div>
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
+        ${bullLine}
+      </div>
+
+      <div class="small">Scorelines</div>
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
+        Wins 2–0: ${stats.wins20}, Wins 2–1: ${stats.wins21}<br>
+        Losses 0–2: ${stats.losses20}, Losses 1–2: ${stats.losses21}
+      </div>
+
+      <div class="small">Streaks</div>
+      <div style="font-size:.85rem; margin-bottom:.6rem;">
+        Longest win streak: ${stats.longestWinStreak}<br>
+        Longest losing streak: ${stats.longestLossStreak}
+      </div>
+
+      <div class="small">Best Opponent</div>
+      <div style="font-size:.85rem; margin-bottom:.3rem;">
+        ${bestOpp}
+      </div>
+
+      <div class="small">Worst Opponent</div>
+      <div style="font-size:.85rem; margin-bottom:1rem;">
+        ${worstOpp}
+      </div>
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Achievements</div>
+      ${achHTML}
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Rivalries</div>
+      ${rivalryHTML}
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Head‑to‑Head</div>
+      ${h2hHTML}
+    </div>
+
+    <div style="margin-bottom:1rem;">
+      <div class="admin-section-title">Match History</div>
+      ${historyHTML}
+    </div>
+  `;
+
+  panel.classList.add("open");
+
+}
+/* -----------------------------------------------------------
+   CLOSE PROFILE PANEL
+   ----------------------------------------------------------- */
+function closePlayerProfile() {
+  document.getElementById("player-profile-panel").classList.remove("open");
+}
+
+/* -----------------------------------------------------------
+   INIT
+   ----------------------------------------------------------- */
+window.addEventListener("load", () => {
+  buildLegUI();
+  renderSelects();
+  renderRules();
+});
+
+// Wire the Import JSON button to trigger the hidden file input
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('import-btn');
+  const fileInput = document.getElementById('importFile');
+  if (btn && fileInput) {
+    btn.addEventListener('click', () => fileInput.click());
+  }
+});
+
+/* -----------------------------------------------------------
+   SCORING PAGE: keypad, scoring flow, bust & double-out logic
+   ----------------------------------------------------------- */
+// build player selects for scoring (solo and match)
+function renderScoringPlayers() {
+  const ch = document.getElementById('match-challenger');
+  const op = document.getElementById('match-opponent');
+  if (ch) ch.innerHTML = '';
+  if (op) op.innerHTML = '';
+  // Build options with index values so we can easily filter by ladder position
+  ladder.forEach((p, i) => {
+    if (ch) ch.innerHTML += `<option value="${i}">${p.name}</option>`;
+    if (op) op.innerHTML += `<option value="${i}">${p.name}</option>`;
+  });
+
+  // when challenger changes, update opponent choices to honor the challenge rule
+  if (ch) {
+    ch.removeEventListener('change', window.__matchChChangeHandler__);
+    window.__matchChChangeHandler__ = () => {
+      const idx = parseInt(ch.value, 10);
+      updateOpponentOptions(idx);
+    };
+    ch.addEventListener('change', window.__matchChChangeHandler__);
+  }
+  // If a scoring session was restored earlier, re-select the players now that options exist
+  try {
+    if (scoringState && Array.isArray(scoringState.players) && scoringState.players.length === 2) {
+      // scoringState.players stores names; find corresponding indices in ladder
+      try {
+        if (ch) {
+          const idx = ladder.findIndex(p => p.name === scoringState.players[0]);
+          if (idx >= 0) ch.value = String(idx);
+        }
+        if (op) {
+          const idx2 = ladder.findIndex(p => p.name === scoringState.players[1]);
+          if (idx2 >= 0) op.value = String(idx2);
+        }
+        // ensure opponent options are filtered according to selected challenger
+        const selIdx = ch ? parseInt(ch.value, 10) : NaN;
+        if (!isNaN(selIdx)) updateOpponentOptions(selIdx);
+      } catch (e) {}
+      // also restore best-of and start selectors
+      const boSel = document.getElementById('match-best-of');
+      const startSel = document.getElementById('score-start');
+      if (boSel && scoringState.bestOf) boSel.value = scoringState.bestOf;
+      if (startSel && scoringState.start) startSel.value = scoringState.start;
+    }
+  } catch(e) {}
+}
+
+// Update opponent select options to reflect who the selected challenger may challenge
+// Rule: a player may challenge up to 3 positions above them in the ladder
+function updateOpponentOptions(challengerIndex) {
+  const op = document.getElementById('match-opponent');
+  const ch = document.getElementById('match-challenger');
+  if (!op) return;
+  // If challenger not selected or ladder empty, show all options
+  if (isNaN(challengerIndex) || challengerIndex < 0) {
+    op.innerHTML = '';
+    ladder.forEach((p, i) => op.innerHTML += `<option value="${i}">${p.name}</option>`);
+    return;
+  }
+
+  // allowed opponents are those above the challenger up to 3 positions
+  const maxAbove = 3;
+  const start = Math.max(0, challengerIndex - maxAbove);
+  const end = challengerIndex - 1; // exclusive of challenger
+  op.innerHTML = '';
+  // If no one above (top of ladder), allow all opponents (fallback)
+  if (end < start) {
+    ladder.forEach((p, i) => op.innerHTML += `<option value="${i}">${p.name}</option>`);
+    return;
+  }
+  for (let i = start; i <= end; i++) {
+    const p = ladder[i];
+    if (!p) continue;
+    op.innerHTML += `<option value="${i}">${p.name}</option>`;
+  }
+}
+
+// keypad buttons (mobile-friendly)
+function buildKeypad() {
+  const keypad = document.getElementById('keypad');
+  keypad.innerHTML = '';
+  // Calculator-style keypad: digits, backspace, clear, enter
+  const keys = [1,2,3,4,5,6,7,8,9,'←',0,'C'];
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-secondary';
+    btn.style = 'padding:1rem; font-size:1.1rem; border-radius:10px;';
+    btn.textContent = k;
+    btn.addEventListener('click', () => onKeypadPress(k));
+    keypad.appendChild(btn);
+  });
+  const enter = document.createElement('button');
+  enter.className = 'btn-primary';
+  enter.style = 'grid-column: span 3; padding:1rem; font-size:1.05rem; border-radius:10px;';
+  enter.textContent = 'Enter';
+  enter.addEventListener('click', () => onKeypadPress('ENTER'));
+  keypad.appendChild(enter);
+}
+
+let scoringState = null; // expanded state to support match mode
+
+function resetScoringState() {
+  scoringState = {
+    mode: 'match',
+    start: 501,
+    // calculator-style entry for the three-dart total (string)
+    currentEntry: '',
+    players: [],
+    currentPlayerIndex: 0,
+    // starter resolution state: store closest-to-bull numeric values and resolved starter index
+    closest: { ch: null, op: null },
+    starterIndex: null,
+    legs: [],
+    activeLeg: null,
+    bestOf: 3,
+    requiredToWin: 2
+  };
+}
+
+// Precompute achievable 1-3 dart totals so we can reject impossible visit entries
+window.possibleThreeDartTotals = null;
+function buildPossibleThreeDartTotals() {
+  const vals = new Set();
+  const singles = [];
+  const doubles = [];
+  const trebles = [];
+  for (let i = 1; i <= 20; i++) {
+    singles.push(i);
+    doubles.push(2*i);
+    trebles.push(3*i);
+  }
+  singles.push(25); // single bull
+  doubles.push(50); // double bull
+
+  const throws = [].concat(singles, doubles, trebles);
+
+  // 1-dart
+  throws.forEach(a => { if (a <= 180) vals.add(a); });
+  // 2-dart
+  for (let i = 0; i < throws.length; i++) for (let j = 0; j < throws.length; j++) {
+    const s = throws[i] + throws[j]; if (s <= 180) vals.add(s);
+  }
+  // 3-dart
+  for (let i = 0; i < throws.length; i++) for (let j = 0; j < throws.length; j++) for (let k = 0; k < throws.length; k++) {
+    const s = throws[i] + throws[j] + throws[k]; if (s <= 180) vals.add(s);
+  }
+
+  window.possibleThreeDartTotals = vals;
+}
+
+
+// Persistence helpers: save/load/clear scoringState to localStorage
+window.saveScoringStateToStorage = function() {
+  try {
+    if (!scoringState) return;
+    const copy = JSON.parse(JSON.stringify(scoringState));
+    // avoid storing functions or DOM refs
+    localStorage.setItem('fox_scoring_state', JSON.stringify(copy));
+  } catch (e) { /* ignore storage errors */ }
+};
+
+window.loadScoringStateFromStorage = function() {
+  try {
+    const raw = localStorage.getItem('fox_scoring_state');
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    // basic validation
+    if (!obj || !Array.isArray(obj.players)) return null;
+    scoringState = obj;
+    return scoringState;
+  } catch (e) { return null; }
+};
+
+window.clearScoringStateFromStorage = function() {
+  try { localStorage.removeItem('fox_scoring_state'); } catch(e) {}
+};
+
+function openScoring() {
+  // initialize scoring UI
+  renderScoringPlayers();
+  buildKeypad();
+  // ensure possible totals are available
+  try { if (!window.possibleThreeDartTotals) buildPossibleThreeDartTotals(); } catch(e) {}
+  // try to restore saved scoring session first
+  const restored = loadScoringStateFromStorage();
+  if (!restored) resetScoringState();
+  // ensure scoring board is visible so selectors and start button show
+  try { document.getElementById('scoring-board').style.display = 'block'; } catch(e) {}
+
+  // debug: inspect scoring-board and selector contents
+  try {
+    const sb = document.getElementById('scoring-board');
+    if (sb) {
+  // scoring board diagnostics suppressed
+      try {
+        sb.style.setProperty('min-height', '220px', 'important');
+        sb.style.display = 'block';
+        sb.style.visibility = 'visible';
+      } catch(e) {}
+    }
+    const chSel = document.getElementById('match-challenger');
+    const opSel = document.getElementById('match-opponent');
+  // match selector presence checked
+  } catch(e) { console.error('openScoring debug error', e); }
+  try { document.getElementById('keypad').style.display = 'grid'; } catch(e) {}
+
+  // match-only flow: ensure match selectors visible
+  scoringState.mode = 'match';
+  try { document.getElementById('match-challenger').style.display = ''; } catch(e) {}
+  try { document.getElementById('match-opponent').style.display = ''; } catch(e) {}
+  try { document.getElementById('match-best-of').style.display = ''; } catch(e) {}
+
+  // validation state handled by achievable totals checks
+
+  // diagnostics removed
+}
+
+function scoringStart() {
+  // match-only
+  const start = parseInt(document.getElementById('score-start').value) || 501;
+  resetScoringState();
+  scoringState.start = start;
+  scoringState.mode = 'match';
+
+  // Match mode
+  // selects store ladder indices as values
+  const chVal = document.getElementById('match-challenger').value;
+  const opVal = document.getElementById('match-opponent').value;
+  const chIdx = isNaN(parseInt(chVal,10)) ? -1 : parseInt(chVal,10);
+  const opIdx = isNaN(parseInt(opVal,10)) ? -1 : parseInt(opVal,10);
+  if (chIdx < 0 || opIdx < 0 || chIdx === opIdx) return alert('Choose two different players for a match');
+  const chName = (ladder[chIdx] && ladder[chIdx].name) ? ladder[chIdx].name : null;
+  const opName = (ladder[opIdx] && ladder[opIdx].name) ? ladder[opIdx].name : null;
+  if (!chName || !opName) return alert('Selected players not found in the ladder');
+  scoringState.players = [chName, opName];
+  scoringState.bestOf = parseInt(document.getElementById('match-best-of').value) || 3;
+  scoringState.requiredToWin = Math.ceil(scoringState.bestOf / 2);
+  // show closest-to-bull inputs to decide who throws first
+  // set button labels to the player names
+  const chEntry = ladder[chIdx] || { name: chName, nick: null };
+  const opEntry = ladder[opIdx] || { name: opName, nick: null };
+  const chBtn = document.getElementById('sc-closest-ch');
+  const opBtn = document.getElementById('sc-closest-op');
+  if (chBtn) chBtn.textContent = chEntry.name || ch;
+  if (chBtn) chBtn.title = chEntry.name || ch;
+  if (opBtn) opBtn.title = opEntry.name || op;
+  if (opBtn) opBtn.textContent = opEntry.name || opName;
+  document.getElementById('sc-closest').style.display = 'block';
+  document.getElementById('sc-match-banner').style.display = 'block';
+  // pre-fill banner and meta
+  try { updateScoringDisplay(); } catch(e) {}
+  // prepare UI defaults
+  document.getElementById('sc-current').textContent = '0';
+  document.getElementById('sc-history').textContent = '—';
+  document.getElementById('sc-bust').style.display = 'none';
+  // reflect restored state in UI if present
+  try {
+    if (scoringState && scoringState.activeLeg) {
+      // show scoring board and populate UI to let user resume immediately
+      document.getElementById('scoring-board').style.display = 'block';
+      updateScoringDisplay();
+      // populate current entry & history text
+      try { document.getElementById('sc-current').textContent = scoringState.currentEntry || '0'; } catch(e) {}
+      try { document.getElementById('sc-history').textContent = scoringState.activeLeg ? `P1:${(scoringState.activeLeg.visits[0]||[]).join(',')} | P2:${(scoringState.activeLeg.visits[1]||[]).join(',')}` : '—'; } catch(e) {}
+      // restore match selectors to reflect saved players and settings
+      try {
+        const chSel = document.getElementById('match-challenger');
+        const opSel = document.getElementById('match-opponent');
+        const boSel = document.getElementById('match-best-of');
+        const startSel = document.getElementById('score-start');
+        if (chSel && opSel && Array.isArray(scoringState.players)) {
+          chSel.value = scoringState.players[0] || chSel.value;
+          opSel.value = scoringState.players[1] || opSel.value;
+        }
+        if (boSel && scoringState.bestOf) boSel.value = scoringState.bestOf;
+        if (startSel && scoringState.start) startSel.value = scoringState.start;
+      } catch(e) {}
+    }
+  } catch(e) {}
+  // persist initial scoring choices
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+}
+
+// Persist on page unload and when tab visibility changes so refreshes and tab switches save progress
+window.addEventListener('beforeunload', () => {
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+});
+
+document.addEventListener('visibilitychange', () => {
+  try {
+    if (document.visibilityState === 'hidden') window.saveScoringStateToStorage();
+  } catch(e) {}
+});
+
+// Resolve who starts based on closest-to-bull numeric entries (smaller wins). If equal or missing, prompt manual pick.
+// Simplified: clicking the challenger/opponent buttons resolves the starter directly
+function resolveStart(starterIdx) {
+  scoringState.closest = { ch: starterIdx === 0 ? true : false, op: starterIdx === 1 ? true : false };
+  scoringState.starterIndex = starterIdx;
+  document.getElementById('sc-closest').style.display = 'none';
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+  startMatchAfterResolve();
+}
+
+function startMatchAfterResolve() {
+  // set initial player index to resolved starter
+  scoringState.currentPlayerIndex = (typeof scoringState.starterIndex === 'number') ? scoringState.starterIndex : 0;
+  const start = scoringState.start || 501;
+  const leg = { startingScore: start, remaining: [start, start], visits: [[], []], winner: null, starter: scoringState.currentPlayerIndex };
+  scoringState.activeLeg = leg;
+  scoringState.legs = [];
+  // hide manual pick
+  const manualBtn = document.getElementById('sc-manual-start'); if (manualBtn) manualBtn.style.display = 'none';
+  document.getElementById('scoring-board').style.display = 'block';
+  try { updateScoringDisplay(); } catch(e) {}
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+}
+
+function onKeypadPress(val) {
+  if (!scoringState) return;
+  const curEl = document.getElementById('sc-current');
+  // digit keys
+  if (typeof val === 'number') {
+    // append digit, but limit entry to 3 chars max
+  if (scoringState.currentEntry.length < 3) {
+      const candidate = scoringState.currentEntry + String(val);
+      const num = parseInt(candidate,10);
+      // enforce max 180
+      if (num > 180) return;
+      // if possible totals computed, allow only entries that could lead to a valid total
+      if (window.possibleThreeDartTotals && !isNaN(num)) {
+        // if candidate is partial (less than 3 digits), accept for now as long as some possible total starts with this prefix
+        const prefix = String(candidate);
+        let ok = false;
+        window.possibleThreeDartTotals.forEach(v => { if (!ok && String(v).startsWith(prefix)) ok = true; });
+        if (!ok) return; // reject impossible prefix
+      }
+      scoringState.currentEntry = candidate;
+    }
+    curEl.textContent = scoringState.currentEntry || '0';
+    try { window.saveScoringStateToStorage(); } catch(e) {}
+    return;
+  }
+
+  if (val === '←') {
+    scoringState.currentEntry = scoringState.currentEntry.slice(0, -1);
+    curEl.textContent = scoringState.currentEntry || '0';
+    try { window.saveScoringStateToStorage(); } catch(e) {}
+    return;
+  }
+
+  if (val === 'C') {
+    scoringState.currentEntry = '';
+    curEl.textContent = '0';
+    try { window.saveScoringStateToStorage(); } catch(e) {}
+    return;
+  }
+
+  if (val === 'ENTER') {
+    // trigger submit visit flow manually (same as pressing Submit Visit)
+    const fakeClick = document.getElementById('sc-submit');
+    if (fakeClick) fakeClick.click();
+    return;
+  }
+}
+
+
+
+// Listen for storage changes (other tabs) and restore scoring state if available
+window.addEventListener('storage', (ev) => {
+  try {
+    if (ev.key === 'fox_scoring_state' && ev.newValue) {
+      const restored = loadScoringStateFromStorage();
+      if (restored) {
+        // if scoring page is visible, update UI immediately
+        const sc = document.getElementById('page-scoring');
+        if (sc && getComputedStyle(sc).display !== 'none') {
+          try { document.getElementById('scoring-board').style.display = 'block'; } catch(e) {}
+          try { updateScoringDisplay(); } catch(e) {}
+          try { document.getElementById('sc-current').textContent = scoringState.currentEntry || '0'; } catch(e) {}
+        }
+      }
+    }
+  } catch(e) {}
+});
+
+document.getElementById('sc-undo').addEventListener('click', () => {
+  if (!scoringState) return;
+  // if there's an in-progress entry, clear last digit
+  if (scoringState.currentEntry && scoringState.currentEntry.length) {
+    scoringState.currentEntry = scoringState.currentEntry.slice(0, -1);
+    document.getElementById('sc-current').textContent = scoringState.currentEntry || '0';
+    return;
+  }
+
+  // otherwise undo last visit for previous player
+  const leg = scoringState.activeLeg;
+  let undone = false;
+  for (let p = 1; p >= 0; p--) {
+    const arr = leg.visits[p];
+    if (arr.length) {
+      const last = arr.pop();
+      const lastScore = (typeof last === 'object' && last !== null) ? (Number(last.score) || 0) : (Number(last) || 0);
+      leg.remaining[p] += lastScore;
+  try { updateScoringDisplay(); } catch(e) {}
+      // update visits counter display
+      const visitsText = `C:${leg.visits[0].length} • O:${leg.visits[1].length}`;
+      const scHistEl = document.getElementById('sc-history');
+      if (scHistEl) scHistEl.textContent = visitsText;
+      undone = true; break;
+    }
+  }
+  if (!undone) return;
+  // refresh UI after undo
+  try { updateScoringDisplay(); } catch (e) {}
+  try { renderScoringLegsPanel(); } catch(e) {}
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+});
+
+// Update the scoring UI: player label, remaining and 3-dart average
+function updateScoringDisplay() {
+  if (!scoringState || !scoringState.activeLeg) return;
+  const leg = scoringState.activeLeg;
+  const chName = scoringState.players && scoringState.players[0];
+  const opName = scoringState.players && scoringState.players[1];
+
+  // map to ladder entries to show nick if present
+  const chEntry = ladder.find(p => p.name === chName) || { name: chName, nick: null };
+  const opEntry = ladder.find(p => p.name === opName) || { name: opName, nick: null };
+
+  // display both nickname and full name when available: "Nick (Full Name)"
+  const chLabel = chEntry.nick ? `${chEntry.nick} (${chEntry.name})` : (chEntry.name || 'Challenger');
+  const opLabel = opEntry.nick ? `${opEntry.nick} (${opEntry.name})` : (opEntry.name || 'Opponent');
+
+  // set countdown labels to full name only (no nickname)
+  const chNameEl = document.getElementById('sc-ch-name'); if (chNameEl) chNameEl.textContent = (chEntry.name || 'Challenger');
+  const opNameEl = document.getElementById('sc-op-name'); if (opNameEl) opNameEl.textContent = (opEntry.name || 'Opponent');
+
+  // remaining values
+  const chRemEl = document.getElementById('sc-ch-rem'); if (chRemEl) chRemEl.textContent = leg.remaining[0];
+  const opRemEl = document.getElementById('sc-op-rem'); if (opRemEl) opRemEl.textContent = leg.remaining[1];
+
+  // checkout suggestions
+  try {
+    const chCO = computeCheckouts(Number(leg.remaining[0]));
+    const opCO = computeCheckouts(Number(leg.remaining[1]));
+    const chEl = document.getElementById('sc-ch-checkouts');
+    const opEl = document.getElementById('sc-op-checkouts');
+    if (chEl) chEl.textContent = chCO.length ? `Checkout: ${chCO.join(' • ')}` : 'Checkout: —';
+    if (opEl) opEl.textContent = opCO.length ? `Checkout: ${opCO.join(' • ')}` : 'Checkout: —';
+  } catch(e) {}
+
+  // compute averages
+  const chVisits = Array.isArray(leg.visits[0]) ? leg.visits[0] : [];
+  const opVisits = Array.isArray(leg.visits[1]) ? leg.visits[1] : [];
+  const chTotal = chVisits.reduce((s,v) => s + (typeof v === 'object' ? (v.score||0) : v), 0);
+  const opTotal = opVisits.reduce((s,v) => s + (typeof v === 'object' ? (v.score||0) : v), 0);
+  const chAvg = chVisits.length ? Math.round((chTotal / chVisits.length) * 10) / 10 : '—';
+  const opAvg = opVisits.length ? Math.round((opTotal / opVisits.length) * 10) / 10 : '—';
+  const chAvgEl = document.getElementById('sc-ch-avg'); if (chAvgEl) chAvgEl.textContent = chAvg;
+  const opAvgEl = document.getElementById('sc-op-avg'); if (opAvgEl) opAvgEl.textContent = opAvg;
+
+  // visits counter display
+  try {
+    const visitsCh = Array.isArray(leg.visits[0]) ? leg.visits[0].length : 0;
+    const visitsOp = Array.isArray(leg.visits[1]) ? leg.visits[1].length : 0;
+    const scHistEl = document.getElementById('sc-history');
+    if (scHistEl) scHistEl.textContent = `C:${visitsCh} • O:${visitsOp}`;
+    // show 45-dart indicator if reached
+    if (leg.reached45) {
+      if (scHistEl) scHistEl.textContent += ` • 45 darts — bull decided: ${leg.bull ? chEntry.name : opEntry.name}`;
+    }
+  } catch(e) {}
+
+  // visually indicate whose turn
+  const pIdx = scoringState.currentPlayerIndex || 0;
+  if (pIdx === 0) {
+    if (chRemEl) chRemEl.style.color = 'var(--accent)';
+    if (opRemEl) opRemEl.style.color = '';
+  } else {
+    if (opRemEl) opRemEl.style.color = 'var(--accent)';
+    if (chRemEl) chRemEl.style.color = '';
+  }
+
+  // populate match banner
+  try {
+    const banner = document.getElementById('sc-match-banner');
+    const title = document.getElementById('sc-match-title');
+    const meta = document.getElementById('sc-match-meta');
+    if (banner && title && meta && scoringState.players && scoringState.players.length === 2) {
+      banner.style.display = 'block';
+  // build title with a muted 'versus' separator
+  const safeCh = String(chLabel).replace(/</g,'&lt;');
+  const safeOp = String(opLabel).replace(/</g,'&lt;');
+  title.innerHTML = `${safeCh} <span class="vs-muted">versus</span> ${safeOp}`;
+      meta.textContent = `Best of ${scoringState.bestOf} • Start ${scoringState.start}`;
+      // show starter indicator if resolved
+      const starterElId = 'sc-starter-indicator';
+      let starterEl = document.getElementById(starterElId);
+      if (!starterEl) {
+        starterEl = document.createElement('div');
+        starterEl.id = starterElId;
+        starterEl.className = 'small';
+        starterEl.style.color = '#9ca3af';
+        starterEl.style.marginLeft = '1rem';
+        meta.parentNode.appendChild(starterEl);
+      }
+      if (typeof scoringState.starterIndex === 'number') {
+        const starterLabel = scoringState.starterIndex === 0 ? chLabel : opLabel;
+        starterEl.textContent = ` • Starter: ${starterLabel}`;
+        starterEl.style.display = 'inline-block';
+      } else {
+        if (starterEl) starterEl.style.display = 'none';
+      }
+    } else if (banner) banner.style.display = 'none';
+  } catch(e) { }
+}
+
+// helper: check if a given score results in a valid checkout under double-out rules
+function isValidCheckout(remainingBefore, visitTotal) {
+  // reject impossible totals (not achievable in 1-3 darts)
+  try {
+    if (window.possibleThreeDartTotals && !window.possibleThreeDartTotals.has(visitTotal)) {
+      return { valid: false, bust: false, impossible: true };
+    }
+  } catch(e) {}
+  const after = remainingBefore - visitTotal;
+  // busts
+  if (after < 0) return { valid: false, bust: true };
+  if (after === 1) return { valid: false, bust: true };
+  if (after === 0) {
+    // must be finished on a double — since the calculator entry captures only the 3-dart total
+    // we cannot determine per-dart multipliers. Prompt the user to confirm they finished on a double.
+    return { valid: true, requiresDouble: true };
+  }
+  return { valid: true, bust: false };
+}
+
+// Compute checkout suggestions for a remaining score (prefer 1-3 dart finishes, final dart must be a double)
+function computeCheckouts(rem) {
+  // simple table-driven approach for common finishes up to 170
+  if (typeof rem !== 'number' || rem <= 0) return [];
+  const suggestions = [];
+
+  // Common known checkouts (first pass) — each entry is an array of throws (strings)
+  const common = {
+    170: ['T20','T20','Bull'],
+    167: ['T20','T19','Bull'],
+    164: ['T20','T18','Bull'],
+    161: ['T20','T17','Bull'],
+    160: ['T20','T20','D20'],
+    158: ['T20','T20','D19'],
+    157: ['T20','T19','D20'],
+    156: ['T20','T20','D18'],
+    155: ['T20','T19','D19'],
+    154: ['T20','T18','D20'],
+    153: ['T20','T19','D18'],
+    152: ['T20','T20','D16'],
+    151: ['T20','T17','D20'],
+    150: ['T20','T18','D18'],
+    149: ['T20','T19','D16'],
+    148: ['T20','T16','D20'],
+    147: ['T19','T16','D18'],
+    146: ['T20','T18','D8'],
+    145: ['T20','T15','D20'],
+    144: ['T20','T16','D16'],
+    143: ['T20','T13','D20'],
+    142: ['T20','T14','D16'],
+    141: ['T20','T11','D20'],
+    140: ['T20','T20','D10'],
+    138: ['T20','T18','D12'],
+    136: ['T20','T20','D8'],
+    135: ['T20','T13','D18'],
+    134: ['T20','T14','D18'],
+    132: ['T20','T12','D18'],
+    130: ['T20','T20','D5'],
+    128: ['T18','T14','D16'],
+    126: ['T20','T19','D6'],
+    124: ['T20','T16','D8'],
+    122: ['T18','T18','D7'],
+    120: ['T20','20','D20'],
+    116: ['T20','20','D18'],
+    114: ['T20','14','D16'],
+    112: ['T20','14','D18'],
+    110: ['T20','18','D18'],
+    108: ['T20','16','D18'],
+    106: ['T20','10','D18'],
+    104: ['T18','18','D16'],
+    102: ['T20','10','D16'],
+    100: ['T20','D20'],
+    98: ['T20','D19'],
+    96: ['T20','D18'],
+    94: ['T18','D20'],
+    92: ['T20','D16'],
+    90: ['T18','D18'],
+    88: ['T16','D20'],
+    86: ['T16','D19'],
+    84: ['T20','D12'],
+    82: ['T14','D20'],
+    80: ['T20','D10'],
+    78: ['T18','D12'],
+    76: ['T20','D8'],
+    74: ['T14','D16'],
+    72: ['T12','D18'],
+    70: ['T18','D8'],
+    68: ['T20','D4'],
+    66: ['T10','D18'],
+    64: ['T16','D8'],
+    62: ['T10','D16'],
+    60: ['20','D20'],
+    58: ['18','D20'],
+    56: ['16','D20'],
+    54: ['14','D20'],
+    52: ['12','D20'],
+    50: ['18','D16'],
+    48: ['16','D16'],
+    46: ['10','D18'],
+    44: ['12','D16'],
+    42: ['10','D16'],
+    40: ['D20'],
+    38: ['D19'],
+    36: ['D18'],
+    34: ['D17'],
+    32: ['D16'],
+    30: ['D15'],
+    28: ['D14'],
+    26: ['D13'],
+    24: ['D12'],
+    22: ['D11'],
+    20: ['D10'],
+    18: ['D9'],
+    16: ['D8'],
+    14: ['D7'],
+    12: ['D6'],
+    10: ['D5'],
+    8: ['D4'],
+    6: ['D3'],
+    4: ['D2'],
+    2: ['D1']
+  };
+
+  if (rem in common) {
+    suggestions.push(common[rem].join(' • '));
+  }
+
+  // If not found in common, try to decompose into 2-dart then 3-dart with a final double
+  if (suggestions.length === 0) {
+    // try finishing with single dart double (1-dart)
+    if (rem % 2 === 0 && rem <= 40) suggestions.push(`D${rem/2}`);
+
+    // try two-dart finishes: single/treble + double
+    for (let d = 20; d >= 1 && suggestions.length < 3; d--) {
+      const singleVals = [d, d*2, d*3];
+      for (let sv of singleVals) {
+        const need = rem - sv;
+        if (need > 1 && need <= 40 && need % 2 === 0) {
+          suggestions.push(`${sv >= 40 ? `T${Math.floor(sv/3)}` : sv} • D${need/2}`);
+          if (suggestions.length >= 3) break;
+        }
+      }
+
+    // render per-leg panel
+    try { renderScoringLegsPanel(); } catch(e) {}
+    }
+
+  // Render per-leg details on the scoring page
+  function renderScoringLegsPanel() {
+    try {
+      const panel = document.getElementById('sc-legs-panel');
+      if (!panel) return;
+      if (!scoringState) { panel.style.display = 'none'; return; }
+      const legs = scoringState.legs || [];
+      const active = scoringState.activeLeg;
+
+      let html = '';
+      if (legs.length) {
+        html += '<div class="small">Completed Legs</div>';
+        legs.forEach((l,i) => {
+          const w = l.winner || '';
+          const chArr = Array.isArray(l.visits) ? (l.visits[0]||[]) : (l.visits && l.visits.challenger ? l.visits.challenger : []);
+          const opArr = Array.isArray(l.visits) ? (l.visits[1]||[]) : (l.visits && l.visits.opponent ? l.visits.opponent : []);
+          const chStr = chArr.map(v => typeof v === 'object' ? (v.score||0) + (v.bust ? '<span class="visit-bust">(BUST)</span>' : '') : v).join(', ');
+          const opStr = opArr.map(v => typeof v === 'object' ? (v.score||0) + (v.bust ? '<span class="visit-bust">(BUST)</span>' : '') : v).join(', ');
+          const chHigh = chArr.reduce((m,v)=> Math.max(m, typeof v === 'object' ? (v.score||0) : (Number(v)||0)), 0);
+          const opHigh = opArr.reduce((m,v)=> Math.max(m, typeof v === 'object' ? (v.score||0) : (Number(v)||0)), 0);
+          html += `<div style="margin-top:.45rem; padding:.45rem; border-radius:6px; background:var(--panel-soft);">
+            <div style="font-weight:700;">Leg ${i+1} — Winner: ${w || 'N/A'}</div>
+            <div class="small">Challenger visits: ${chStr || '—'} • High: ${chHigh}</div>
+            <div class="small">Opponent visits: ${opStr || '—'} • High: ${opHigh}</div>
+            ${l.bull ? '<div class="small">Decided by bull (45 darts)</div>' : ''}
+          </div>`;
+        });
+      }
+
+      // show active leg summary
+      if (active) {
+        const chArr = Array.isArray(active.visits) ? (active.visits[0]||[]) : (active.visits && active.visits.challenger ? active.visits.challenger : []);
+        const opArr = Array.isArray(active.visits) ? (active.visits[1]||[]) : (active.visits && active.visits.opponent ? active.visits.opponent : []);
+  const chStr = chArr.map(v => typeof v === 'object' ? (v.score||0) + (v.bust ? '<span class="visit-bust">(BUST)</span>' : '') : v).join(', ');
+  const opStr = opArr.map(v => typeof v === 'object' ? (v.score||0) + (v.bust ? '<span class="visit-bust">(BUST)</span>' : '') : v).join(', ');
+        const activeTitle = legs.length ? 'Active Leg' : 'Leg 1 (active)';
+        html += `<div style="margin-top:.6rem;"><div class="small">${activeTitle}</div>
+          <div style="padding:.45rem; border-radius:6px; background:var(--panel);">
+            <div class="small">Challenger: ${chStr || '—'}</div>
+            <div class="small">Opponent: ${opStr || '—'}</div>
+          </div></div>`;
+      }
+
+      panel.innerHTML = html || '<div class="small" style="color:#9ca3af;">No legs started</div>';
+      panel.style.display = '';
+    } catch(e) { console.error('renderScoringLegsPanel error', e); }
+  }
+  }
+
+  // dedupe and return top 3
+  const uniq = Array.from(new Set(suggestions)).slice(0,3);
+  return uniq;
+}
+
+document.getElementById('sc-submit').addEventListener('click', () => {
+  if (!scoringState) return;
+  const visitTotal = parseInt(scoringState.currentEntry || '0', 10) || 0;
+  if (visitTotal === 0) return;
+
+  // validate achievable total
+  if (window.possibleThreeDartTotals && !window.possibleThreeDartTotals.has(visitTotal)) {
+    alert('Entered total is not achievable with three darts. Please check the visit total.');
+    scoringState.currentEntry = '';
+    document.getElementById('sc-current').textContent = '0';
+    return;
+  }
+
+  // solo mode removed — run match flow only
+
+  // match mode
+  const pi = scoringState.currentPlayerIndex;
+  const leg = scoringState.activeLeg;
+  const check = isValidCheckout(leg.remaining[pi], visitTotal);
+  if (!check.valid && check.bust) {
+    // BUST: record the visit so it counts toward throw limits, but do NOT change the player's
+    // remaining score (restore to start-of-turn). End the player's turn immediately and pass
+    // play to the opponent. Keep a visible BUST indicator.
+    try {
+      const bustVisit = { score: visitTotal, bust: true };
+      // record the visit (counts toward 45-dart/visit limits)
+      leg.visits[pi].push(bustVisit);
+      // Do NOT subtract from leg.remaining[pi] (ignore darts for scoring)
+
+      // update visits counter display
+      try {
+        const visitsText = `C:${leg.visits[0].length} • O:${leg.visits[1].length}`;
+        const scHistEl = document.getElementById('sc-history');
+        if (scHistEl) scHistEl.textContent = visitsText;
+      } catch(e) {}
+
+      // show bust indicator briefly
+      try { document.getElementById('sc-bust').style.display = 'block'; } catch(e) {}
+      setTimeout(() => { try { document.getElementById('sc-bust').style.display = 'none'; } catch(e) {} }, 1600);
+
+      // clear current entry and UI
+      scoringState.currentEntry = '';
+      try { document.getElementById('sc-current').textContent = '0'; } catch(e) {}
+
+      // end turn: pass play to opponent
+      scoringState.currentPlayerIndex = (scoringState.currentPlayerIndex + 1) % 2;
+
+      // persist and refresh display
+      try { window.saveScoringStateToStorage(); } catch(e) {}
+      try { updateScoringDisplay(); } catch(e) {}
+      try { renderScoringLegsPanel(); } catch(e) {}
+    } catch(e) {
+      console.error('Error handling bust visit', e);
+    }
+    return;
+  }
+  if (check.requiresDouble) {
+    const confirmed = confirm('Finish requires double-out. Did you finish on a double?');
+    if (!confirmed) { scoringState.currentEntry = ''; document.getElementById('sc-current').textContent = '0'; return; }
+    // mark this visit object as doubleConfirmed when we push it below
+  }
+  // store visit as an object to preserve metadata (doubleConfirmed)
+  const visitObj = { score: visitTotal };
+  if (check.requiresDouble) visitObj.doubleConfirmed = true;
+  leg.visits[pi].push(visitObj);
+  leg.remaining[pi] -= visitTotal;
+  // update visits counter display
+  try {
+    const visitsText = `C:${leg.visits[0].length} • O:${leg.visits[1].length}`;
+    const scHistEl = document.getElementById('sc-history');
+    if (scHistEl) scHistEl.textContent = visitsText;
+  } catch(e) {}
+  // special: celebrate a 100 visit with fireworks
+  try {
+    if (typeof window.showFireworks === 'function' && visitTotal >= 100) {
+      if (visitTotal >= 180) window.showFireworks({ duration: 2600, bursts: 26, pMin: 28, pMax: 48 });
+      else if (visitTotal >= 140) window.showFireworks({ duration: 2000, bursts: 18, pMin: 22, pMax: 36 });
+      else window.showFireworks({ duration: 1400, bursts: 10, pMin: 16, pMax: 26 });
+    }
+  } catch(e) {}
+  // visits counter already updated above
+  try { updateScoringDisplay(); } catch(e) {}
+  scoringState.currentEntry = '';
+  try { updateScoringDisplay(); } catch(e) {}
+
+  // persist updated scoring progress
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+
+  // Enforce 45-dart rule: when both players have made 15 visits (45 darts), prompt to decide nearest bull
+  try {
+    const visitsCh = leg.visits[0].length;
+    const visitsOp = leg.visits[1].length;
+    if (!leg.reached45 && visitsCh >= 15 && visitsOp >= 15) {
+      // mark leg as reached45 and prompt scorer to choose nearest bull
+      leg.reached45 = true;
+      const choose = confirm('Both players have thrown 45 darts. Decide nearest to bull now.\nPress OK to mark Challenger as nearest, Cancel to mark Opponent.');
+      leg.bull = !!choose; // true -> challenger won nearest bull
+      // record winner accordingly and finish the leg
+      leg.winner = leg.bull ? scoringState.players[0] : scoringState.players[1];
+      scoringState.legs.push(leg);
+      // update banner/history text
+      document.getElementById('sc-history').textContent += ` • Leg decided by bull: ${leg.winner}`;
+      try { window.saveScoringStateToStorage(); } catch(e) {}
+  try { renderScoringLegsPanel(); } catch(e) {}
+
+      // check for match end similar to normal finish
+      const p0Wins = scoringState.legs.filter(l => l.winner === scoringState.players[0]).length;
+      const p1Wins = scoringState.legs.filter(l => l.winner === scoringState.players[1]).length;
+      if (p0Wins >= scoringState.requiredToWin || p1Wins >= scoringState.requiredToWin) {
+        const matchObj = {
+          challenger: scoringState.players[0],
+          opponent: scoringState.players[1],
+          winner: p0Wins > p1Wins ? scoringState.players[0] : scoringState.players[1],
+          loser: p0Wins > p1Wins ? scoringState.players[1] : scoringState.players[0],
+          legs: scoringState.legs,
+          timestamp: new Date().toLocaleString(),
+          movement: 'Scoring page match entry (bull-decided)'
+        };
+        submitMatchObject(matchObj);
+        // show a results panel and wait for scorer to dismiss
+        renderScoringMatchResults(matchObj);
+        return;
+      }
+
+      // start next leg - loser starts
+      const nextLeg = { startingScore: scoringState.start, remaining: [scoringState.start, scoringState.start], visits: [[], []], winner: null };
+      scoringState.activeLeg = nextLeg;
+      scoringState.currentPlayerIndex = leg.winner === scoringState.players[0] ? 1 : 0;
+      try { window.saveScoringStateToStorage(); } catch(e) {}
+      try { updateScoringDisplay(); } catch(e) {}
+  try { renderScoringLegsPanel(); } catch(e) {}
+      return;
+    }
+  } catch(e) {}
+
+  if (leg.remaining[pi] <= 0) {
+    leg.winner = scoringState.players[pi];
+    scoringState.legs.push(leg);
+
+    // check match over
+    const p0Wins = scoringState.legs.filter(l => l.winner === scoringState.players[0]).length;
+    const p1Wins = scoringState.legs.filter(l => l.winner === scoringState.players[1]).length;
+    if (p0Wins >= scoringState.requiredToWin || p1Wins >= scoringState.requiredToWin) {
+      // finalize match
+      const matchObj = {
+        challenger: scoringState.players[0],
+        opponent: scoringState.players[1],
+        winner: p0Wins > p1Wins ? scoringState.players[0] : scoringState.players[1],
+        loser: p0Wins > p1Wins ? scoringState.players[1] : scoringState.players[0],
+        legs: scoringState.legs,
+        timestamp: new Date().toLocaleString(),
+        movement: 'Scoring page match entry'
+      };
+      submitMatchObject(matchObj);
+      // show a results panel and wait for scorer to dismiss
+      renderScoringMatchResults(matchObj);
+      try { renderScoringLegsPanel(); } catch(e) {}
+      return;
+    }
+
+    // start next leg - loser starts
+    const nextLeg = { startingScore: scoringState.start, remaining: [scoringState.start, scoringState.start], visits: [[], []], winner: null };
+    scoringState.activeLeg = nextLeg;
+    scoringState.currentPlayerIndex = pi === 0 ? 1 : 0;
+  try { window.saveScoringStateToStorage(); } catch(e) {}
+  try { updateScoringDisplay(); } catch(e) {}
+  try { renderScoringLegsPanel(); } catch(e) {}
+    try { updateScoringDisplay(); } catch(e) {}
+    document.getElementById('sc-history').textContent += ` • Leg ${scoringState.legs.length} won by ${leg.winner}`;
+    return;
+  }
+
+  // alternate turn
+  scoringState.currentPlayerIndex = (scoringState.currentPlayerIndex + 1) % 2;
+  try { updateScoringDisplay(); } catch(e) {}
+  document.getElementById('sc-current').textContent = '0';
+  try { updateScoringDisplay(); } catch(e) {}
+});
+
+// End game: clear and hide
+document.getElementById('sc-end').addEventListener('click', () => {
+  if (!scoringState) return;
+  if (confirm('End scoring session?')) {
+    resetScoringState();
+    document.getElementById('scoring-board').style.display = 'none';
+    try { window.clearScoringStateFromStorage(); } catch(e) {}
+  }
+});
+
+// Compose and persist a match object to history and update ladder similar to submitMatch
+function submitMatchObject(matchObj) {
+  // normalize legs: ensure each leg has visits split by player where needed
+  const challengerName = matchObj.challenger;
+  const opponentName = matchObj.opponent;
+
+  // find ladder entries
+  const challenger = ladder.find(p => p.name === challengerName);
+  const opponent = ladder.find(p => p.name === opponentName);
+
+  // update ladder counts if both found
+  if (challenger && opponent) {
+    const p0Wins = matchObj.legs.filter(l => l.winner === challengerName).length;
+    const p1Wins = matchObj.legs.filter(l => l.winner === opponentName).length;
+
+    const winner = p0Wins > p1Wins ? challenger : opponent;
+    const loser = p0Wins > p1Wins ? opponent : challenger;
+
+    winner.w = (winner.w || 0) + 1;
+    loser.l = (loser.l || 0) + 1;
+
+    winner.lf = (winner.lf || 0) + Math.max(p0Wins, p1Wins);
+    winner.la = (winner.la || 0) + Math.min(p0Wins, p1Wins);
+    loser.lf = (loser.lf || 0) + Math.min(p0Wins, p1Wins);
+    loser.la = (loser.la || 0) + Math.max(p0Wins, p1Wins);
+
+    const stamp = matchObj.timestamp || new Date().toLocaleString();
+    winner.last = `W vs ${loser.name} (${stamp})`;
+    loser.last = `L vs ${winner.name} (${stamp})`;
+
+    // ladder movement
+    const wIndex = ladder.indexOf(winner);
+    const lIndex = ladder.indexOf(loser);
+    let movement = 'No movement';
+    if (wIndex > lIndex) {
+      const oldPos = wIndex + 1;
+      const newPos = lIndex + 1;
+      const moved = ladder.splice(wIndex, 1)[0];
+      ladder.splice(lIndex, 0, moved);
+      movement = `Moved from ${oldPos} to ${newPos}`;
+    }
+
+    // push to history
+    db.ref('history').push({
+      challenger: challenger.name,
+      challengerNick: challenger.nick,
+      opponent: opponent.name,
+      opponentNick: opponent.nick,
+      winner: winner.name,
+      loser: loser.name,
+      legs: matchObj.legs,
+      stats: computeMatchStats({ challenger: challenger.name, opponent: opponent.name, legs: matchObj.legs }),
+      timestamp: stamp,
+      movement
+    });
+
+    saveLadder();
+  } else {
+    // fallback: push match without ladder update
+    db.ref('history').push(matchObj);
+  }
+}
+
+// Render a match summary on the scoring page and keep the board visible until user closes
+function renderScoringMatchResults(matchObj) {
+  try {
+    const el = document.getElementById('sc-match-results');
+    if (!el) return;
+    const challenger = matchObj.challenger;
+    const opponent = matchObj.opponent;
+    const legs = matchObj.legs || [];
+    const winner = matchObj.winner;
+    const loser = matchObj.loser;
+
+    const legLines = legs.map((l, i) => {
+      const w = l.winner || (l.bull ? (l.bull === true ? challenger : opponent) : '');
+      const chVisits = Array.isArray(l.visits) ? (l.visits[0] || []) : (l.visits && l.visits.challenger ? l.visits.challenger : []);
+      const opVisits = Array.isArray(l.visits) ? (l.visits[1] || []) : (l.visits && l.visits.opponent ? l.visits.opponent : []);
+      const chPts = chVisits.reduce((s,v)=> s + (typeof v === 'object' ? (v.score||0) : (Number(v)||0)), 0);
+      const opPts = opVisits.reduce((s,v)=> s + (typeof v === 'object' ? (v.score||0) : (Number(v)||0)), 0);
+      return `<div style="margin-bottom:.35rem;"><strong>Leg ${i+1}:</strong> Winner: ${w || 'N/A'} • ${challenger} ${chPts} — ${opponent} ${opPts}${l.bull ? ' • bull decided' : ''}</div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="card" style="padding:.6rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-weight:800;">Match Result</div>
+          <div class="small">${new Date(matchObj.timestamp || Date.now()).toLocaleString()}</div>
+        </div>
+        <div style="margin-top:.6rem;">${challenger} vs ${opponent}</div>
+        <div style="margin-top:.4rem; font-weight:700;">Final: ${winner} defeated ${loser}</div>
+        <div style="margin-top:.6rem;">${legLines}</div>
+        <div style="display:flex; gap:.5rem; margin-top:.8rem;">
+          <button class="btn-primary" id="sc-results-close">Close</button>
+          <button class="btn-secondary" id="sc-results-view-history">View in History</button>
+        </div>
+      </div>
+    `;
+
+    el.style.display = 'block';
+
+    // attach actions
+    const closeBtn = document.getElementById('sc-results-close');
+    if (closeBtn) closeBtn.addEventListener('click', () => closeScoringMatchResults());
+    const viewBtn = document.getElementById('sc-results-view-history');
+    if (viewBtn) viewBtn.addEventListener('click', () => { showPage('history'); setTimeout(() => { renderHistoryList && renderHistoryList(); }, 200); });
+  } catch(e) { console.error('renderScoringMatchResults error', e); }
+}
+
+function closeScoringMatchResults() {
+  try {
+    const el = document.getElementById('sc-match-results');
+    if (!el) return;
+    el.style.display = 'none';
+    // now clear scoring UI and hide board
+    resetScoringState();
+    try { window.clearScoringStateFromStorage(); } catch(e) {}
+    document.getElementById('scoring-board').style.display = 'none';
+  } catch(e) { console.error(e); }
+}
+
+// ensure scoring UI is inited when page shown
+// (showPage now handles scoring initialization)
+
+// Defensive: delegated click handler only to bootstrap the new scoringStart when needed
+document.addEventListener('click', (ev) => {
+  const id = ev.target && ev.target.id;
+  if (!id) return;
+  if (id === 'scoring-start-btn') {
+    // call the match-aware start logic
+    try { scoringStart(); } catch (e) { console.error(e); }
+  }
+  if (id === 'sc-manual-start') {
+    // manual pick toggles between challenger (0) and opponent (1) on each press until match starts
+    if (!scoringState) return;
+    scoringState.starterIndex = (typeof scoringState.starterIndex === 'number') ? (1 - scoringState.starterIndex) : 0;
+    // start the match immediately after manual pick
+    try { startMatchAfterResolve(); } catch (e) { console.error(e); }
+  }
+  if (id === 'sc-closest-ch') {
+    try { resolveStart(0); } catch (e) { console.error(e); }
+  }
+  if (id === 'sc-closest-op') {
+    try { resolveStart(1); } catch (e) { console.error(e); }
+  }
+});
+</script>
+
+</body>
+</html>
