@@ -3175,27 +3175,42 @@ document.getElementById('sc-undo').addEventListener('click', () => {
     document.getElementById('sc-current').textContent = scoringState.currentEntry || '0';
     return;
   }
-
-  // otherwise undo last visit for previous player
+  // otherwise undo the last visit that was entered (global), but remain on the current player
   const leg = scoringState.activeLeg;
-  let undone = false;
-  for (let p = 1; p >= 0; p--) {
-    const arr = leg.visits[p];
-    if (arr.length) {
-      const last = arr.pop();
-      const lastScore = (typeof last === 'object' && last !== null) ? (Number(last.score) || 0) : (Number(last) || 0);
-      leg.remaining[p] += lastScore;
-  try { updateScoringDisplay(); } catch(e) {}
-      // update visits counter display
-      const visitsText = `C:${leg.visits[0].length} • O:${leg.visits[1].length}`;
-      const scHistEl = document.getElementById('sc-history');
-      if (scHistEl) scHistEl.textContent = visitsText;
-      undone = true; break;
-    }
+  if (!leg) return;
+  const len0 = (leg.visits[0] || []).length;
+  const len1 = (leg.visits[1] || []).length;
+  // determine which player made the last entered visit
+  let lastPlayer = null;
+  if (len0 === 0 && len1 === 0) return; // nothing to undo
+  if (len0 > len1) lastPlayer = 0;
+  else if (len1 > len0) lastPlayer = 1;
+  else {
+    // equal lengths: last visit was by the opponent of the current player
+    const cur = typeof scoringState.currentPlayerIndex === 'number' ? scoringState.currentPlayerIndex : 0;
+    lastPlayer = (cur + 1) % 2;
   }
-  if (!undone) return;
-  // refresh UI after undo
-  try { updateScoringDisplay(); } catch (e) {}
+
+  const arr = leg.visits[lastPlayer] || [];
+  if (!arr.length) return;
+  const last = arr.pop();
+  const lastScore = (typeof last === 'object' && last !== null) ? (Number(last.score) || 0) : (Number(last) || 0);
+  // If the visit was a bust, it didn't change remaining when recorded, so don't add back
+  if (!(typeof last === 'object' && last && last.bust)) {
+    leg.remaining[lastPlayer] += lastScore;
+  }
+
+  // update visits counter display
+  try {
+    const visitsText = `C:${(leg.visits[0]||[]).length} • O:${(leg.visits[1]||[]).length}`;
+    const scHistEl = document.getElementById('sc-history');
+    if (scHistEl) scHistEl.textContent = visitsText;
+  } catch(e) {}
+
+  // Do NOT change scoringState.currentPlayerIndex; remain on the player who invoked undo
+  // Switch active player to the one whose visit was undone so the UI reflects that player
+  try { scoringState.currentPlayerIndex = lastPlayer; } catch(e) {}
+  try { updateScoringDisplay(); } catch(e) {}
   try { renderScoringLegsPanel(); } catch(e) {}
   try { window.saveScoringStateToStorage(); } catch(e) {}
 });
