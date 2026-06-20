@@ -496,6 +496,9 @@ input, select {
   /* Bust visit marker */
   .visit-bust { color: var(--danger); font-weight:800; margin-left:0.45rem; }
 
+  /* Sparkline tooltip */
+  .spark-tooltip { background: rgba(15,23,42,0.96); color: var(--text); border: 1px solid rgba(255,255,255,0.04); padding: .45rem .6rem; border-radius:8px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); pointer-events:none; font-weight:600; }
+
   /* Hide 'View in History' on scoring page but keep it in DOM for script compatibility */
   #page-scoring #sc-results-view-history {
     display: none !important;
@@ -1031,7 +1034,7 @@ function renderRules() {
     "Normal darts rules apply – straight in, double out.",
     "Matches must be scored and witnessed by a third member of the ladder.",
     "Players must declare to the scorer/witness that the match is a ladder match before starting.",
-    "Format: Best of 3 legs. Default 501 start, or 301 if both players agree.",
+    "Format: Default 501 start, or 301 if both players agree.",
     "45‑dart rule: After each player has thrown 45 darts (15 visits), if neither has checked out, the leg is decided by one dart nearest the bull.",
     "No remaining‑score comparison is used after 45 darts — nearest‑bull only.",
     "Challenge rule: A player may challenge up to 3 positions above them in the ladder.",
@@ -1214,8 +1217,13 @@ db.ref("history").on("value", snap => {
 
         const legs = m.legs.map((l, i) => {
           if (!l.winner) return `Leg ${i+1}: –`;
-          const w = l.winner === "challenger" ? cName : oName;
-          return `Leg ${i+1}: ${w}`;
+          const lw = l.winner;
+          // resolve winner: accept 'challenger'/'opponent' keys or stored player names
+          let wname = '';
+          if (lw === 'challenger' || lw === m.challenger || lw === cName) wname = cName;
+          else if (lw === 'opponent' || lw === m.opponent || lw === oName) wname = oName;
+          else wname = String(lw);
+          return `Leg ${i+1}: ${wname}`;
         }).join(" • ");
 
         list.innerHTML += `
@@ -2010,14 +2018,17 @@ function computeAdvancedStats(name) {
     if (isWinner) wins++;
     else losses++;
 
-    const isChallenger = m.challenger === name;
-    const myKey = isChallenger ? "challenger" : "opponent";
+  const isChallenger = m.challenger === name;
+  const myKey = isChallenger ? "challenger" : "opponent";
+  const oppKey = isChallenger ? "opponent" : "challenger";
+  const oppName = getOpponentName(m, name);
 
-    const myLegs = m.legs.filter(l => l.winner === myKey).length;
-    const oppLegs = m.legs.length - myLegs;
+  // leg.winner may be stored as the key ('challenger'/'opponent') or as the player's name
+  const myLegs = m.legs.filter(l => l.winner === myKey || l.winner === name).length;
+  const oppLegs = m.legs.filter(l => l.winner === oppKey || l.winner === oppName).length;
 
-    legsFor += myLegs;
-    legsAgainst += oppLegs;
+  legsFor += myLegs;
+  legsAgainst += oppLegs;
 
     if (isWinner && myLegs === 2 && oppLegs === 0) wins20++;
     if (isWinner && myLegs === 2 && oppLegs === 1) wins21++;
@@ -2026,8 +2037,8 @@ function computeAdvancedStats(name) {
 
     m.legs.forEach(l => {
       if (l.bull) {
-        if (l.winner === myKey) bullWins++;
-        else bullLosses++;
+        if (l.winner === myKey || l.winner === name) bullWins++;
+        else if (l.winner === oppKey || l.winner === oppName) bullLosses++;
       }
     });
 
@@ -2384,7 +2395,11 @@ function renderPlayerDashboard(index) {
   legsCard.style = 'margin-top:.6rem; padding:1rem;';
   legsCard.innerHTML = `
     <div class="small">Legs Won vs Lost</div>
-    <div style="font-size:1.2rem; font-weight:700; margin-top:.3rem;">${stats.legsFor} – ${stats.legsAgainst}</div>
+    <div style="font-size:1.2rem; font-weight:700; margin-top:.3rem;">
+      <span class="small" style="color:#9ca3af; margin-right:.45rem;">Won</span>${stats.legsFor}
+      <span style="margin:0 .6rem; color:rgba(255,255,255,0.6);">–</span>
+      <span class="small" style="color:#9ca3af; margin-left:.45rem; margin-right:.45rem;">Lost</span>${stats.legsAgainst}
+    </div>
     <div class="small" style="color:#9ca3af; margin-top:.5rem;">Win rate: ${stats.winRate}% • Avg leg diff: ${stats.avgLegs}</div>
   `;
   dash.appendChild(legsCard);
@@ -2493,12 +2508,67 @@ function drawSparkline(canvasId, playerName) {
   if (!vals.length) return;
   const max = Math.max(...vals); const min = Math.min(...vals);
   ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.beginPath();
+  const points = [];
   vals.forEach((v,i) => {
     const x = i / (vals.length-1 || 1) * w;
     const y = h - ((v - min) / (max - min || 1) * h);
+    points.push({ x, y, v, match: matches[i] });
     if (i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
   });
   ctx.stroke();
+
+  // Draw small circles on points for easier hover targeting
+  ctx.fillStyle = '#60a5fa';
+  points.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 2.5, 0, Math.PI*2); ctx.fill(); });
+
+  // Tooltip element (singleton)
+  let tt = document.getElementById('spark-tooltip');
+  if (!tt) {
+    tt = document.createElement('div');
+    tt.id = 'spark-tooltip';
+    tt.className = 'spark-tooltip';
+    tt.style.position = 'fixed';
+    tt.style.display = 'none';
+    tt.style.zIndex = 9999;
+    document.body.appendChild(tt);
+  }
+
+  function showAtNearest(evt) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = evt.clientX - rect.left;
+    const my = evt.clientY - rect.top;
+    let nearest = null; let minDist = Infinity;
+    points.forEach(p => {
+      const dx = p.x - mx; const dy = p.y - my; const d = Math.hypot(dx, dy);
+      if (d < minDist) { minDist = d; nearest = p; }
+    });
+    if (nearest && minDist < 12) {
+      tt.style.display = 'block';
+      // show value and optional match timestamp
+      const ts = nearest.match && (nearest.match.timestamp || nearest.match.date || '');
+      tt.innerHTML = `<div style="font-weight:800;">${nearest.v}</div>${ts ? `<div class="small" style="color:#9ca3af; margin-top:.25rem;">${ts}</div>` : ''}`;
+      // position tooltip above the point when possible
+      const ttRect = tt.getBoundingClientRect();
+      let left = rect.left + nearest.x - ttRect.width / 2;
+      let top = rect.top + nearest.y - ttRect.height - 8;
+      // flip below if not enough space above
+      if (top < 6) top = rect.top + nearest.y + 8;
+      // clamp horizontally
+      left = Math.max(6, Math.min(window.innerWidth - ttRect.width - 6, left));
+      tt.style.left = `${Math.round(left)}px`;
+      tt.style.top = `${Math.round(top)}px`;
+    } else {
+      tt.style.display = 'none';
+    }
+  }
+
+  // attach handlers (remove existing to avoid dupes)
+  canvas.removeEventListener('__spark_mousemove__', canvas.__spark_mousemove_handler);
+  canvas.removeEventListener('mousemove', canvas.__spark_mousemove_handler);
+  const handler = function(e) { showAtNearest(e); };
+  canvas.__spark_mousemove_handler = handler;
+  canvas.addEventListener('mousemove', handler);
+  canvas.addEventListener('mouseleave', () => { if (tt) tt.style.display = 'none'; });
 }
 /* -----------------------------------------------------------
    PLAYER PROFILE PANEL (FULLY FIXED)
@@ -2620,7 +2690,9 @@ function openPlayerProfile(index) {
 
       <div class="small">Leg Difference</div>
       <div style="font-size:1.1rem; margin-bottom:.6rem;">
-        ${stats.legsFor}:${stats.legsAgainst}
+        <span class="small" style="color:#9ca3af; margin-right:.4rem;">Won</span>${stats.legsFor}
+        <span style="margin:0 .5rem; color:rgba(255,255,255,0.6);">:</span>
+        <span class="small" style="color:#9ca3af; margin-left:.4rem; margin-right:.4rem;">Lost</span>${stats.legsAgainst}
       </div>
 
       <div class="small">Form</div>
