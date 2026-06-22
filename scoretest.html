@@ -453,8 +453,8 @@ input, select {
   #scoring-board > div > div { min-width:160px; flex:1 1 180px; }
 
   /* Current visit / big numbers */
-  #sc-current { font-size:1.6rem; font-weight:800; letter-spacing:0.02em; }
-  #sc-ch-rem, #sc-op-rem { font-size:1.6rem; font-weight:800; }
+  #sc-current { font-size:2.6rem; font-weight:900; letter-spacing:0.02em; line-height:1; }
+  #sc-ch-rem, #sc-op-rem { font-size:2.2rem; font-weight:900; line-height:1; }
 
   /* Legs panel: keep a reasonable height on small screens */
   #sc-legs-panel { max-height: 22vh; overflow:auto; padding-right:.25rem; }
@@ -478,6 +478,9 @@ input, select {
     #keypad button { padding:1.15rem; font-size:1.25rem; min-height:56px; }
     #keypad .btn-primary { grid-column: span 3; font-size:1.05rem; padding:1rem; }
     #sc-legs-panel { max-height: 28vh; }
+  /* scale scores down on small screens to preserve layout */
+  #sc-current { font-size:1.6rem; }
+  #sc-ch-rem, #sc-op-rem { font-size:1.6rem; }
     .closest-center { order: 2; width:100%; text-align:center; }
     .closest-block > div { width:100%; text-align:center; }
     #sc-match-banner > div { flex-direction:column; align-items:flex-start; gap:.4rem; }
@@ -495,6 +498,9 @@ input, select {
 
   /* Bust visit marker */
   .visit-bust { color: var(--danger); font-weight:800; margin-left:0.45rem; }
+
+  /* Friendly match badge */
+  .badge-friendly { display:inline-flex; align-items:center; gap:.4rem; padding:.25rem .5rem; border-radius:999px; background:linear-gradient(90deg,#eef2ff,#eef7ff); color:#1e3a8a; border:1px solid rgba(99,102,241,0.08); font-weight:700; font-size:.95rem; }
 
   /* Sparkline tooltip */
   .spark-tooltip { background: rgba(15,23,42,0.96); color: var(--text); border: 1px solid rgba(255,255,255,0.04); padding: .45rem .6rem; border-radius:8px; box-shadow: 0 6px 18px rgba(0,0,0,0.6); pointer-events:none; font-weight:600; }
@@ -555,6 +561,14 @@ input, select {
 
   .admin-close { font-size: 1.4rem; }
   .container { padding: 0; }
+}
+
+/* Match result emphasis in scoring panel */
+.sc-result-highlight {
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 900;
+  text-shadow: 0 6px 18px rgba(255,138,31,0.12);
 }
 </style>
 </head>
@@ -644,26 +658,36 @@ input, select {
 
     <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:.6rem; align-items:center;">
       <!-- Match selectors -->
-      <select id="match-challenger" style="flex:1;"></select>
-      <select id="match-opponent" style="flex:1;"></select>
-      <select id="match-best-of" style="width:100px;">
+      <select id="match-challenger" style="flex:1;" aria-label="Select challenger"></select>
+      <select id="match-opponent" style="flex:1;" aria-label="Select opponent"></select>
+      <label style="display:flex; align-items:center; gap:.4rem; margin-left:.6rem;">
+        <input type="checkbox" id="match-friendly-checkbox" aria-label="Friendly match" />
+        <span class="small">Friendly match</span>
+      </label>
+      <select id="match-best-of" style="width:100px;" aria-label="Best of (legs)">
         <option value="1">1</option>
         <option value="3" selected>3</option>
         <option value="5">5</option>
       </select>
 
-      <select id="score-start" style="width:140px;">
+      <select id="score-start" style="width:140px;" aria-label="Starting score">
         <option value="501">501</option>
         <option value="301">301</option>
       </select>
-      <button class="btn-secondary" id="scoring-start-btn">Start Game</button>
+      <button class="btn-secondary" id="scoring-start-btn" aria-label="Start match">Start Match</button>
     </div>
 
     <!-- Match banner: shows current participants and match meta -->
     <div id="sc-match-banner" style="display:none; margin-top:.6rem;">
       <div style="background:var(--panel-soft); padding:.6rem; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-        <div id="sc-match-title" style="font-weight:700;">Match</div>
-        <div id="sc-match-meta" class="small" style="color:#9ca3af;">Best of</div>
+        <div style="display:flex; align-items:center; gap:.6rem;">
+          <div id="sc-match-title" style="font-weight:700;">Match</div>
+          <span id="sc-starter-badge" class="badge-friendly" style="display:none; font-size:.85rem; padding:.18rem .5rem;">Starter</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.6rem;">
+          <div id="sc-match-meta" class="small" style="color:#9ca3af;">Best of</div>
+          <span id="sc-friendly-badge" class="badge-friendly" style="display:none;" title="Friendly matches are for practice only — they do not affect the ladder or player statistics" aria-label="Friendly match: not recorded to ladder or stats">Friendly match</span>
+        </div>
       </div>
     </div>
 
@@ -689,32 +713,35 @@ input, select {
             <div class="small">Challenger <span id="sc-ch-name" class="small" style="color:#9ca3af; font-weight:600;">—</span></div>
             <div id="sc-ch-rem" style="font-size:1.6rem; font-weight:700;">501</div>
             <div id="sc-ch-checkouts" class="small" style="color:#9ca3af; margin-top:.35rem;">—</div>
-            <div class="small" style="margin-top:.35rem;">3-dart avg: <span id="sc-ch-avg" style="font-weight:700;">—</span></div>
+            <div class="small" style="margin-top:.35rem;">3‑dart avg (per visit): <span id="sc-ch-avg" style="font-weight:700;">—</span></div>
           </div>
           <div style="flex:1;">
             <div class="small">Opponent <span id="sc-op-name" class="small" style="color:#9ca3af; font-weight:600;">—</span></div>
             <div id="sc-op-rem" style="font-size:1.6rem; font-weight:700;">501</div>
             <div id="sc-op-checkouts" class="small" style="color:#9ca3af; margin-top:.35rem;">—</div>
-            <div class="small" style="margin-top:.35rem;">3-dart avg: <span id="sc-op-avg" style="font-weight:700;">—</span></div>
+            <div class="small" style="margin-top:.35rem;">3‑dart avg (per visit): <span id="sc-op-avg" style="font-weight:700;">—</span></div>
           </div>
         </div>
 
         <div style="flex:1;">
-          <div class="small">Current Visit</div>
-          <div id="sc-current" style="font-size:1.4rem;">0</div>
-          <div class="small" id="sc-bust" style="color:var(--danger); display:none;">BUST</div>
+          <div class="small">Current Visit <span class="small" style="color:#9ca3af;">(3‑dart total)</span></div>
+            <div id="sc-current" style="font-size:1.4rem;" aria-live="polite" role="status">0</div>
+            <div class="small" id="sc-bust" style="color:var(--danger); display:none;" aria-live="assertive" role="alert">BUST</div>
         </div>
 
         <div style="flex:1;">
-          <div class="small">Visits</div>
-          <div id="sc-history" class="small" style="max-height:6.5rem; overflow:auto;">C:0 • O:0</div>
+          <div class="small">Visits this leg</div>
+          <div id="sc-history" class="small" style="max-height:6.5rem; overflow:auto;" aria-live="polite" role="status">C:0 • O:0</div>
         </div>
       </div>
 
       <!-- Per-leg details panel -->
       <div id="sc-legs-panel" style="margin-top:.8rem;"></div>
 
-      <div id="keypad" style="margin-top:1rem; display:grid; grid-template-columns: repeat(3,1fr); gap:.5rem;">
+      <!-- Match results panel shown after a multi-leg match completes (placed above keypad) -->
+      <div id="sc-match-results" style="display:none; margin-top:.6rem;"></div>
+
+      <div id="keypad" style="margin-top:0.8rem; display:grid; grid-template-columns: repeat(3,1fr); gap:.5rem;">
         <!-- numeric buttons inserted by JS -->
       </div>
 
@@ -723,9 +750,6 @@ input, select {
         <button class="btn-primary" id="sc-submit">Submit Visit</button>
         <button class="btn-secondary" id="sc-end">End Game</button>
       </div>
-
-      <!-- Match results panel shown after a multi-leg match completes -->
-      <div id="sc-match-results" style="display:none; margin-top:.8rem;"></div>
     </div>
   </div>
 </div>
@@ -1373,13 +1397,13 @@ function buildLegUI() {
 
         <div style="display:flex; gap:1rem; margin-top:.6rem; flex-wrap:wrap;">
           <div style="flex:1; min-width:220px;">
-            <div class="small" style="margin-bottom:.3rem;">Challenger visits</div>
+            <div class="small" style="margin-bottom:.3rem;">Challenger visits (this leg)</div>
             <div class="visits-ch" data-leg="${n}"></div>
             <button class="btn-secondary" onclick="addVisit(${n}, 'challenger')" style="margin-top:.5rem;">+ Add visit</button>
           </div>
 
           <div style="flex:1; min-width:220px;">
-            <div class="small" style="margin-bottom:.3rem;">Opponent visits</div>
+            <div class="small" style="margin-bottom:.3rem;">Opponent visits (this leg)</div>
             <div class="visits-op" data-leg="${n}"></div>
             <button class="btn-secondary" onclick="addVisit(${n}, 'opponent')" style="margin-top:.5rem;">+ Add visit</button>
           </div>
@@ -1748,29 +1772,76 @@ function importAll(e) {
 }
 
 function resetLadderOnly() {
-  if (!confirm("Reset ladder?")) return;
-  ladder = [];
-  db.ref("ladder").set([]);
-  renderLadder();
-  renderSelects();
+  if (!confirm("Reset ladder? This will remove all ladder entries and clear local ladder state.")) return;
+  try {
+    ladder = [];
+    // clear local storage keys related to ladder
+    try { localStorage.removeItem('fox_ladder'); } catch(e) {}
+    // clear remote ladder if available
+    try { if (typeof db !== 'undefined' && db && db.ref) db.ref('ladder').set([]); } catch(e) { console.warn('Could not clear remote ladder', e); }
+    try { renderLadder(); } catch(e) {}
+    try { renderSelects(); } catch(e) {}
+    try { document.getElementById('admin-msg').textContent = 'Ladder reset.'; } catch(e) {}
+  } catch(err) {
+    console.error('resetLadderOnly error', err);
+    try { document.getElementById('admin-msg').textContent = 'Reset ladder failed: ' + (err && err.message ? err.message : 'unknown'); } catch(e) {}
+  }
 }
 
 function resetHistoryOnly() {
-  if (!confirm("Reset match history?")) return;
-  historyCache = {};
-  db.ref("history").set({});
-  // history-list removed
+  if (!confirm("Reset match history? This will remove all stored match history and local history cache.")) return;
+  try {
+    historyCache = {};
+    try { localStorage.removeItem('fox_history_cache'); } catch(e) {}
+    try { if (typeof db !== 'undefined' && db && db.ref) db.ref('history').set({}); } catch(e) { console.warn('Could not clear remote history', e); }
+    try { document.getElementById('history-list').innerHTML = ''; } catch(e) {}
+    try { document.getElementById('admin-msg').textContent = 'History reset.'; } catch(e) {}
+    try { resetScoringState(); } catch(e) {}
+  } catch(err) {
+    console.error('resetHistoryOnly error', err);
+    try { document.getElementById('admin-msg').textContent = 'Reset history failed: ' + (err && err.message ? err.message : 'unknown'); } catch(e) {}
+  }
 }
 
 function resetAll() {
-  if (!confirm("Reset ladder AND history?")) return;
-  ladder = [];
-  historyCache = {};
-  db.ref("ladder").set([]);
-  db.ref("history").set({});
-  renderLadder();
-  renderSelects();
-  // history-list removed
+  if (!confirm("Reset ladder AND history? This will remove all ladder entries, match history, and local scoring state.")) return;
+  try {
+    // clear in-memory
+    ladder = [];
+    historyCache = {};
+    // clear scoring progress and local storage entries
+    try {
+      scoringState = null;
+      // known storage keys used by the app (conservative clear)
+      const keys = ['fox_ladder', 'fox_history_cache', 'fox_scoring_state', 'fox_admin_export_temp'];
+      keys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
+    } catch(e) {}
+
+    // clear Firebase if available
+    try {
+      if (typeof db !== 'undefined' && db && db.ref) {
+        db.ref("ladder").set([]);
+        db.ref("history").set({});
+      }
+    } catch(e) { console.warn('Could not clear remote DB', e); }
+
+    // re-render UI
+    try { renderLadder(); } catch(e) {}
+    try { renderSelects(); } catch(e) {}
+    try { document.getElementById('player-dashboard').innerHTML = ''; } catch(e) {}
+    try { document.getElementById('history-list').innerHTML = ''; } catch(e) {}
+    try { document.getElementById('admin-msg').textContent = 'All data reset.'; } catch(e) {}
+
+    // persist empty ladder/history locally for consistency
+    try { localStorage.setItem('fox_ladder', JSON.stringify([])); } catch(e) {}
+    try { localStorage.setItem('fox_history_cache', JSON.stringify({})); } catch(e) {}
+
+    // Reset scoring UI
+    try { resetScoringState(); } catch(e) {}
+  } catch(err) {
+    console.error('resetAll error', err);
+    try { document.getElementById('admin-msg').textContent = 'Reset failed: ' + (err && err.message ? err.message : 'unknown'); } catch(e) {}
+  }
 }
 </script>
 
@@ -1901,7 +1972,10 @@ function computeMatchStats({ challenger, opponent, legs }) {
           arr = l.visits[key];
         }
       }
+      // For statistics we must ignore bust visits (they still exist in the stored leg for
+      // visit/throw limits but must not affect averages/highs/first9/checkout stats).
       arr.forEach(v => {
+        if (typeof v === 'object' && v.bust) return; // skip busts for stats
         const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
         visits.push(val);
         if (val > highest) highest = val;
@@ -1924,7 +1998,9 @@ function computeMatchStats({ challenger, opponent, legs }) {
         else if (l.visits[key]) arr = l.visits[key];
       }
       // compute first 3 visits sum
-      const firstThree = arr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
+      // first9 should use the first three non-bust visits for this player in the leg
+      const nonBustArr = arr.filter(v => !(typeof v === 'object' && v.bust));
+      const firstThree = nonBustArr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
       if (firstThree.length) {
         const s = firstThree.reduce((a,b) => a+b, 0);
         first9Total += s;
@@ -1945,6 +2021,8 @@ function computeMatchStats({ challenger, opponent, legs }) {
       }
       for (let vi = 0; vi < arr.length; vi++) {
         const v = arr[vi];
+        // ignore bust visits when computing remaining/checkout stats
+        if (typeof v === 'object' && v.bust) continue;
         const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
         // an attempt is when remaining before visit <= 170 and val > 0
         if (remaining <= 170 && val > 0) checkoutAttempts++;
@@ -2012,6 +2090,8 @@ function computeAdvancedStats(name) {
   const statsTimeline = [];
 
   matches.forEach((m, idx) => {
+    // Ignore friendly matches entirely for advanced stats (safety)
+    if (m && m.friendly) return;
     const opp = getOpponentName(m, name);
     const isWinner = m.winner === name;
 
@@ -2045,6 +2125,7 @@ function computeAdvancedStats(name) {
     // accumulate visit totals for 3-dart average
     try {
         if (m.stats && m.stats[name]) {
+          // m.stats already computed by computeMatchStats which now excludes busts from its aggregates
           const s = m.stats[name];
           totalVisits += s.visitsCount || 0;
           totalPoints += (s.visits || []).reduce((a,b) => a + (Number(b)||0), 0);
@@ -2055,22 +2136,26 @@ function computeAdvancedStats(name) {
           aggFirst9Total += s.first9Total || 0;
           aggFirst9Legs += s.first9Legs || 0;
         } else {
-          // fallback: derive from legs structure
+          // fallback: derive from legs structure but ignore bust visits when computing stats
           m.legs.forEach(l => {
             const arr = l.visits && l.visits[myKey] ? l.visits[myKey] : [];
+            // totalVisits/points: ignore visits marked as bust
             arr.forEach(v => {
+              if (typeof v === 'object' && v.bust) return;
               const val = typeof v === 'object' ? (v.score || 0) : (Number(v) || 0);
               totalVisits += 1;
               totalPoints += val;
             });
-            // first9
-            const firstThree = arr.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
+            // first9: take first three non-bust visits
+            const nonBust = arr.filter(v => !(typeof v === 'object' && v.bust));
+            const firstThree = nonBust.slice(0,3).map(v => (typeof v === 'object' ? (v.score||0) : (Number(v)||0)));
             if (firstThree.length) { aggFirst9Total += firstThree.reduce((a,b)=>a+b,0); aggFirst9Legs += 1; }
-            // checkout/doubles: simplified scan
+            // checkout/doubles: simplified scan ignoring busts
             let remaining = l.startingScore ?? 501;
             const dblFlags = (l.visits && l.visits[myKey]) ? l.visits[`${myKey}DoubleFlags`] : null;
             for (let vi=0; vi<arr.length; vi++) {
               const v = arr[vi];
+              if (typeof v === 'object' && v.bust) continue;
               const val = typeof v === 'object' ? (v.score||0) : (Number(v)||0);
               if (remaining <= 170 && val > 0) aggCheckoutAttempts++;
               remaining -= val;
@@ -2171,6 +2256,10 @@ function computeAdvancedStats(name) {
     totalPoints
     ,
     firstNineAvg,
+    // expose the aggregated checkout counts so the dashboard shows real Attempts / Hits
+    checkoutAttempts: aggCheckoutAttempts,
+    checkoutHits: aggCheckoutHits,
+    doubleConfirmedHits: aggDoubleHits,
     aggregateCheckoutPercent,
     aggregateDoublesPct
   };
@@ -2362,7 +2451,7 @@ function renderPlayerDashboard(index) {
       <div>
         <div class="small">Checkout %</div>
         <div style="font-size:1.6rem; font-weight:800;">${stats.aggregateCheckoutPercent || '—'}%</div>
-        <div class="small" style="color:#9ca3af; margin-top:.35rem;">Attempts: ${stats.totalMatches ? (stats.legsFor+stats.legsAgainst) : (stats.checkoutAttempts || 0)} • Hits: ${stats.checkoutHits || 0}</div>
+  <div class="small" style="color:#9ca3af; margin-top:.35rem;">Attempts: ${stats.checkoutAttempts || 0} • Hits: ${stats.checkoutHits || 0}</div>
       </div>
       <div style="width:88px; height:88px;">
         <svg id="co-circle-${index}" viewBox="0 0 36 36" style="width:88px;height:88px;"></svg>
@@ -2609,7 +2698,7 @@ function openPlayerProfile(index) {
     ? `Win rate ${stats.winRate}% • Avg legs ${stats.avgLegs} • Leg 3 in ${stats.leg3Rate}%`
     : "No matches yet";
 
-  const threeDartLine = (stats.threeDartAvg && stats.threeDartAvg !== '—') ? `3‑dart avg: ${stats.threeDartAvg}` : `3‑dart avg: —`;
+  const threeDartLine = (stats.threeDartAvg && stats.threeDartAvg !== '—') ? `3‑dart avg (per visit): ${stats.threeDartAvg}` : `3‑dart avg (per visit): —`;
 
   const bullLine = (stats.bullWins + stats.bullLosses)
     ? `${stats.bullWins}–${stats.bullLosses} bull-decided (${stats.bullRate}% won)`
@@ -2802,6 +2891,23 @@ function renderScoringPlayers() {
     };
     ch.addEventListener('change', window.__matchChChangeHandler__);
   }
+  // wire friendly checkbox to allow all opponents when checked
+  try {
+    const friendlyCb = document.getElementById('match-friendly-checkbox');
+    if (friendlyCb) {
+      friendlyCb.removeEventListener('change', window.__matchFriendlyHandler__);
+      window.__matchFriendlyHandler__ = () => {
+        window.allowAnyOpponent = friendlyCb.checked;
+        // refresh opponent list based on current challenger selection
+        try { const idx = parseInt((ch && ch.value) || '-1', 10); updateOpponentOptions(idx); } catch(e) {}
+      };
+      friendlyCb.addEventListener('change', window.__matchFriendlyHandler__);
+    }
+    // restore checkbox state from scoringState if available
+    if (friendlyCb && scoringState && typeof scoringState.isFriendly !== 'undefined') friendlyCb.checked = !!scoringState.isFriendly;
+    // ensure the global toggle is in sync
+    window.allowAnyOpponent = !!(friendlyCb && friendlyCb.checked);
+  } catch(e) {}
   // If a scoring session was restored earlier, re-select the players now that options exist
   try {
     if (scoringState && Array.isArray(scoringState.players) && scoringState.players.length === 2) {
@@ -2841,6 +2947,15 @@ function updateOpponentOptions(challengerIndex) {
     return;
   }
 
+  // If friendly mode is enabled, allow any opponent (show full list)
+  try {
+    if (window.allowAnyOpponent) {
+      op.innerHTML = '';
+      ladder.forEach((p, i) => op.innerHTML += `<option value="${i}">${p.name}</option>`);
+      return;
+    }
+  } catch(e) {}
+
   // allowed opponents are those above the challenger up to 3 positions
   const maxAbove = 3;
   const start = Math.max(0, challengerIndex - maxAbove);
@@ -2869,6 +2984,9 @@ function buildKeypad() {
     btn.className = 'btn-secondary';
     btn.style = 'padding:1rem; font-size:1.1rem; border-radius:10px;';
     btn.textContent = k;
+    // set accessible label and title for screen readers
+    btn.setAttribute('aria-label', typeof k === 'number' ? `Digit ${k}` : (k === 'C' ? 'Clear entry' : (k === '←' ? 'Backspace' : String(k))));
+    btn.title = btn.getAttribute('aria-label');
     btn.addEventListener('click', () => onKeypadPress(k));
     keypad.appendChild(btn);
   });
@@ -2876,6 +2994,8 @@ function buildKeypad() {
   enter.className = 'btn-primary';
   enter.style = 'grid-column: span 3; padding:1rem; font-size:1.05rem; border-radius:10px;';
   enter.textContent = 'Enter';
+  enter.setAttribute('aria-label', 'Submit visit');
+  enter.title = 'Submit visit';
   enter.addEventListener('click', () => onKeypadPress('ENTER'));
   keypad.appendChild(enter);
 }
@@ -3004,6 +3124,13 @@ function scoringStart() {
   resetScoringState();
   scoringState.start = start;
   scoringState.mode = 'match';
+
+  // Read Friendly checkbox instead of prompting; default to false
+  try {
+    const friendlyCb = document.getElementById('match-friendly-checkbox');
+    scoringState.isFriendly = !!(friendlyCb && friendlyCb.checked);
+    window.allowAnyOpponent = scoringState.isFriendly === true;
+  } catch(e) { scoringState.isFriendly = false; window.allowAnyOpponent = false; }
 
   // Match mode
   // selects store ladder indices as values
@@ -3292,24 +3419,26 @@ function updateScoringDisplay() {
   const safeOp = String(opLabel).replace(/</g,'&lt;');
   title.innerHTML = `${safeCh} <span class="vs-muted">versus</span> ${safeOp}`;
       meta.textContent = `Best of ${scoringState.bestOf} • Start ${scoringState.start}`;
-      // show starter indicator if resolved
-      const starterElId = 'sc-starter-indicator';
-      let starterEl = document.getElementById(starterElId);
-      if (!starterEl) {
-        starterEl = document.createElement('div');
-        starterEl.id = starterElId;
-        starterEl.className = 'small';
-        starterEl.style.color = '#9ca3af';
-        starterEl.style.marginLeft = '1rem';
-        meta.parentNode.appendChild(starterEl);
-      }
-      if (typeof scoringState.starterIndex === 'number') {
-        const starterLabel = scoringState.starterIndex === 0 ? chLabel : opLabel;
-        starterEl.textContent = ` • Starter: ${starterLabel}`;
-        starterEl.style.display = 'inline-block';
-      } else {
-        if (starterEl) starterEl.style.display = 'none';
-      }
+      // show starter indicator if resolved: toggle placeholder visibility and text
+      try {
+        const starterBadge = document.getElementById('sc-starter-badge');
+        if (starterBadge) {
+          if (typeof scoringState.starterIndex === 'number') {
+            const starterLabel = scoringState.starterIndex === 0 ? chLabel : opLabel;
+            starterBadge.textContent = `Starter: ${starterLabel}`;
+            starterBadge.style.display = 'inline-flex';
+          } else {
+            starterBadge.style.display = 'none';
+          }
+        }
+      } catch(e) {}
+      // Friendly badge: toggle visibility of the fixed badge element
+      try {
+        const badge = document.getElementById('sc-friendly-badge');
+        if (badge) {
+          badge.style.display = scoringState.isFriendly ? 'inline-flex' : 'none';
+        }
+      } catch(e) {}
     } else if (banner) banner.style.display = 'none';
   } catch(e) { }
 }
@@ -3318,6 +3447,8 @@ function updateScoringDisplay() {
 function isValidCheckout(remainingBefore, visitTotal) {
   // reject impossible totals (not achievable in 1-3 darts)
   try {
+    // allow a zero visit (missed three darts) as a valid non-bust entry
+    if (Number(visitTotal) === 0) return { valid: true, bust: false };
     if (window.possibleThreeDartTotals && !window.possibleThreeDartTotals.has(visitTotal)) {
       return { valid: false, bust: false, impossible: true };
     }
@@ -3483,8 +3614,8 @@ function computeCheckouts(rem) {
           const opHigh = opArr.reduce((m,v)=> Math.max(m, typeof v === 'object' ? (v.score||0) : (Number(v)||0)), 0);
           html += `<div style="margin-top:.45rem; padding:.45rem; border-radius:6px; background:var(--panel-soft);">
             <div style="font-weight:700;">Leg ${i+1} — Winner: ${w || 'N/A'}</div>
-            <div class="small">Challenger visits: ${chStr || '—'} • High: ${chHigh}</div>
-            <div class="small">Opponent visits: ${opStr || '—'} • High: ${opHigh}</div>
+            <div class="small">Challenger visits (this leg): ${chStr || '—'} • High: ${chHigh}</div>
+            <div class="small">Opponent visits (this leg): ${opStr || '—'} • High: ${opHigh}</div>
             ${l.bull ? '<div class="small">Decided by bull (45 darts)</div>' : ''}
           </div>`;
         });
@@ -3517,11 +3648,36 @@ function computeCheckouts(rem) {
 
 document.getElementById('sc-submit').addEventListener('click', () => {
   if (!scoringState) return;
-  const visitTotal = parseInt(scoringState.currentEntry || '0', 10) || 0;
-  if (visitTotal === 0) return;
+  const raw = (scoringState.currentEntry || '').toString().trim();
+  // Treat letter 'O' or 'o' as an explicit bust marker
+  if (raw.toUpperCase() === 'O') {
+    // route through existing bust handling by setting visitTotal to the numeric value of 0 but marking bust
+    const pi = scoringState.currentPlayerIndex;
+    const leg = scoringState.activeLeg;
+    try {
+      const bustVisit = { score: 0, bust: true };
+      leg.visits[pi].push(bustVisit);
+      try {
+        const visitsText = `C:${leg.visits[0].length} • O:${leg.visits[1].length}`;
+        const scHistEl = document.getElementById('sc-history'); if (scHistEl) scHistEl.textContent = visitsText;
+      } catch(e) {}
+      try { document.getElementById('sc-bust').style.display = 'block'; } catch(e) {}
+      setTimeout(() => { try { document.getElementById('sc-bust').style.display = 'none'; } catch(e) {} }, 1600);
+      scoringState.currentEntry = '';
+      try { document.getElementById('sc-current').textContent = '0'; } catch(e) {}
+      scoringState.currentPlayerIndex = (scoringState.currentPlayerIndex + 1) % 2;
+      try { window.saveScoringStateToStorage(); } catch(e) {}
+      try { updateScoringDisplay(); } catch(e) {}
+      try { renderScoringLegsPanel(); } catch(e) {}
+    } catch(e) { console.error('Error recording O as bust', e); }
+    return;
+  }
 
-  // validate achievable total
-  if (window.possibleThreeDartTotals && !window.possibleThreeDartTotals.has(visitTotal)) {
+  // numeric entry: allow explicit 0 (missed three darts)
+  const visitTotal = (raw.length === 0) ? 0 : (parseInt(raw, 10) || 0);
+
+  // validate achievable total unless it's zero (zero is always allowed)
+  if (visitTotal !== 0 && window.possibleThreeDartTotals && !window.possibleThreeDartTotals.has(visitTotal)) {
     alert('Entered total is not achievable with three darts. Please check the visit total.');
     scoringState.currentEntry = '';
     document.getElementById('sc-current').textContent = '0';
@@ -3714,8 +3870,11 @@ function submitMatchObject(matchObj) {
   const challenger = ladder.find(p => p.name === challengerName);
   const opponent = ladder.find(p => p.name === opponentName);
 
-  // update ladder counts if both found
-  if (challenger && opponent) {
+  // If match is marked as friendly, don't update ladder or compute/store per-player stats.
+  const isFriendly = !!matchObj.friendly || !!scoringState && !!scoringState.isFriendly;
+
+  // update ladder counts if both found AND this is NOT a friendly match
+  if (!isFriendly && challenger && opponent) {
     const p0Wins = matchObj.legs.filter(l => l.winner === challengerName).length;
     const p1Wins = matchObj.legs.filter(l => l.winner === opponentName).length;
 
@@ -3746,7 +3905,7 @@ function submitMatchObject(matchObj) {
       movement = `Moved from ${oldPos} to ${newPos}`;
     }
 
-    // push to history
+    // push to history with stats
     db.ref('history').push({
       challenger: challenger.name,
       challengerNick: challenger.nick,
@@ -3762,8 +3921,15 @@ function submitMatchObject(matchObj) {
 
     saveLadder();
   } else {
-    // fallback: push match without ladder update
-    db.ref('history').push(matchObj);
+    // Friendly match OR missing ladder entries: do NOT push to history when friendly.
+    const stamp = matchObj.timestamp || new Date().toLocaleString();
+    if (!isFriendly) {
+      // missing ladder entries but not marked friendly: still push the raw match
+      db.ref('history').push(matchObj);
+    } else {
+      // Friendly: skip recording in history entirely (extra safety)
+      try { console.info('Friendly match - not persisted to history', matchObj); } catch(e) {}
+    }
   }
 }
 
@@ -3794,7 +3960,7 @@ function renderScoringMatchResults(matchObj) {
           <div class="small">${new Date(matchObj.timestamp || Date.now()).toLocaleString()}</div>
         </div>
         <div style="margin-top:.6rem;">${challenger} vs ${opponent}</div>
-        <div style="margin-top:.4rem; font-weight:700;">Final: ${winner} defeated ${loser}</div>
+  <div style="margin-top:.4rem;" class="sc-result-highlight">Final: ${winner} defeated ${loser}</div>
         <div style="margin-top:.6rem;">${legLines}</div>
         <div style="display:flex; gap:.5rem; margin-top:.8rem;">
           <button class="btn-primary" id="sc-results-close">Close</button>
