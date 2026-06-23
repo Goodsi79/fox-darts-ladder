@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Practice Mode — Fox Darts Ladder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #05070a; --panel:#0f141d; --panel-soft:#151b26; --border:#1f2933; --text:#e5e7eb; --muted:#6b7280; --accent:#ff8a1f; --accent-soft:rgba(255,138,31,0.18); --radius:12px; --font: "Inter", system-ui, sans-serif;
+    }
+    html,body{height:100%;margin:0;background:radial-gradient(circle at top,#141b2a 0,#05070a 55%);color:var(--text);font-family:var(--font);}
+    .container{max-width:980px;margin:18px auto;padding:0 16px;}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    h1{margin:0;font-size:1.25rem}
+    .card{background:rgba(15,23,42,0.95);border-radius:12px;padding:12px;border:1px solid rgba(55,65,81,0.9);box-shadow:0 18px 45px rgba(0,0,0,0.65)}
+    .card-header{display:flex;justify-content:space-between;align-items:center}
+    .small{font-size:.8rem;color:var(--muted)}
+    .btn-primary{background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;padding:.6rem 1rem;border-radius:999px;border:1px solid transparent;font-weight:700}
+    .btn-secondary{background:rgba(15,23,42,0.9);color:var(--text);padding:.5rem .9rem;border-radius:999px;border:1px solid rgba(148,163,184,0.2)}
+    input[type=text], input[type=number], select{background:#0b1120;border-radius:999px;border:1px solid rgba(55,65,81,0.9);color:var(--text);padding:.45rem .7rem}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:12px;align-items:start}
+    @media(max-width:720px){.grid{grid-template-columns:1fr}}
+    .player-head{display:flex;gap:12px;align-items:center}
+    .avatar{width:56px;height:56px;border-radius:999px;background:linear-gradient(90deg,#0f1724,#0b1120);display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:800}
+    /* scoreboard */
+    .score-big{font-size:2.6rem;font-weight:900}
+    .score-med{font-size:1.6rem;font-weight:800}
+    .muted{color:var(--muted)}
+    /* keypad */
+    #keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:10px}
+    #keypad button{padding:1rem;font-size:1.1rem;border-radius:10px;min-height:52px;background:rgba(15,23,42,0.95);color:var(--text);border:1px solid rgba(55,65,81,0.9)}
+    #keypad .enter{grid-column:span 3;background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;font-weight:800}
+    /* summary modal */
+    .modal{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999}
+    .modal .card{width:calc(100% - 32px);max-width:720px}
+    .stat-row{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px dashed rgba(55,65,81,0.06)}
+    .badge{display:inline-flex;gap:.35rem;padding:.2rem .6rem;border-radius:999px;background:rgba(238,242,255,0.06);border:1px solid rgba(99,102,241,0.06);color:#c7d2fe;font-weight:700}
+    /* result highlight pulse */
+    .sc-result-highlight{color:var(--accent);font-weight:900;}
+    .pulse{animation:practice-pulse 900ms ease-out 1}
+    @keyframes practice-pulse{0%{transform:scale(0.98);opacity:0.3}60%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+  /* visit history and bust styles */
+  .visit-row{padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.03);display:flex;justify-content:space-between;align-items:center}
+  .visit-bust{color:#ff6b6b;font-weight:700}
+  .bust-flash{animation:bust-flash 1000ms ease-out 1}
+  @keyframes bust-flash{0%{background:rgba(255,107,107,0.18)}60%{background:rgba(255,107,107,0.08)}100%{background:transparent}}
+  /* Show current score again; keep darts thrown hidden */
+  #practice-remaining { display: block !important; }
+  #practice-darts { display: none !important; }
+   /* Keep the player container visible so the select remains usable,
+     but hide the avatar and the large header name. */
+  .player-head { display: flex !important; align-items: center; gap: 12px; }
+  /* Responsive tweaks */
+  @media (max-width: 900px) {
+    .container { padding: 0 12px; }
+    .card { padding: 10px; }
+    .card-header { flex-wrap: wrap; gap: 8px; align-items: center; }
+    /* make the controls wrap nicely */
+    .card-header > div:last-child { margin-left: 0; }
+    .player-head { width: 100%; }
+  }
+
+  @media (max-width: 720px) {
+    /* stack header controls vertically */
+    .card-header { flex-direction: column; align-items: stretch; gap: 10px; }
+    .player-head { order: 0; width: 100%; }
+    /* make selects and inputs expand to available width */
+    #practice-player-select, #practice-start-select, #practice-custom-start { width: 100% !important; min-width: 0 !important; }
+    /* stack buttons for easy tapping */
+    #practice-start-btn, #practice-stats-btn { width: 100% !important; margin-left: 0 !important; }
+    /* reduce large score font on small screens */
+    .score-big { font-size: 2rem; }
+    .score-med { font-size: 1.2rem; }
+    /* keypad touch targets */
+    #keypad { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+    #keypad button { padding: 1.1rem; min-height: 56px; font-size: 1.05rem; }
+    /* responsive chart */
+    #stats-averages-chart { width: 100% !important; height: auto !important; }
+    /* modals fit on small screens */
+    .modal .card { max-width: 95% !important; max-height: 90vh; overflow: auto; }
+  }
+
+  @media (max-width: 480px) {
+    .container { margin: 12px auto; }
+    .score-big { font-size: 1.6rem; }
+    #keypad button { padding: 0.9rem; min-height: 52px; font-size: 1rem; }
+    .card { padding: 8px; }
+  }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Fox at Peasemore Practice</h1>
+    </header>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="player-head">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <select id="practice-player-select" aria-label="Select player" style="min-width:180px; display:block;">
+                <option>Loading players...</option>
+              </select>
+            </div>
+            <div class="small">Solo practice • Stats saved separately from the ladder</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="small muted">Start</label>
+          <select id="practice-start-select">
+            <option value="301">301</option>
+            <option value="501" selected>501</option>
+            <option value="custom">Custom</option>
+          </select>
+          <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;margin-left:6px;" />
+
+          <label style="margin-left:12px;display:flex;align-items:center;gap:6px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
+
+          <button id="practice-start-btn" class="btn-primary" style="margin-left:8px">Start</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+        <div style="flex:1;min-width:220px;">
+          <div class="small">Current Score</div>
+          <div id="practice-remaining" class="score-big">501</div>
+          <div style="margin-top:6px" class="small muted">Highest visit: <span id="practice-highest">—</span></div>
+          <div id="practice-checkout" class="small muted" style="margin-top:6px">Suggested checkout: —</div>
+        </div>
+
+        <div style="width:220px;">
+          <div class="small">Darts thrown</div>
+          <div id="practice-darts" class="score-med">0</div>
+          <div style="margin-top:8px" class="small">3-dart avg: <strong id="practice-avg">—</strong></div>
+          <div class="small">First 9 avg: <strong id="practice-f9">—</strong></div>
+        </div>
+      </div>
+
+      <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
+
+      <div id="keypad-area" style="margin-top:12px">
+        <div id="keypad"></div>
+
+        <div style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
+            <button id="practice-undo" class="btn-secondary">Undo</button>
+            <button id="practice-end" class="btn-secondary">End Session</button>
+            <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>
+            <button id="practice-back-btn" class="btn-secondary" style="margin-left:6px">Back to Ladder</button>
+          </div>
+      </div>
+    
+    </div>
+
+    <!-- Summary modal -->
+    <div id="practice-modal" class="modal" style="display:none">
+      <div class="card">
+        <div class="card-header"><div style="font-weight:800">Session Summary</div><div class="small" id="practice-duration">00:00</div></div>
+        <div style="margin-top:10px">
+          <div class="stat-row"><div>Total darts thrown</div><div id="m-darts">0</div></div>
+          <div class="stat-row"><div>3-dart average</div><div id="m-avg">—</div></div>
+          <div class="stat-row"><div>First 9 average</div><div id="m-f9">—</div></div>
+          <div class="stat-row"><div>Highest visit</div><div id="m-highest">—</div></div>
+          <div class="stat-row"><div>Checkout attempts</div><div id="m-check-attempts">0</div></div>
+          <div class="stat-row"><div>Checkout success</div><div id="m-check-success">0%</div></div>
+          <div class="stat-row"><div>Starting score</div><div id="m-start">501</div></div>
+        </div>
+        <div style="display:flex;gap:.6rem;margin-top:12px;justify-content:flex-end">
+          <button id="practice-save" class="btn-primary">Save Session</button>
+          <button id="practice-close" class="btn-secondary">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practice Stats modal -->
+    <div id="practice-stats-modal" class="modal" style="display:none">
+      <div class="card" style="max-width:900px">
+        <div class="card-header">
+          <div style="font-weight:800">Practice Stats</div>
+          <div><button id="practice-stats-close" class="btn-secondary">Close</button></div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px;align-items:flex-start">
+          <div style="width:300px">
+            <div class="small muted">Players</div>
+            <div id="stats-player-list" style="margin-top:8px;max-height:480px;overflow:auto"></div>
+          </div>
+          <div style="flex:1">
+            <div id="stats-header" style="display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div id="stats-player-name" style="font-weight:800;font-size:1.05rem">Select a player</div>
+                <div id="stats-player-sub" class="small muted">Lifetime practice stats</div>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <div class="badge" id="stats-player-total">—</div>
+              </div>
+            </div>
+
+            <div id="stats-summary" style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+              <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">Lifetime avg<div id="stats-lifetimeAvg" style="font-weight:800;margin-top:6px">—</div></div>
+              <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">Best session<div id="stats-best" style="font-weight:800;margin-top:6px">—</div></div>
+              <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">Highest visit<div id="stats-highest" style="font-weight:800;margin-top:6px">—</div></div>
+              <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);padding:8px;border-radius:8px">Checkout %<div id="stats-checkpct" style="font-weight:800;margin-top:6px">—</div></div>
+            </div>
+
+            <div style="margin-top:12px">
+              <div style="font-weight:700;margin-bottom:8px">Recent sessions</div>
+              <div id="stats-recent-list" style="max-height:220px;overflow:auto;background:rgba(255,255,255,0.02);padding:8px;border-radius:8px"></div>
+            </div>
+
+            <div id="stats-chart-wrap" style="position:relative;margin-top:12px">
+              <canvas id="stats-averages-chart" width="640" height="240" style="background:rgba(255,255,255,0.02);border-radius:8px;display:block"></canvas>
+              <div id="stats-tooltip" style="position:absolute;display:none;pointer-events:none;padding:8px;border-radius:6px;background:rgba(0,0,0,0.85);color:#fff;font-size:13px;box-shadow:0 6px 18px rgba(0,0,0,0.5)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Firebase (compat) and practice module -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script>
+    // Firebase config - exposed as window.FIREBASE_CONFIG so practice.js can auto-initialize
+    window.FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAvgoAxAaLmJH14tYxJTKOHUNsy3bEwC6A",
+      authDomain: "fox-darts-ladder.firebaseapp.com",
+      databaseURL: "https://fox-darts-ladder-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "fox-darts-ladder",
+      storageBucket: "fox-darts-ladder.firebasestorage.app",
+      messagingSenderId: "1028079521201",
+      appId: "1:1028079521201:web:6ed5afd7348f86ae2cc190"
+    };
+  </script>
+  <style>
+    /* Make Practice Stats button match primary buttons */
+    #practice-stats-btn { background: linear-gradient(90deg,var(--accent),#ff7a00); color:#111827; padding:.6rem 1rem; border-radius:999px; border:1px solid transparent; font-weight:700; }
+    #practice-stats-btn:hover { filter:brightness(0.98); }
+  </style>
+  <script src="practice.js"></script>
+  
+</body>
+</html>
