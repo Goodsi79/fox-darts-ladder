@@ -596,6 +596,7 @@ input, select {
   <button id="nav-rules" class="btn-primary" onclick="showPage('rules')">Rules</button>
   <button id="nav-history" class="btn-primary" onclick="showPage('history')">History</button>
     <button id="nav-player-stats" class="btn-primary" onclick="showPage('player-stats')">Stats</button>
+    <button id="nav-practice" class="btn-primary" onclick="openPractice()" aria-label="Practice mode">Practice</button>
   </div>
 </div>
 
@@ -852,6 +853,35 @@ let ladder = [];
 let previousLadder = [];
 let historyCache = {};
 let editIndex = null;
+
+// Timestamp helpers: robust parsing and formatting to avoid 'Invalid Date' when data contains
+// different timestamp shapes (ISO, locale string, numeric ms). Use formatTimestamp() when
+// rendering and tsToMillis() for sorting.
+function tsToMillis(ts) {
+  try {
+    if (!ts) return 0;
+    if (typeof ts === 'number' && !isNaN(ts)) return ts;
+    // handle numeric strings
+    const num = Number(String(ts).trim());
+    if (!isNaN(num) && String(ts).trim().length >= 10) return num;
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? 0 : d.getTime();
+  } catch (e) { return 0; }
+}
+
+function formatTimestamp(ts) {
+  try {
+    if (!ts) return new Date().toLocaleString();
+    if (ts instanceof Date) {
+      if (!isNaN(ts.getTime())) return ts.toLocaleString();
+      return String(ts);
+    }
+    const ms = tsToMillis(ts);
+    if (ms) return new Date(ms).toLocaleString();
+    // as a last resort, return the original string trimmed
+    return String(ts).slice(0, 64);
+  } catch (e) { return String(ts); }
+}
 
 /* -----------------------------------------------------------
    PAGE SWITCHING
@@ -1253,7 +1283,7 @@ db.ref("history").on("value", snap => {
         list.innerHTML += `
           <div style="margin-bottom:1rem; padding-bottom:.7rem; border-bottom:1px dashed rgba(55,65,81,0.7);">
             <div><strong>${winner}</strong> beat <strong>${loser}</strong></div>
-            <div class="small" style="color:#9ca3af;">${m.timestamp}</div>
+      <div class="small" style="color:#9ca3af;">${formatTimestamp(m.timestamp)}</div>
             <div class="small" style="margin-top:.3rem;">${legs}</div>
           </div>
         `;
@@ -1944,7 +1974,7 @@ function resetAll() {
 function getPlayerMatches(name) {
   return Object.values(historyCache || {})
     .filter(m => m.challenger === name || m.opponent === name)
-    .sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+    .sort((a,b) => tsToMillis(b.timestamp) - tsToMillis(a.timestamp));
 }
 
 function getOpponentName(match, name) {
@@ -2058,6 +2088,32 @@ function computeMatchStats({ challenger, opponent, legs }) {
   });
   return result;
 }
+
+// Open Practice mode in the same tab. If practice.html is not available, fall back to a landing page.
+function openPractice() {
+  try {
+    // prefer same-origin relative link
+    const url = 'practice.html';
+    // simple guard: ensure we are not in an iframe that disallows navigation
+    if (window.top && window.top !== window) {
+      // attempt to navigate top if allowed
+      try { window.top.location.href = url; return; } catch (e) { /* fallthrough */ }
+    }
+    window.location.href = url;
+  } catch (e) {
+    console.error('openPractice failed', e);
+    alert('Unable to open Practice mode.');
+  }
+}
+
+// Wire FAB click handler defensively
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    // ensure nav-practice button triggers openPractice
+    const navPractice = document.getElementById('nav-practice');
+    if (navPractice) navPractice.addEventListener('click', (ev) => { ev.preventDefault(); openPractice(); });
+  } catch (e) { console.error('Failed to wire Practice handlers', e); }
+});
 
 /* -----------------------------------------------------------
    ADVANCED STATS ENGINE (Stage 1)
@@ -2731,7 +2787,7 @@ function openPlayerProfile(index) {
             <strong>${isWinner ? "Won" : "Lost"}</strong> vs ${opp}
             <span style="color:#9ca3af;"> (${myLegs}–${oppLegs})</span>
             <span class="small" style="color:#9ca3af;">${statsLine}</span><br>
-            <span class="small">${m.timestamp}</span>
+            <span class="small">${formatTimestamp(m.timestamp)}</span>
           </div>
         `;
       }).join("")
@@ -3957,7 +4013,7 @@ function renderScoringMatchResults(matchObj) {
       <div class="card" style="padding:.6rem;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div style="font-weight:800;">Match Result</div>
-          <div class="small">${new Date(matchObj.timestamp || Date.now()).toLocaleString()}</div>
+          <div class="small">${formatTimestamp(matchObj.timestamp || Date.now())}</div>
         </div>
         <div style="margin-top:.6rem;">${challenger} vs ${opponent}</div>
   <div style="margin-top:.4rem;" class="sc-result-highlight">Final: ${winner} defeated ${loser}</div>
