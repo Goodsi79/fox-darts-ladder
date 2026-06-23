@@ -241,12 +241,12 @@
 })();
 // NOTE: the compat DB script is loaded via script tags in `practice.html`; use the global `firebase`/`db` if present
 
-// Minimal shim to access the global db from index.html if available
+// Minimal shim to access the global db from scoretest.html if available
 // Don't call window.firebase.database() at top-level — do this lazily inside init
 var dbGlobal = null;
 
 // If this page wasn't loaded via the main app, try initializing firebase with the same config
-// (uses same config as index.html so practice.html can read the shared ladder/history nodes)
+// (uses same config as scoretest.html so practice.html can read the shared ladder/history nodes)
 function maybeInitFirebase() {
   try {
     if (dbGlobal) return;
@@ -687,7 +687,7 @@ window.addEventListener('load', ()=>{
     } catch (e) { console.error('open stats failed', e); }
   });
   const backBtn = document.getElementById('practice-back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
+  if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'scoretest.html'; });
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
 });
