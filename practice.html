@@ -98,12 +98,15 @@
      main card body to scroll independently. */
   @media (max-width: 720px) {
     /* height reserved for keypad + actions; adjust if you change keypad size */
-    :root { --mobile-keypad-height: 156px; }
+    :root { --mobile-keypad-height: 180px; }
 
-    .card { padding-bottom: calc(var(--mobile-keypad-height) + 18px); }
+    /* Reserve space at the bottom of the viewport so the fixed keypad doesn't cover content
+       and make the main card scrollable so users can reach any section. */
+    body { padding-bottom: var(--mobile-keypad-height); }
+    .card { padding-bottom: calc(var(--mobile-keypad-height) + 18px); max-height: calc(100vh - var(--mobile-keypad-height) - 20px); overflow:auto; -webkit-overflow-scrolling: touch; }
 
-    /* Make the history area scrollable so long content doesn't push layout */
-    #practice-history { max-height: calc(50vh); overflow:auto; -webkit-overflow-scrolling:touch; }
+    /* Make the history area scrollable; limit its height relative to viewport so it doesn't grow under the keypad */
+    #practice-history { max-height: calc(100vh - var(--mobile-keypad-height) - 220px); overflow:auto; -webkit-overflow-scrolling:touch; }
 
     /* Fix the keypad area to the bottom of the viewport */
     #keypad-area {
