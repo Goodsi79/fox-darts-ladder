@@ -47,9 +47,11 @@
   .visit-bust{color:#ff6b6b;font-weight:700}
   .bust-flash{animation:bust-flash 1000ms ease-out 1}
   @keyframes bust-flash{0%{background:rgba(255,107,107,0.18)}60%{background:rgba(255,107,107,0.08)}100%{background:transparent}}
-  /* Show current score again; keep darts thrown hidden */
-  #practice-remaining { display: block !important; }
-  #practice-darts { display: none !important; }
+  /* Show current score and make it lighter/brighter */
+  #practice-remaining { display: block !important; color:#ffffff; font-weight:800; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
+  /* per-visit point and remaining styling */
+  .visit-points { color: #ffffff; font-weight:700; }
+  .visit-remaining { color: #e9f2ff; font-weight:700; }
    /* Keep the player container visible so the select remains usable,
      but hide the avatar and the large header name. */
   .player-head { display: flex !important; align-items: center; gap: 12px; }
@@ -90,12 +92,44 @@
     .card { padding: 8px; }
   }
 
+  /* Mobile-friendly sticky keypad/actions
+     Keep the keypad and action buttons fixed at the bottom of the viewport
+     on small screens so input doesn't push them off-screen. Allow the
+     main card body to scroll independently. */
+  @media (max-width: 720px) {
+    /* height reserved for keypad + actions; adjust if you change keypad size */
+    :root { --mobile-keypad-height: 156px; }
+
+    .card { padding-bottom: calc(var(--mobile-keypad-height) + 18px); }
+
+    /* Make the history area scrollable so long content doesn't push layout */
+    #practice-history { max-height: calc(50vh); overflow:auto; -webkit-overflow-scrolling:touch; }
+
+    /* Fix the keypad area to the bottom of the viewport */
+    #keypad-area {
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:1200;
+      background:linear-gradient(180deg, rgba(15,23,42,0.98), rgba(11,17,32,0.98));
+      border-top:1px solid rgba(255,255,255,0.03);
+      padding:10px 12px 18px 12px;
+      box-shadow:0 -12px 30px rgba(0,0,0,0.6);
+    }
+
+    /* Ensure keypad layout and action row are usable when fixed */
+    #keypad{ margin-top:0 }
+    #keypad button{ min-height:56px }
+    #keypad-area .btn-secondary, #keypad-area .btn-primary { min-width:88px }
+  }
+
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Fox at Peasemore Darts Practice</h1>
+      <h1>Fox at Peasemore Practice</h1>
     </header>
 
     <div class="card">
@@ -147,10 +181,10 @@
         <div id="keypad"></div>
 
         <div style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
-            <button id="practice-undo" class="btn-primary">Undo</button>
-            <button id="practice-end" class="btn-primary">End Session</button>
+            <button id="practice-undo" class="btn-secondary">Undo</button>
+            <button id="practice-end" class="btn-secondary">End Session</button>
             <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>
-            <button id="practice-back-btn" class="btn-primary" style="margin-left:6px">Back to Ladder</button>
+            <button id="practice-back-btn" class="btn-secondary" style="margin-left:6px">Back to Ladder</button>
           </div>
       </div>
     

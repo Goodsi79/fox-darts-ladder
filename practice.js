@@ -241,12 +241,12 @@
 })();
 // NOTE: the compat DB script is loaded via script tags in `practice.html`; use the global `firebase`/`db` if present
 
-// Minimal shim to access the global db from scoretest.html if available
+// Minimal shim to access the global db from index.html if available
 // Don't call window.firebase.database() at top-level — do this lazily inside init
 var dbGlobal = null;
 
 // If this page wasn't loaded via the main app, try initializing firebase with the same config
-// (uses same config as scoretest.html so practice.html can read the shared ladder/history nodes)
+// (uses same config as index.html so practice.html can read the shared ladder/history nodes)
 function maybeInitFirebase() {
   try {
     if (dbGlobal) return;
@@ -452,13 +452,20 @@ function renderHistory() {
   if (!session || !session.throws.length) { container.textContent = 'No throws yet'; return; }
   session.throws.slice().reverse().forEach((t, idx) => {
     const row = document.createElement('div'); row.className = 'visit-row';
-    const left = document.createElement('div');
-    const right = document.createElement('div');
+    const left = document.createElement('div'); left.className='visit-points';
+    const right = document.createElement('div'); right.className='visit-remaining';
     left.textContent = `${t.score} pts`;
     right.textContent = t.bust ? 'BUST' : `Remaining ${t.remaining}`;
-    if (t.bust) { right.className = 'visit-bust'; }
+    if (t.bust) { right.classList.add('visit-bust'); left.classList.add('visit-bust'); }
     row.appendChild(left); row.appendChild(right); container.appendChild(row);
   });
+  // Auto-scroll: newest entries are at the top (we reversed the list), so ensure scrollTop is 0
+  try {
+    container.style.scrollBehavior = 'smooth';
+    container.scrollTop = 0;
+    // clear smooth behavior after a tick to avoid interfering with other scroll actions
+    setTimeout(()=>{ try{ container.style.scrollBehavior=''; }catch(e){} }, 400);
+  } catch (e) { /* ignore */ }
 }
 
 function flashLatestBust() {
@@ -687,7 +694,7 @@ window.addEventListener('load', ()=>{
     } catch (e) { console.error('open stats failed', e); }
   });
   const backBtn = document.getElementById('practice-back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'scoretest.html'; });
+  if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'index.html'; });
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
 });
