@@ -432,7 +432,7 @@ function updateUI(){
   if(!session) return;
   document.getElementById('practice-remaining').textContent = session.remaining;
   document.getElementById('practice-darts').textContent = session.darts;
-  document.getElementById('practice-highest').textContent = session.highest||'—';
+  const ph = document.getElementById('practice-highest'); if (ph) ph.textContent = session.highest||'—';
   const avg = session.darts? Math.round((session.throws.reduce((s,t)=>s+t.score,0)/ (session.darts/3)) *10)/10 : '—';
   document.getElementById('practice-avg').textContent = avg;
   const f9 = session.first9list.length? Math.round((session.first9list.reduce((a,b)=>a+b,0)/session.first9list.length)*10)/10 : '—';
@@ -440,9 +440,23 @@ function updateUI(){
   document.getElementById('practice-history').textContent = `Visits: ${session.throws.length}`;
   // suggested checkout
   try {
-    const checkoutEl = document.getElementById('practice-checkout');
-    if (checkoutEl) checkoutEl.textContent = 'Suggested checkout: ' + (computeSuggestedCheckout(session.remaining, session.doubleOut) || '—');
+  const checkoutEl = document.getElementById('practice-checkout');
+  if (checkoutEl) checkoutEl.textContent = 'Suggested checkout: ' + (computeSuggestedCheckout(session.remaining, session.doubleOut) || '—');
   } catch (e) { console.warn('updateUI checkout update failed', e); }
+  // Mobile summary (if present)
+  try {
+    const mLast = document.getElementById('mobile-last-visit');
+    const mDarts = document.getElementById('mobile-darts');
+    const mRem = document.getElementById('mobile-remaining');
+    const mSug = document.getElementById('mobile-suggested');
+    if (mLast) {
+      const last = session.throws.length ? session.throws[session.throws.length-1] : null;
+      mLast.textContent = last ? `Last: ${last.score} pts${last.bust? ' (BUST)':''}` : 'Last: —';
+    }
+    if (mDarts) mDarts.textContent = `Darts: ${session.darts||0}`;
+    if (mRem) mRem.textContent = `Remaining: ${session.remaining}`;
+    if (mSug) mSug.textContent = `Checkout: ${computeSuggestedCheckout(session.remaining, session.doubleOut) || '—'}`;
+  } catch (e) { /* ignore mobile summary errors */ }
 }
 
 function renderHistory() {

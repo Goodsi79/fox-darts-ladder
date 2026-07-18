@@ -38,6 +38,8 @@
     #keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:10px}
     #keypad button{padding:1rem;font-size:1.1rem;border-radius:10px;min-height:52px;background:rgba(15,23,42,0.95);color:var(--text);border:1px solid rgba(55,65,81,0.9)}
     #keypad .enter{grid-column:span 3;background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;font-weight:800}
+  /* hide the small typed placeholder used by JS; we don't need to show a '0' above the keypad */
+  #practice-typed { display: none; }
   /* mobile quick entry hidden by default; shown via media query on small screens */
   #mobile-entry { display: none; }
     /* summary modal */
@@ -187,8 +189,6 @@
         <div style="flex:1;min-width:220px;">
           <div class="small">Current Score</div>
           <div id="practice-remaining" class="score-big">501</div>
-          <div style="margin-top:6px" class="small muted">Highest visit: <span id="practice-highest">—</span></div>
-          <div id="practice-checkout" class="small muted" style="margin-top:6px">Suggested checkout: —</div>
         </div>
 
         <div style="width:220px;">
@@ -203,6 +203,14 @@
   <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
   <button id="practice-mobile-add" class="btn-primary" style="padding:.45rem .8rem">Add</button>
       </div>
+
+  <!-- Mobile summary: last visit, darts, remaining, suggested checkout -->
+  <div id="mobile-summary" style="padding:6px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:0.95rem;color:var(--muted)">
+    <div id="mobile-last-visit">Last: —</div>
+    <div id="mobile-darts">Darts: 0</div>
+    <div id="mobile-remaining">Remaining: 501</div>
+    <div id="mobile-suggested" style="color:var(--text);font-weight:700">Checkout: —</div>
+  </div>
 
   <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
   <div style="padding:0 12px;margin-top:6px"><button id="practice-show-full-history" class="btn-secondary" style="display:none">Show full history</button></div>
