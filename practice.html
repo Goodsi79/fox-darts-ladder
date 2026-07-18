@@ -38,6 +38,8 @@
     #keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:10px}
     #keypad button{padding:1rem;font-size:1.1rem;border-radius:10px;min-height:52px;background:rgba(15,23,42,0.95);color:var(--text);border:1px solid rgba(55,65,81,0.9)}
     #keypad .enter{grid-column:span 3;background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;font-weight:800}
+  /* mobile quick entry hidden by default; shown via media query on small screens */
+  #mobile-entry { display: none; }
     /* summary modal */
     .modal{position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999}
     .modal .card{width:calc(100% - 32px);max-width:720px}
@@ -178,8 +180,8 @@
           <div class="small">First 9 avg: <strong id="practice-f9">—</strong></div>
         </div>
       </div>
-      <!-- Mobile quick entry (shows on small screens) -->
-      <div id="mobile-entry" style="display:none;padding:8px 12px;gap:8px;align-items:center;">
+  <!-- Mobile quick entry (shows on small screens) -->
+  <div id="mobile-entry" style="padding:8px 12px;gap:8px;align-items:center;">
         <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
         <button id="practice-mobile-add" class="btn-primary" style="padding:.45rem .8rem">Add</button>
         <button id="practice-mobile-enter-last" class="btn-secondary" style="padding:.45rem .6rem">Enter Last</button>
