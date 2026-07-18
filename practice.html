@@ -9,7 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg: #05070a; --panel:#0f141d; --panel-soft:#151b26; --border:#1f2933; --text:#e5e7eb; --muted:#6b7280; --accent:#ff8a1f; --accent-soft:rgba(255,138,31,0.18); --radius:12px; --font: "Inter", system-ui, sans-serif;
+      /* High-contrast palette applied permanently */
+      --bg: #000000; --panel:#000000; --panel-soft:#0b0b0b; --border:#ffffff; --text:#ffffff; --muted:#cfcfcf; --accent:#ff8a1f; --accent-soft:rgba(255,138,31,0.18); --radius:12px; --font: "Inter", system-ui, sans-serif;
     }
   html,body{height:100%;margin:0;background:radial-gradient(circle at top,#141b2a 0,#05070a 55%);color:var(--text);font-family:var(--font);overflow:auto}
     .container{max-width:980px;margin:18px auto;padding:0 16px;}
@@ -182,9 +183,7 @@
 
   /* High contrast mode overrides (do not change action button colors) */
   .high-contrast { --bg: #000000; --panel: #000000; --panel-soft:#0b0b0b; --border:#ffffff; --text:#ffffff; --muted:#cfcfcf; }
-  .hc-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:.25rem .5rem;border-radius:6px;color:var(--text);cursor:pointer}
-  /* use a fixed pressed color for the toggle so primary buttons inherit their normal styles */
-  .hc-toggle[aria-pressed="true"]{background:#ffd700;color:#111;font-weight:800}
+  /* toggle removed - high contrast applied permanently */
 
   </style>
 </head>
@@ -192,8 +191,7 @@
   <div class="container">
     <header>
       <h1>Fox at Peasemore Practice</h1>
-      <!-- High contrast toggle -->
-      <button id="high-contrast-toggle" class="hc-toggle" aria-pressed="false" aria-label="Toggle high contrast mode" title="Toggle high contrast mode">🌓</button>
+  <!-- high contrast mode applied permanently -->
     </header>
 
     <div class="card">
@@ -265,10 +263,10 @@
         </div>
       </div>
   <!-- Mobile quick entry (shows on small screens) -->
-  <div id="mobile-entry" style="padding:8px 12px;gap:8px;align-items:center;">
-  <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
-  <button id="practice-mobile-add" type="button" class="btn-primary" style="padding:.45rem .8rem" aria-label="Add visit">Add</button>
-      </div>
+  <div id="mobile-entry" style="padding:12px 12px;display:flex;gap:12px;align-items:center;justify-content:center;">
+    <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:180px;padding:.85rem;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff;font-size:1.05rem;font-weight:700;text-align:center" />
+    <button id="practice-mobile-add" type="button" class="btn-primary" style="padding:.7rem 1rem;font-size:1.05rem;border-radius:10px" aria-label="Add visit">Add</button>
+  </div>
 
   <!-- Mobile summary: last visit, darts, remaining, suggested checkout -->
   <div id="mobile-summary" style="padding:6px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:0.95rem;color:var(--muted)">
@@ -277,25 +275,7 @@
   <!-- mobile-ai-remaining removed per request -->
   </div>
 
-  <script>
-    (function(){
-      const toggle = document.getElementById('high-contrast-toggle');
-      if(!toggle) return;
-      const LS_KEY = 'practice_high_contrast';
-      function apply(state){
-        if(state){ document.documentElement.classList.add('high-contrast'); toggle.setAttribute('aria-pressed','true'); }
-        else { document.documentElement.classList.remove('high-contrast'); toggle.setAttribute('aria-pressed','false'); }
-      }
-      const saved = localStorage.getItem(LS_KEY);
-      apply(saved === '1');
-      toggle.addEventListener('click', ()=>{
-        const isOn = document.documentElement.classList.toggle('high-contrast');
-        toggle.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-        localStorage.setItem(LS_KEY, isOn ? '1' : '0');
-      });
-      toggle.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle.click(); } });
-    })();
-  </script>
+  <!-- high contrast toggle removed; high-contrast palette applied via :root -->
 
   <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
   <div style="padding:0 12px;margin-top:6px"><button id="practice-show-full-history" class="btn-secondary" style="display:none">Show full history</button></div>
