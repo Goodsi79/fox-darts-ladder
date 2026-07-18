@@ -38,8 +38,9 @@
     #keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:10px}
     #keypad button{padding:1rem;font-size:1.1rem;border-radius:10px;min-height:52px;background:rgba(15,23,42,0.95);color:var(--text);border:1px solid rgba(55,65,81,0.9)}
     #keypad .enter{grid-column:span 3;background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;font-weight:800}
-  /* hide the small typed placeholder used by JS; we don't need to show a '0' above the keypad */
-  #practice-typed { display: none; }
+  /* show the small typed placeholder used by JS on larger screens so the user sees their entry above the keypad;
+    keep it hidden on small screens where the compact mobile entry is used */
+  #practice-typed { display: block; margin-top:8px; font-size:1.4rem; font-weight:800; color:var(--text); text-align:center; }
   /* mobile quick entry hidden by default; shown via media query on small screens */
   #mobile-entry { display: none; }
     /* summary modal */
@@ -90,6 +91,8 @@
   /* hide full keypad on small screens — use mobile quick entry instead */
   #keypad { display:none }
   #mobile-entry { display:flex }
+  /* hide the typed placeholder on small screens (mobile input area shows the value) */
+  #practice-typed { display: none; }
   /* keypad touch targets if visible */
   #keypad button { padding: 1.1rem; min-height: 56px; font-size: 1.05rem; }
     /* responsive chart */

@@ -274,6 +274,7 @@ let possibleThreeDartTotals = null;
 // AI opponent state
 let aiDifficulty = 'medium';
 let aiRemaining = null;
+let keypadState = '';
 
 function buildPossibleThreeDartTotals() {
   if (possibleThreeDartTotals) return;
