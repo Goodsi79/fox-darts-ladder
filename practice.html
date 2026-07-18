@@ -124,6 +124,12 @@
       box-shadow:none;
     }
 
+    /* action row should wrap so buttons don't overflow in portrait */
+    .action-row { flex-wrap:wrap; }
+    .action-row button { flex: 1 1 auto; min-width:84px; }
+    /* provide safe-area inset so buttons aren't obscured by device UI (iOS home indicator) */
+    #keypad-area { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
+
     /* Ensure keypad layout and action row are usable when not fixed */
     #keypad{ margin-top:0 }
     #keypad button{ min-height:56px }
@@ -194,7 +200,7 @@
       <div id="keypad-area" style="margin-top:12px">
         <div id="keypad"></div>
 
-        <div style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
+        <div class="action-row" style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
             <button id="practice-undo" class="btn-secondary">Undo</button>
             <button id="practice-end" class="btn-secondary">End Session</button>
             <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>

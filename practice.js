@@ -732,10 +732,11 @@ window.addEventListener('load', ()=>{
   const mobileEntry = document.getElementById('practice-mobile-entry');
   const mobileAdd = document.getElementById('practice-mobile-add');
   const mobileEnterLast = document.getElementById('practice-mobile-enter-last');
-  function mobileSubmitFromInput() {
+  function mobileSubmitFromInput(e) {
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
     if (!mobileEntry) return;
     const raw = mobileEntry.value || '';
-    const val = parseInt(raw.replace(/[^0-9]/g,''), 10);
+    const val = parseInt(String(raw).replace(/[^0-9]/g,''), 10);
     if (isNaN(val)) { alert('Enter a numeric visit (0-180)'); return; }
     if (val < 0 || val > 180) { alert('Visit must be between 0 and 180'); return; }
     // set keypadState and reuse canonical submitVisit() so validations are identical
@@ -745,8 +746,22 @@ window.addEventListener('load', ()=>{
     submitVisit();
     mobileEntry.value = '';
   }
-  if (mobileAdd) mobileAdd.addEventListener('click', (e)=>{ e.preventDefault(); mobileSubmitFromInput(); });
-  if (mobileEntry) mobileEntry.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); mobileSubmitFromInput(); } });
+  if (mobileAdd) {
+    // support click and touchstart for reliability on mobile devices
+    mobileAdd.addEventListener('click', (e)=>{ e.preventDefault(); mobileSubmitFromInput(e); });
+    mobileAdd.addEventListener('touchstart', (e)=>{ e.preventDefault(); mobileSubmitFromInput(e); }, {passive:false});
+  }
+  if (mobileEntry) {
+    // accept Enter from various mobile browsers/keyboards
+    mobileEntry.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); mobileSubmitFromInput(ev); } });
+    mobileEntry.addEventListener('keypress', (ev)=>{ if (ev.key === 'Enter' || ev.which === 13) { ev.preventDefault(); mobileSubmitFromInput(ev); } });
+    mobileEntry.addEventListener('keyup', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); } });
+    // some soft keyboards don't fire Enter events reliably; listen for input 'submit' via Enter in forms is ideal,
+    // but as a fallback, also listen for the 'input' event and the 'blur' event to accept typed values when the user finishes.
+    mobileEntry.addEventListener('blur', ()=>{
+      // do nothing on blur; keep value for user to press Add explicitly
+    });
+  }
   if (mobileEnterLast) mobileEnterLast.addEventListener('click', (e)=>{ e.preventDefault(); if (!session || !session.throws.length) return; const last = session.throws[session.throws.length-1]; if (!last) return; if (mobileEntry) mobileEntry.value = String(last.score || ''); });
 });
 
