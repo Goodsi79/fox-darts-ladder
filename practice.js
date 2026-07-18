@@ -270,8 +270,10 @@ function maybeInitFirebase() {
 
 // Practice session state
 let session = null;
-let keypadState = '';
 let possibleThreeDartTotals = null;
+// AI opponent state
+let aiDifficulty = 'medium';
+let aiRemaining = null;
 
 function buildPossibleThreeDartTotals() {
   if (possibleThreeDartTotals) return;
@@ -332,6 +334,10 @@ function startPracticeSession(){
     const sel = document.getElementById('practice-player-select');
     const playerId = sel && sel.value ? sel.value : (localStorage.getItem('fox_practice_name') || 'Player');
     localStorage.setItem('fox_practice_name', playerId);
+    // read AI settings
+    aiEnabled = !!document.getElementById('practice-vs-ai').checked;
+    const d = document.getElementById('practice-ai-difficulty'); aiDifficulty = d ? d.value : 'medium';
+    aiRemaining = aiEnabled ? start : null;
     initSession({ playerId: playerId, startingScore: start, doubleOut: !!document.getElementById('practice-double').checked });
   });
   const submitBtn = document.getElementById('practice-submit');
@@ -360,6 +366,18 @@ function updatePlayerDisplay(){
   if (pn) pn.textContent = name;
   const pa = document.getElementById('player-avatar');
   if (pa) pa.textContent = (name && name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase()) || 'P';
+}
+
+// Helper: return selected player's nickname (if available)
+function getSelectedNick(){
+  try{
+    const sel = document.getElementById('practice-player-select');
+    if(!sel) return null;
+    const opt = sel.options[sel.selectedIndex];
+    if(!opt) return null;
+    const nick = opt.getAttribute('data-nick');
+    return nick || null;
+  }catch(e){return null}
 }
 
 // Populate the player select from Firebase ladder or fallback to localStorage/stored players
@@ -425,6 +443,8 @@ function initSession(opts){
     activeVisit: [] // per-throw breakdown optional
   };
   keypadState='';
+  // initialize AI remaining if enabled
+  if (aiEnabled) aiRemaining = session.startingScore;
   updateUI();
 }
 
@@ -433,6 +453,7 @@ function updateUI(){
   document.getElementById('practice-remaining').textContent = session.remaining;
   document.getElementById('practice-darts').textContent = session.darts;
   const ph = document.getElementById('practice-highest'); if (ph) ph.textContent = session.highest||'—';
+  const aiEl = document.getElementById('practice-ai-remaining'); if (aiEl) aiEl.textContent = (aiEnabled && aiRemaining !== null) ? aiRemaining : '—';
   const avg = session.darts? Math.round((session.throws.reduce((s,t)=>s+t.score,0)/ (session.darts/3)) *10)/10 : '—';
   document.getElementById('practice-avg').textContent = avg;
   const f9 = session.first9list.length? Math.round((session.first9list.reduce((a,b)=>a+b,0)/session.first9list.length)*10)/10 : '—';
@@ -456,6 +477,7 @@ function updateUI(){
     if (mDarts) mDarts.textContent = `Darts: ${session.darts||0}`;
     if (mRem) mRem.textContent = `Remaining: ${session.remaining}`;
     if (mSug) mSug.textContent = `Checkout: ${computeSuggestedCheckout(session.remaining, session.doubleOut) || '—'}`;
+    const mAi = document.getElementById('mobile-ai-remaining'); if (mAi) mAi.textContent = `AI: ${aiEnabled && aiRemaining !== null ? aiRemaining : '—'}`;
   } catch (e) { /* ignore mobile summary errors */ }
 }
 
@@ -467,11 +489,14 @@ function renderHistory() {
   // show only the most recent N entries on the main UI to avoid any scrolling
   const MAX_MAIN = 6;
   const recent = session.throws.slice().reverse().slice(0, MAX_MAIN);
-  recent.forEach((t, idx) => {
+  recent.forEach((t) => {
     const row = document.createElement('div'); row.className = 'visit-row';
+    if (t.ai) row.classList.add('ai');
     const left = document.createElement('div'); left.className='visit-points';
     const right = document.createElement('div'); right.className='visit-remaining';
-    left.textContent = `${t.score} pts`;
+    // label AI as Gary and show player nick where appropriate
+    const nick = t.ai ? 'Gary' : getSelectedNick();
+    left.textContent = `${t.score} pts` + (nick ? ` (${nick})` : '');
     right.textContent = t.bust ? 'BUST' : `Remaining ${t.remaining}`;
     if (t.bust) { right.classList.add('visit-bust'); left.classList.add('visit-bust'); }
     row.appendChild(left); row.appendChild(right); container.appendChild(row);
@@ -481,17 +506,22 @@ function renderHistory() {
   if (session.throws.length > MAX_MAIN && moreBtn) { moreBtn.style.display = 'inline-block'; } else if (moreBtn) { moreBtn.style.display='none'; }
 }
 
-// Full-history overlay: create on demand
+// Ensure the full-history overlay exists and return it
 function ensureFullHistoryOverlay() {
   let overlay = document.getElementById('practice-full-history');
   if (overlay) return overlay;
-  overlay = document.createElement('div'); overlay.id='practice-full-history';
-  overlay.className='modal'; overlay.style.display='none';
-  const card = document.createElement('div'); card.className='card'; card.style.maxWidth='720px'; card.style.maxHeight='80vh'; card.style.overflow='auto';
-  const hdr = document.createElement('div'); hdr.className='card-header'; hdr.innerHTML='<div style="font-weight:800">Full History</div><div><button id="practice-full-history-close" class="btn-secondary">Close</button></div>';
-  const body = document.createElement('div'); body.style.padding='12px'; body.id='practice-full-history-body';
+  overlay = document.createElement('div'); overlay.id = 'practice-full-history'; overlay.className = 'modal'; overlay.style.display = 'none';
+  const card = document.createElement('div'); card.className = 'card'; card.style.maxWidth = '720px'; card.style.maxHeight = '80vh'; card.style.overflow = 'auto';
+  const hdr = document.createElement('div'); hdr.className = 'card-header'; hdr.innerHTML = '<div style="font-weight:800">Full History</div><div><button id="practice-full-history-close" class="btn-secondary">Close</button></div>';
+  // add a small legend under the header title to explain AI styling
+  const legend = document.createElement('div'); legend.style.fontSize='0.85rem'; legend.style.color='var(--muted)'; legend.style.marginTop='8px';
+  const badge = document.createElement('span'); badge.className='badge'; badge.style.background='rgba(96,165,250,0.12)'; badge.style.color='#9fbff6'; badge.textContent = 'Gary';
+  const legendText = document.createElement('span'); legendText.style.marginLeft='8px'; legendText.textContent = ' = AI throws (Gary)';
+  legend.appendChild(badge); legend.appendChild(legendText);
+  hdr.appendChild(legend);
+  const body = document.createElement('div'); body.style.padding = '12px'; body.id = 'practice-full-history-body';
   card.appendChild(hdr); card.appendChild(body); overlay.appendChild(card); document.body.appendChild(overlay);
-  document.getElementById('practice-full-history-close').addEventListener('click', ()=> overlay.style.display='none');
+  const closeBtn = overlay.querySelector('#practice-full-history-close'); if (closeBtn) closeBtn.addEventListener('click', ()=> overlay.style.display = 'none');
   return overlay;
 }
 
@@ -502,9 +532,17 @@ function showFullHistory() {
   if (!session || !session.throws.length) { body.textContent = 'No throws yet'; } else {
     session.throws.slice().reverse().forEach(t => {
       const r = document.createElement('div'); r.className='visit-row'; r.style.padding='8px 0';
-      const l = document.createElement('div'); l.className='visit-points'; l.textContent = `${t.score} pts`;
+      if (t.ai) r.classList.add('ai');
+      const l = document.createElement('div'); l.className='visit-points';
+      const label = t.ai ? `Gary: ${t.score} pts` : `${t.score} pts`;
+      l.textContent = label;
       const rr = document.createElement('div'); rr.className='visit-remaining'; rr.textContent = t.bust ? 'BUST' : `Remaining ${t.remaining}`;
       if (t.bust) { l.classList.add('visit-bust'); rr.classList.add('visit-bust'); }
+      // style AI rows slightly differently for clarity
+      if (t.ai) {
+        l.style.color = '#9fbff6'; l.style.fontStyle = 'italic';
+        rr.style.opacity = '0.95'; rr.style.color = '#9fbff6';
+      }
       r.appendChild(l); r.appendChild(rr); body.appendChild(r);
     });
   }
@@ -570,12 +608,55 @@ function computeSuggestedCheckout(remaining, doubleOut) {
   return null;
 }
 
+// Global helper: can this numeric total finish on a double (1-3 darts, last a double)?
+function canFinishOnDoubleGlobal(total) {
+  if (typeof total !== 'number' || total <= 0) return false;
+  const singles = [], doubles = [], trebles = [];
+  for (let i=1;i<=20;i++){ singles.push(i); doubles.push(2*i); trebles.push(3*i); }
+  singles.push(25); doubles.push(50);
+  // 1 dart
+  if (doubles.includes(total)) return true;
+  // 2 darts: first any (single/treble), second double
+  const firstSet = trebles.concat(singles);
+  for (let i=0;i<firstSet.length;i++){
+    for (let j=0;j<doubles.length;j++){
+      if (firstSet[i] + doubles[j] === total) return true;
+    }
+  }
+  // 3 darts: two any, last double
+  const any = trebles.concat(doubles).concat(singles);
+  for (let i=0;i<any.length;i++){
+    for (let j=0;j<any.length;j++){
+      for (let k=0;k<doubles.length;k++){
+        if (any[i] + any[j] + doubles[k] === total) return true;
+      }
+    }
+  }
+  return false;
+}
+
+// Find a numeric total (1..180) that finishes on a double for the given remaining, or null
+function findDoubleFinishTotal(remaining) {
+  if (remaining <= 0) return null;
+  const singles = [], doubles = [], trebles = [];
+  for (let i=1;i<=20;i++){ singles.push(i); doubles.push(2*i); trebles.push(3*i); }
+  singles.push(25); doubles.push(50);
+  // 1 dart
+  for (const d of doubles) if (d === remaining) return d;
+  // 2 darts: first any (single/treble), second double
+  for (const f of trebles.concat(singles)) for (const dd of doubles) if (f + dd === remaining) return f + dd;
+  // 3 darts: two any, last double
+  const any = trebles.concat(doubles).concat(singles);
+  for (let i=0;i<any.length;i++) for (let j=0;j<any.length;j++) for (let k=0;k<doubles.length;k++) if (any[i] + any[j] + doubles[k] === remaining) return any[i] + any[j] + doubles[k];
+  return null;
+}
+
 function submitVisit(){
-  if(!session) return alert('Start a session first');
+  if(!session) return showInlineMessage('Start a session first', 'error');
   const raw = keypadState||'0';
   const visitTotal = parseInt(raw,10)||0;
   // validate achievable totals
-  if (visitTotal !==0 && possibleThreeDartTotals && !possibleThreeDartTotals.has(visitTotal)) { alert('Not achievable'); keypadState=''; document.getElementById('practice-typed').textContent='0'; return; }
+  if (visitTotal !==0 && possibleThreeDartTotals && !possibleThreeDartTotals.has(visitTotal)) { showInlineMessage('Not achievable', 'error'); keypadState=''; document.getElementById('practice-typed').textContent='0'; return; }
 
   const remBefore = session.remaining;
   const after = remBefore - visitTotal;
@@ -647,6 +728,55 @@ function submitVisit(){
   if(nb.length) session.first9list[session.throws.length-1] = nb.reduce((a,b)=>a+b,0);
   keypadState=''; document.getElementById('practice-typed').textContent='0'; updateUI();
   renderHistory();
+  // If AI is enabled, let AI take a turn after a short delay
+  if (aiEnabled && aiRemaining !== null && session.remaining > 0) {
+    setTimeout(()=> { aiTakeTurn(); updateUI(); renderHistory(); }, 400);
+  }
+}
+
+// Simple AI turn: subtract a plausible visit based on difficulty
+function aiTakeTurn(){
+  if (!aiEnabled || aiRemaining === null || aiRemaining <= 0) return;
+  // If AI can finish and double-out is required, attempt a proper finish
+  const playerDoubleOut = !!session.doubleOut;
+  if (playerDoubleOut) {
+    const finishTotal = findDoubleFinishTotal(aiRemaining);
+    if (finishTotal) {
+      // AI attempts to finish
+      aiRemaining = Math.max(0, aiRemaining - finishTotal);
+      session.throws.push({ score: finishTotal, remaining: aiRemaining, ai: true, bust: false, doubleConfirmed: true });
+      session.darts +=3;
+      // update UI and show summary if AI finished
+      try { updateUI(); renderHistory(); } catch(e){}
+      if (aiRemaining === 0) {
+        try { setTimeout(()=> showSummary('ai-checkout'), 250); } catch(e){ console.error('ai finish summary failed', e); }
+      }
+      return;
+    }
+  }
+  // difficulty influences average score
+  const ranges = { easy: [10,40], medium: [30,80], hard: [50,120] };
+  const r = ranges[aiDifficulty] || ranges.medium;
+  // choose a plausible three-dart total that doesn't bust unless finishing
+  const candidates = Array.from(possibleThreeDartTotals || []).filter(v=> v>=r[0] && v<=r[1]);
+  let pick = candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : Math.max(r[0], Math.min(r[1], Math.floor((r[0]+r[1])/2)));
+  // if pick would bust, reduce to safe value
+  if (aiRemaining - pick < 0) pick = Math.max(0, aiRemaining - Math.floor(aiRemaining/3));
+  // apply pick
+  aiRemaining = Math.max(0, aiRemaining - pick);
+  // record AI visit as a special throw in session.throws for visibility
+  session.throws.push({ score: pick, remaining: aiRemaining, ai: true, bust: false });
+  session.darts +=3;
+  // If AI has finished (reached zero), open the session modal so user can save/inspect
+  if (aiRemaining === 0) {
+    // Annotate modal title/message to indicate AI won and show the save summary
+    try {
+      // ensure UI reflects the AI remaining
+      updateUI(); renderHistory();
+      // Show the summary - mark as 'ai-checkout' so handlers can detect AI win
+      setTimeout(()=> showSummary('ai-checkout'), 250);
+    } catch(e){ console.error('aiTakeTurn: failed to show summary', e); }
+  }
 }
 
 function undoVisit(){
@@ -659,13 +789,30 @@ function undoVisit(){
   renderHistory();
 }
 
+// Inline message helper (replaces alert popups)
+function showInlineMessage(msg, type='info', timeout=3500){
+  try{
+    const outer = document.getElementById('practice-inline-msg');
+    const body = document.getElementById('practice-inline-msg-body');
+    if(!outer || !body){ console.debug('showInlineMessage: no container'); return; }
+    body.innerHTML = '';
+    const txt = document.createElement('div'); txt.textContent = msg; txt.style.flex='1';
+    const close = document.createElement('button'); close.textContent = '×'; close.className='btn-secondary'; close.style.marginLeft='8px'; close.style.height='28px'; close.style.padding='0 .6rem';
+    close.addEventListener('click', ()=>{ outer.style.display='none'; });
+    body.appendChild(txt); body.appendChild(close);
+    outer.style.display='block';
+    if (timeout>0) setTimeout(()=>{ try{ outer.style.display='none'; }catch(e){} }, timeout);
+  }catch(e){ console.error('showInlineMessage failed', e); }
+}
+
 function endSession(){
   if(!session) return;
   showSummary('abandoned');
 }
 
 function showSummary(result){
-  document.getElementById('practice-modal').style.display='flex';
+  const modal = document.getElementById('practice-modal');
+  if (modal) modal.style.display='flex';
   const duration = Date.now()-session.startTime;
   document.getElementById('practice-duration').textContent = new Date(duration).toISOString().substr(11,8);
   document.getElementById('m-darts').textContent = session.darts;
@@ -678,30 +825,54 @@ function showSummary(result){
   const succPct = session.checkoutAttempts? Math.round((session.checkoutSuccess/session.checkoutAttempts)*100):0;
   document.getElementById('m-check-success').textContent = succPct+'%';
   document.getElementById('m-start').textContent = session.startingScore;
+  // If AI won, annotate the modal and disable the Save button so AI victories aren't saved as player sessions
+  try{
+    const saveBtn = document.getElementById('practice-save');
+    const header = modal && modal.querySelector('.card-header');
+    // remove any existing ai-banner
+    const prev = modal && modal.querySelector('.ai-win-banner'); if (prev) prev.remove();
+    if (result === 'ai-checkout' || (aiEnabled && aiRemaining === 0 && session.remaining > 0)){
+      // insert a small banner at the top of the modal
+  const banner = document.createElement('div'); banner.className='ai-win-banner'; banner.style.padding='8px'; banner.style.background='linear-gradient(90deg, rgba(96,165,250,0.12), rgba(255,255,255,0.02))'; banner.style.borderRadius='6px'; banner.style.margin='8px'; banner.style.fontWeight='700'; banner.textContent = 'Gary AI won';
+      if (modal && modal.firstElementChild) modal.firstElementChild.insertBefore(banner, modal.firstElementChild.firstChild);
+      if (saveBtn) { saveBtn.disabled = true; saveBtn.classList.add('btn-secondary'); saveBtn.classList.remove('btn-primary'); }
+    } else {
+      if (saveBtn) { saveBtn.disabled = false; saveBtn.classList.add('btn-primary'); saveBtn.classList.remove('btn-secondary'); }
+    }
+  }catch(e){ console.warn('showSummary: failed to set AI banner', e); }
 }
 
 async function savePracticeSessionToFirebase(){
-  if(!dbGlobal) return alert('No database available');
+  if(!dbGlobal) return showInlineMessage('No database available', 'error');
   const sid = 's_'+Date.now();
+  // Compute stats from player-only throws so AI visits do not alter player stats
+  const playerThrows = (session.throws || []).filter(t => !t.ai);
+  // average computed as 3-dart average: sum of player throw scores / (darts/3)
+  const dartsForPlayer = Math.max(0, session.darts - ((session.throws||[]).filter(t=>t.ai).length * 3));
+  const avg = dartsForPlayer ? Math.round((playerThrows.reduce((s,t)=>s+(t.score||0),0) / (dartsForPlayer/3)) *10)/10 : '—';
+  const first9 = playerThrows.length? Math.round((session.first9list.reduce((a,b)=>a+b,0)/session.first9list.length)*10)/10 : '—';
+  const highest = playerThrows.length? Math.max(0, ...playerThrows.map(t=>t.score||0)) : session.highest || 0;
   const payload = {
     playerId: session.playerId,
     startTime: session.startTime,
     endTime: Date.now(),
     startingScore: session.startingScore,
     doubleOut: session.doubleOut,
+    // keep full throws (including AI) for auditability, but stats below exclude AI
     throws: session.throws,
-    result: session.remaining===0? 'checkout':'abandoned',
+    // if AI finished, mark result accordingly; treat as 'ai-checkout' when AI won
+    result: (typeof session !== 'undefined' && session && session.remaining===0) ? 'checkout' : ((aiEnabled && aiRemaining===0) ? 'ai-checkout' : 'abandoned'),
     stats: {
-      average: document.getElementById('m-avg').textContent,
-      first9: document.getElementById('m-f9').textContent,
-      highestVisit: session.highest,
+      average: avg,
+      first9: first9,
+      highestVisit: highest,
       checkoutAttempts: session.checkoutAttempts,
       checkoutSuccess: session.checkoutSuccess
     }
   };
   try{
     await dbGlobal.ref('practiceSessions/'+sid).set(payload);
-    alert('Saved');
+    showInlineMessage('Saved', 'success', 2500);
     document.getElementById('practice-modal').style.display='none';
   }catch(e){console.error(e);alert('Save failed')}
 }
@@ -746,22 +917,36 @@ window.addEventListener('load', ()=>{
   const mobileEntry = document.getElementById('practice-mobile-entry');
   const mobileAdd = document.getElementById('practice-mobile-add');
   function mobileSubmitFromInput(e) {
-    if (e && typeof e.preventDefault === 'function') e.preventDefault();
-    if (!mobileEntry) return;
-    const raw = mobileEntry.value || '';
-    const val = parseInt(String(raw).replace(/[^0-9]/g,''), 10);
-    if (isNaN(val)) { alert('Enter a numeric visit (0-180)'); return; }
-    if (val < 0 || val > 180) { alert('Visit must be between 0 and 180'); return; }
-    // set keypadState and reuse canonical submitVisit() so validations are identical
-    keypadState = String(val);
-    // quick check against achievable totals
-    if (possibleThreeDartTotals && val !== 0 && !possibleThreeDartTotals.has(val)) { alert('Not an achievable total'); keypadState=''; return; }
-    submitVisit();
-    mobileEntry.value = '';
+    try {
+      console.debug('mobileSubmitFromInput: invoked', e && e.type);
+      if (e && typeof e.preventDefault === 'function') e.preventDefault();
+      if (!mobileEntry) { console.debug('mobileSubmitFromInput: no mobileEntry'); return; }
+      // normalize and allow 0. If the input has already been cleared by a prior
+      // event (duplicate click/pointerdown/touchstart), skip silently instead
+      // of showing an alert. This prevents the "must be between 0 and 180"
+      // dialog firing on duplicate handlers.
+      const raw = mobileEntry.value || '';
+      const digits = String(raw).replace(/[^0-9]/g, '');
+      if (!digits) { console.debug('mobileSubmitFromInput: no digits to submit; ignoring'); return; }
+      const val = parseInt(digits, 10);
+  if (isNaN(val)) { showInlineMessage('Enter a numeric visit (0-180)', 'error'); return; }
+  if (val < 0 || val > 180) { showInlineMessage('Visit must be between 0 and 180', 'error'); return; }
+      // set keypadState and reuse canonical submitVisit() so validations are identical
+      keypadState = String(val);
+      // quick check against achievable totals
+  if (possibleThreeDartTotals && val !== 0 && !possibleThreeDartTotals.has(val)) { showInlineMessage('Not an achievable total', 'error'); keypadState=''; return; }
+      submitVisit();
+      mobileEntry.value = '';
+      console.debug('mobileSubmitFromInput: done', val);
+    } catch (err) {
+      console.error('mobileSubmitFromInput error', err);
+      try { keypadState=''; } catch(e){}
+    }
   }
   if (mobileAdd) {
     // support click and touchstart for reliability on mobile devices
     mobileAdd.addEventListener('click', (e)=>{ e.preventDefault(); mobileSubmitFromInput(e); });
+    mobileAdd.addEventListener('pointerdown', (e)=>{ e.preventDefault(); console.debug('mobileAdd pointerdown'); mobileSubmitFromInput(e); });
     mobileAdd.addEventListener('touchstart', (e)=>{ e.preventDefault(); mobileSubmitFromInput(e); }, {passive:false});
   }
   if (mobileEntry) {
