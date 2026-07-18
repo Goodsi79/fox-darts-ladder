@@ -460,24 +460,29 @@ function updateUI(){
   const f9 = session.first9list.length? Math.round((session.first9list.reduce((a,b)=>a+b,0)/session.first9list.length)*10)/10 : '—';
   document.getElementById('practice-f9').textContent = f9;
   document.getElementById('practice-history').textContent = `Visits: ${session.throws.length}`;
-  // suggested checkout
+  // suggested checkout (primary + alternatives)
   try {
-  const checkoutEl = document.getElementById('practice-checkout');
-  if (checkoutEl) checkoutEl.textContent = 'Suggested checkout: ' + (computeSuggestedCheckout(session.remaining, session.doubleOut) || '—');
+    const checkoutEl = document.getElementById('practice-checkout');
+  // request up to primary + 3 alternatives (4 total)
+  const suggestions = computeSuggestedCheckouts(session.remaining, session.doubleOut, 4);
+    if (checkoutEl) {
+      if (!suggestions || !suggestions.length) checkoutEl.textContent = 'Suggested checkout: —';
+      else if (suggestions.length === 1) checkoutEl.textContent = 'Suggested checkout: ' + suggestions[0];
+      else checkoutEl.textContent = 'Suggested checkout: ' + suggestions.join(' | ');
+    }
   } catch (e) { console.warn('updateUI checkout update failed', e); }
   // Mobile summary (if present)
   try {
-    const mLast = document.getElementById('mobile-last-visit');
+    // Mobile summary (compact): only keep darts and suggested checkout visible; remove 'Last' and 'Remaining' small labels
     const mDarts = document.getElementById('mobile-darts');
-    const mRem = document.getElementById('mobile-remaining');
     const mSug = document.getElementById('mobile-suggested');
-    if (mLast) {
-      const last = session.throws.length ? session.throws[session.throws.length-1] : null;
-      mLast.textContent = last ? `Last: ${last.score} pts${last.bust? ' (BUST)':''}` : 'Last: —';
-    }
     if (mDarts) mDarts.textContent = `Darts: ${session.darts||0}`;
-    if (mRem) mRem.textContent = `Remaining: ${session.remaining}`;
-    if (mSug) mSug.textContent = `Checkout: ${computeSuggestedCheckout(session.remaining, session.doubleOut) || '—'}`;
+    if (mSug) {
+      const sug = computeSuggestedCheckouts(session.remaining, session.doubleOut, 4);
+      if (!sug || !sug.length) mSug.textContent = 'Checkout: —';
+      else if (sug.length === 1) mSug.textContent = `Checkout: ${sug[0]}`;
+      else mSug.textContent = `Checkout: ` + sug.join(' | ');
+    }
     const mAi = document.getElementById('mobile-ai-remaining'); if (mAi) mAi.textContent = `AI: ${aiEnabled && aiRemaining !== null ? aiRemaining : '—'}`;
   } catch (e) { /* ignore mobile summary errors */ }
 }
@@ -607,6 +612,49 @@ function computeSuggestedCheckout(remaining, doubleOut) {
   }
 
   return null;
+}
+
+// Compute multiple suggested checkout lines (primary + alternatives)
+function computeSuggestedCheckouts(remaining, doubleOut, maxSuggestions=3) {
+  if (typeof remaining !== 'number' || remaining <= 1) return [];
+  const singles = []; const doubles = []; const trebles = [];
+  for (let i=1;i<=20;i++){ singles.push({label:String(i), val:i}); doubles.push({label:'D'+i, val:2*i}); trebles.push({label:'T'+i, val:3*i}); }
+  singles.push({label:'25', val:25}); doubles.push({label:'DB', val:50});
+
+  const suggestions = [];
+  const pushIfUnique = (s) => { if (!suggestions.includes(s)) suggestions.push(s); };
+
+  // 1-dart (double) finish
+  if (doubleOut) {
+    for (const d of doubles) if (d.val === remaining) pushIfUnique(d.label);
+  } else {
+    for (const s of singles.concat(trebles)) if (s.val === remaining) pushIfUnique(s.label);
+  }
+
+  // 2-dart combos: (treble/single) + double
+  for (const first of trebles.concat(singles)){
+    for (const d of doubles){ if (first.val + d.val === remaining) pushIfUnique(`${first.label}, ${d.label}`); }
+  }
+  // other 2-dart patterns (double + single, single+single)
+  for (const a of doubles.concat(singles)){
+    for (const b of singles.concat(trebles)){
+      if (a.val + b.val === remaining) pushIfUnique(`${a.label}, ${b.label}`);
+    }
+  }
+
+  // 3-dart combos: brute-force over reasonable throws
+  const throws = [].concat(trebles, doubles, singles);
+  for (let i=0;i<throws.length;i++){
+    for (let j=0;j<throws.length;j++){
+      for (let k=0;k<throws.length;k++){
+        if (throws[i].val + throws[j].val + throws[k].val === remaining) pushIfUnique(`${throws[i].label}, ${throws[j].label}, ${throws[k].label}`);
+      }
+    }
+  }
+
+  // sort by number of darts (shorter first) then keep first maxSuggestions
+  suggestions.sort((a,b)=> a.split(',').length - b.split(',').length);
+  return suggestions.slice(0, maxSuggestions);
 }
 
 // Global helper: can this numeric total finish on a double (1-3 darts, last a double)?
