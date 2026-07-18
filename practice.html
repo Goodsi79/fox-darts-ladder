@@ -81,6 +81,12 @@
     /* stack header controls vertically */
     .card-header { flex-direction: column; align-items: stretch; gap: 10px; }
     .player-head { order: 0; width: 100%; }
+  /* responsive start controls */
+  .start-controls { flex-direction: column; align-items: stretch; gap: 8px; }
+  .start-controls .start-row, .start-controls .options-row { width: 100%; display:flex; gap:8px; align-items:center; }
+  .start-controls select, .start-controls input[type=number], .start-controls .ai-diff { flex: 1 1 auto; min-width:0 }
+  .start-controls .option { flex: 1 1 40%; min-width:0 }
+  #practice-start-btn { width: 100%; }
     /* make selects and inputs expand to available width */
     #practice-player-select, #practice-start-select, #practice-custom-start { width: 100% !important; min-width: 0 !important; }
     /* stack buttons for easy tapping */
@@ -175,24 +181,30 @@
             <div class="small">Solo practice • Stats saved separately from the ladder</div>
           </div>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <label class="small muted">Start</label>
-          <select id="practice-start-select">
-            <option value="301">301</option>
-            <option value="501" selected>501</option>
-            <option value="custom">Custom</option>
-          </select>
-          <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;margin-left:6px;" />
+        <div class="start-controls" style="display:flex;gap:8px;align-items:center">
+          <div class="start-row" style="display:flex;gap:8px;align-items:center">
+            <label class="small muted" for="practice-start-select">Start</label>
+            <select id="practice-start-select">
+              <option value="301">301</option>
+              <option value="501" selected>501</option>
+              <option value="custom">Custom</option>
+            </select>
+            <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;margin-left:6px;" />
+          </div>
 
-          <label style="margin-left:12px;display:flex;align-items:center;gap:6px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
-          <label style="margin-left:12px;display:flex;align-items:center;gap:6px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play vs Gary AI</span></label>
-          <select id="practice-ai-difficulty" style="margin-left:6px">
-            <option value="easy">Easy</option>
-            <option value="medium" selected>Medium</option>
-            <option value="hard">Hard</option>
-          </select>
+          <div class="options-row" style="display:flex;gap:8px;align-items:center">
+            <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
+            <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play vs Gary AI</span></label>
+            <select id="practice-ai-difficulty" class="ai-diff" aria-label="AI difficulty" style="margin-left:6px">
+              <option value="easy">Easy</option>
+              <option value="medium" selected>Medium</option>
+              <option value="hard">Hard</option>
+            </select>
+          </div>
 
-          <button id="practice-start-btn" class="btn-primary" style="margin-left:8px">Start</button>
+          <div class="start-row" style="display:flex;gap:8px;align-items:center">
+            <button id="practice-start-btn" class="btn-primary" style="margin-left:8px">Start</button>
+          </div>
         </div>
       </div>
 
