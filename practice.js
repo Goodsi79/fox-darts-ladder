@@ -938,7 +938,12 @@ window.addEventListener('load', ()=>{
     } catch (e) { console.error('open stats failed', e); }
   });
   const backBtn = document.getElementById('practice-back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'scoretest.html'; });
+  if (backBtn) {
+    // ensure this reliably navigates even if other handlers call preventDefault
+    const go = (e) => { try { if (e && typeof e.preventDefault === 'function') e.preventDefault(); const href = backBtn.getAttribute('href') || 'scoretest.html'; window.location.assign(href); } catch(err){ console.error('back navigation failed', err); window.location.href = 'scoretest.html'; } };
+    backBtn.addEventListener('click', go);
+    backBtn.addEventListener('touchend', go, {passive:false});
+  }
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
   const moreBtn = document.getElementById('practice-show-full-history');

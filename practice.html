@@ -87,6 +87,23 @@
   .start-controls select, .start-controls input[type=number], .start-controls .ai-diff { flex: 1 1 auto; min-width:0 }
   .start-controls .option { flex: 1 1 40%; min-width:0 }
   #practice-start-btn { width: 100%; }
+    /* make the practice score area clearer and tidier on mobile
+       - center the big remaining score
+       - show the other stats in a compact 2-column grid with strong labels
+       - increase spacing so it's finger-friendly beneath the start button */
+    .practice-info { flex-direction: column; gap: 10px; padding: 12px; }
+    .practice-info > div { width: 100%; }
+    .practice-info > div:first-child { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 0; }
+    .practice-info > div:first-child .small { text-align:center; margin-bottom:6px; }
+    #practice-remaining { font-size:2rem; letter-spacing:0.5px; }
+    .practice-info > div:nth-child(2) { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; background:rgba(255,255,255,0.02); padding:8px; border-radius:8px }
+    .practice-info .small, .practice-info .score-med { font-size:0.9rem }
+    .practice-info .score-med { font-weight:800 }
+    .practice-info .muted { color:var(--muted); }
+    /* make individual stat cells readable */
+    .practice-info > div:nth-child(2) > div { padding:6px 8px; display:flex; flex-direction:column; gap:4px; }
+    .practice-info .stat-label { font-size:0.78rem; color:var(--muted); }
+    .practice-info .stat-value { font-weight:800; color:var(--text); }
     /* make selects and inputs expand to available width */
     #practice-player-select, #practice-start-select, #practice-custom-start { width: 100% !important; min-width: 0 !important; }
     /* stack buttons for easy tapping */
@@ -174,11 +191,11 @@
         <div class="player-head">
           <div>
             <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+              <label for="practice-player-select" class="small" style="margin-right:8px;">Player</label>
               <select id="practice-player-select" aria-label="Select player" style="min-width:180px; display:block;">
                 <option>Loading players...</option>
               </select>
             </div>
-            <div class="small">Solo practice • Stats saved separately from the ladder</div>
           </div>
         </div>
         <div class="start-controls" style="display:flex;gap:8px;align-items:center">
@@ -214,16 +231,27 @@
           <div id="practice-inline-msg-body" style="display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 10px;color:var(--text)"></div>
         </div>
         <div style="flex:1;min-width:220px;">
-          <div class="small">Current Score</div>
+          <div class="small">Your Current Score</div>
           <div id="practice-remaining" class="score-big">501</div>
         </div>
 
-        <div style="width:220px;">
-          <div class="small">Darts thrown</div>
-          <div id="practice-darts" class="score-med">0</div>
-          <div style="margin-top:6px" class="small muted">Gary Remaining: <span id="practice-ai-remaining">—</span></div>
-          <div style="margin-top:8px" class="small">3-dart avg: <strong id="practice-avg">—</strong></div>
-          <div class="small">First 9 avg: <strong id="practice-f9">—</strong></div>
+        <div class="practice-stats" style="min-width:180px;width:220px;display:grid;gap:8px">
+          <div class="stat-row" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">Darts thrown</div>
+            <div id="practice-darts" class="score-med">0</div>
+          </div>
+          <div class="stat-row" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">Gary's score</div>
+            <div id="practice-ai-remaining" class="score-med">—</div>
+          </div>
+          <div class="stat-row" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">3-dart avg</div>
+            <div id="practice-avg">—</div>
+          </div>
+          <div class="stat-row" style="display:flex;justify-content:space-between;align-items:center">
+            <div class="small">First 9 avg</div>
+            <div id="practice-f9">—</div>
+          </div>
         </div>
       </div>
   <!-- Mobile quick entry (shows on small screens) -->
