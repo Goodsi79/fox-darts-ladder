@@ -211,7 +211,7 @@
 
           <div class="options-row" style="display:flex;gap:8px;align-items:center">
             <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
-            <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play vs Gary AI</span></label>
+            <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play Gary AI</span></label>
             <select id="practice-ai-difficulty" class="ai-diff" aria-label="AI difficulty" style="margin-left:6px">
               <option value="easy">Easy</option>
               <option value="medium" selected>Medium</option>
@@ -262,11 +262,9 @@
 
   <!-- Mobile summary: last visit, darts, remaining, suggested checkout -->
   <div id="mobile-summary" style="padding:6px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:0.95rem;color:var(--muted)">
-    <div id="mobile-last-visit">Last: —</div>
-    <div id="mobile-darts">Darts: 0</div>
-    <div id="mobile-remaining">Remaining: 501</div>
+  <!-- mobile-last-visit and mobile-remaining removed per UX request -->
     <div id="mobile-suggested" style="color:var(--text);font-weight:700">Checkout: —</div>
-  <div id="mobile-ai-remaining" style="font-weight:600;color:var(--text)">Gary: —</div>
+  <!-- mobile-ai-remaining removed per request -->
   </div>
 
   <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
