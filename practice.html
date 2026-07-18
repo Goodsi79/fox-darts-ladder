@@ -115,8 +115,7 @@
   /* hide full keypad on small screens — use mobile quick entry instead */
   #keypad { display:none }
   #mobile-entry { display:flex }
-  /* hide per-visit points/remaining labels under the checkout on small screens */
-  .visit-points, .visit-remaining { display: none !important; }
+  /* per-visit labels are visible on mobile so recent user and AI visits show in the history */
   /* hide the typed placeholder on small screens (mobile input area shows the value) */
   #practice-typed { display: none; }
   /* keypad touch targets if visible */
@@ -270,11 +269,9 @@
     <button id="practice-mobile-add" type="button" class="btn-primary" style="padding:.7rem 1rem;font-size:1.05rem;border-radius:10px" aria-label="Add visit">Add</button>
   </div>
 
-  <!-- Mobile summary: last visit, darts, remaining, suggested checkout -->
+  <!-- Mobile summary: show only suggested checkout on small screens -->
   <div id="mobile-summary" style="padding:6px 12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:0.95rem;color:var(--muted)">
-  <!-- mobile-last-visit and mobile-remaining removed per UX request -->
     <div id="mobile-suggested" style="color:var(--text);font-weight:700">Checkout: —</div>
-  <!-- mobile-ai-remaining removed per request -->
   </div>
 
   <!-- high contrast toggle removed; high-contrast palette applied via :root -->

@@ -459,7 +459,11 @@ function updateUI(){
   document.getElementById('practice-avg').textContent = avg;
   const f9 = session.first9list.length? Math.round((session.first9list.reduce((a,b)=>a+b,0)/session.first9list.length)*10)/10 : '—';
   document.getElementById('practice-f9').textContent = f9;
-  document.getElementById('practice-history').textContent = `Visits: ${session.throws.length}`;
+  const historyEl = document.getElementById('practice-history');
+  if (historyEl) {
+    if (!session.throws || !session.throws.length) historyEl.textContent = 'No throws yet';
+    else historyEl.textContent = `Visits: ${session.throws.length}`;
+  }
   // suggested checkout (primary + alternatives)
   try {
     const checkoutEl = document.getElementById('practice-checkout');
@@ -473,10 +477,16 @@ function updateUI(){
   } catch (e) { console.warn('updateUI checkout update failed', e); }
   // Mobile summary (if present)
   try {
-    // Mobile summary (compact): only keep darts and suggested checkout visible; remove 'Last' and 'Remaining' small labels
+    const mLast = document.getElementById('mobile-last-visit');
     const mDarts = document.getElementById('mobile-darts');
+    const mRem = document.getElementById('mobile-remaining');
     const mSug = document.getElementById('mobile-suggested');
+    if (mLast) {
+      const last = session.throws.length ? session.throws[session.throws.length-1] : null;
+      mLast.textContent = last ? `Last: ${last.score} pts${last.bust? ' (BUST)':''}` : 'Last: —';
+    }
     if (mDarts) mDarts.textContent = `Darts: ${session.darts||0}`;
+    if (mRem) mRem.textContent = `Remaining: ${session.remaining}`;
     if (mSug) {
       const sug = computeSuggestedCheckouts(session.remaining, session.doubleOut, 4);
       if (!sug || !sug.length) mSug.textContent = 'Checkout: —';
@@ -1060,6 +1070,177 @@ window.addEventListener('load', ()=>{
       // do nothing on blur; keep value for user to press Add explicitly
     });
   }
+
+  // Camera-assisted scoring wiring
+  const camBtn = document.getElementById('practice-camera-btn');
+  const camModal = document.getElementById('practice-camera-modal');
+  const camClose = document.getElementById('practice-camera-close');
+  const camVideo = document.getElementById('practice-camera-video');
+  const camCanvas = document.getElementById('practice-camera-canvas');
+  const camCapture = document.getElementById('practice-camera-capture');
+  const camRetake = document.getElementById('practice-camera-retake');
+  const camUse = document.getElementById('practice-camera-use');
+  const camCancel = document.getElementById('practice-camera-cancel');
+  const camValue = document.getElementById('practice-camera-value');
+  let camStream = null;
+  // crop overlay state
+  const cropOverlay = document.getElementById('practice-crop-overlay');
+  const camFrame = document.getElementById('practice-camera-frame');
+  let dragging = false, resizing = false, dragStart = null, startRect = null, resizeDir = null;
+
+  function getOverlayRect() {
+    if (!cropOverlay || !camFrame) return null;
+    const fRect = camFrame.getBoundingClientRect();
+    const oRect = cropOverlay.getBoundingClientRect();
+    // return normalized coordinates relative to video frame (0..1)
+    return {
+      left: (oRect.left - fRect.left) / fRect.width,
+      top: (oRect.top - fRect.top) / fRect.height,
+      width: oRect.width / fRect.width,
+      height: oRect.height / fRect.height
+    };
+  }
+
+  // simple pointer handlers for drag/resize
+  function onPointerDownOverlay(ev) {
+    try {
+      const t = ev.target;
+      if (t && t.classList && t.classList.contains('handle')) {
+        resizing = true; resizeDir = t.getAttribute('data-dir');
+      } else {
+        dragging = true;
+      }
+      dragStart = { x: ev.clientX, y: ev.clientY };
+      const r = cropOverlay.getBoundingClientRect(); startRect = { left: r.left, top: r.top, width: r.width, height: r.height };
+      document.addEventListener('pointermove', onPointerMoveOverlay);
+      document.addEventListener('pointerup', onPointerUpOverlay);
+      ev.preventDefault();
+    } catch(e){}
+  }
+  function onPointerMoveOverlay(ev) {
+    try {
+      if (!dragStart || !startRect) return;
+      const dx = ev.clientX - dragStart.x; const dy = ev.clientY - dragStart.y;
+      const frameRect = camFrame.getBoundingClientRect();
+      if (dragging) {
+        let nx = startRect.left + dx; let ny = startRect.top + dy;
+        // clamp within frame
+        nx = Math.max(frameRect.left, Math.min(frameRect.right - startRect.width, nx));
+        ny = Math.max(frameRect.top, Math.min(frameRect.bottom - startRect.height, ny));
+        cropOverlay.style.left = (nx - frameRect.left) + 'px'; cropOverlay.style.top = (ny - frameRect.top) + 'px';
+      } else if (resizing) {
+        let nw = startRect.width; let nh = startRect.height; let nl = startRect.left; let nt = startRect.top;
+        if (resizeDir.includes('e')) nw = Math.max(24, startRect.width + dx);
+        if (resizeDir.includes('s')) nh = Math.max(24, startRect.height + dy);
+        if (resizeDir.includes('w')) { nw = Math.max(24, startRect.width - dx); nl = startRect.left + dx; }
+        if (resizeDir.includes('n')) { nh = Math.max(24, startRect.height - dy); nt = startRect.top + dy; }
+        // clamp to frame
+        if (nl < frameRect.left) { nw -= (frameRect.left - nl); nl = frameRect.left; }
+        if (nt < frameRect.top) { nh -= (frameRect.top - nt); nt = frameRect.top; }
+        if (nl + nw > frameRect.right) nw = frameRect.right - nl;
+        if (nt + nh > frameRect.bottom) nh = frameRect.bottom - nt;
+        cropOverlay.style.left = (nl - frameRect.left) + 'px'; cropOverlay.style.top = (nt - frameRect.top) + 'px';
+        cropOverlay.style.width = nw + 'px'; cropOverlay.style.height = nh + 'px';
+      }
+    } catch(e){}
+  }
+  function onPointerUpOverlay(ev) {
+    dragging = false; resizing = false; dragStart = null; startRect = null; resizeDir = null;
+    document.removeEventListener('pointermove', onPointerMoveOverlay);
+    document.removeEventListener('pointerup', onPointerUpOverlay);
+  }
+  if (cropOverlay) {
+    cropOverlay.addEventListener('pointerdown', onPointerDownOverlay);
+    const handles = cropOverlay.querySelectorAll('.handle'); handles.forEach(h=>h.addEventListener('pointerdown', onPointerDownOverlay));
+  }
+
+  async function startCamera() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return showInlineMessage('Camera not available', 'error');
+      camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+      if (camVideo) { camVideo.srcObject = camStream; camVideo.play().catch(()=>{}); }
+    } catch (e) { console.warn('startCamera failed', e); showInlineMessage('Camera permission denied or unavailable', 'error'); }
+  }
+
+  function stopCamera() {
+    try {
+      if (camStream && camStream.getTracks) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
+      if (camVideo) { camVideo.pause(); camVideo.srcObject = null; }
+    } catch (e) { console.warn('stopCamera failed', e); }
+  }
+
+  if (camBtn) camBtn.addEventListener('click', (e)=>{
+    try { if (camModal) camModal.style.display = 'flex'; startCamera(); } catch(e){}
+  });
+  if (camClose) camClose.addEventListener('click', ()=>{ if (camModal) camModal.style.display='none'; stopCamera(); });
+  if (camCancel) camCancel.addEventListener('click', ()=>{ if (camModal) camModal.style.display='none'; stopCamera(); });
+
+  if (camCapture) camCapture.addEventListener('click', ()=>{
+    try {
+  if (!camVideo || !camCanvas || !camFrame) return;
+  // determine crop rect in video pixel coordinates
+  const vw = camVideo.videoWidth || camVideo.clientWidth; const vh = camVideo.videoHeight || camVideo.clientHeight;
+  const fRect = camFrame.getBoundingClientRect(); const vRect = camVideo.getBoundingClientRect();
+  // overlay normalized rect
+  const overlay = getOverlayRect();
+  // create temporary canvas sized to cropped area
+  const cropW = Math.max(2, Math.round((overlay && overlay.width ? overlay.width : 1) * vw));
+  const cropH = Math.max(2, Math.round((overlay && overlay.height ? overlay.height : 1) * vh));
+  const cropX = Math.max(0, Math.round((overlay && overlay.left ? overlay.left : 0) * vw));
+  const cropY = Math.max(0, Math.round((overlay && overlay.top ? overlay.top : 0) * vh));
+  camCanvas.width = cropW; camCanvas.height = cropH;
+  const ctx = camCanvas.getContext('2d');
+  // draw the video frame to an offscreen temp canvas then draw the cropped portion
+  const tmp = document.createElement('canvas'); tmp.width = vw; tmp.height = vh; const tctx = tmp.getContext('2d'); tctx.drawImage(camVideo, 0, 0, tmp.width, tmp.height);
+  ctx.clearRect(0,0,camCanvas.width,camCanvas.height); ctx.drawImage(tmp, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+      camCanvas.style.display = 'block'; camVideo.style.display = 'none'; camCapture.style.display = 'none'; camRetake.style.display = 'inline-block';
+      // run OCR (if available) on the captured image to suggest a numeric total
+      try {
+        if (typeof Tesseract !== 'undefined' && Tesseract.recognize) {
+          showInlineMessage('Running OCR...', 'info', 2500);
+          const dataUrl = camCanvas.toDataURL('image/png');
+          Tesseract.recognize(dataUrl, 'eng', { logger: m => { /* optional progress logging */ } })
+            .then(({ data }) => {
+              const txt = (data && data.text) ? data.text : '';
+              // extract the first 1-3 digit number found
+              const m = txt.match(/\d{1,3}/g);
+              if (m && m.length) {
+                // pick the largest plausible number <= 180
+                const nums = m.map(s=>parseInt(s,10)).filter(n=>!isNaN(n) && n>=0 && n<=180);
+                if (nums && nums.length) {
+                  const candidate = Math.max(...nums);
+                  if (camValue) camValue.value = candidate;
+                  if (mobileEntry) mobileEntry.value = String(candidate);
+                  keypadState = String(candidate);
+                  showInlineMessage('OCR suggested: ' + candidate, 'success', 3000);
+                } else {
+                  showInlineMessage('No plausible numeric total found by OCR', 'muted', 3000);
+                }
+              } else {
+                showInlineMessage('No text detected', 'muted', 3000);
+              }
+            }).catch(err=>{ console.warn('Tesseract failed', err); showInlineMessage('OCR failed', 'error', 2000); });
+        }
+      } catch(e){ console.warn('OCR attempt failed', e); }
+    } catch (e) { console.warn('capture failed', e); }
+  });
+  if (camRetake) camRetake.addEventListener('click', ()=>{
+    try { if (camCanvas) camCanvas.style.display='none'; if (camVideo) camVideo.style.display='block'; camCapture.style.display='inline-block'; camRetake.style.display='none'; } catch(e){}
+  });
+
+  if (camUse) camUse.addEventListener('click', ()=>{
+    try {
+      const raw = camValue && camValue.value ? String(camValue.value).replace(/[^0-9]/g,'') : '';
+      const val = raw ? parseInt(raw,10) : null;
+      if (val === null || isNaN(val) || val < 0 || val > 180) { showInlineMessage('Enter a numeric visit (0-180) before using', 'error'); return; }
+      // set mobile entry and keypadState but don't auto-submit
+      if (mobileEntry) { mobileEntry.value = String(val); }
+      keypadState = String(val);
+      // close modal and stop camera
+      if (camModal) camModal.style.display='none'; stopCamera();
+      showInlineMessage('Captured value set as visit. Press Add to submit.', 'success', 2500);
+    } catch (e) { console.error('use captured failed', e); }
+  });
 });
 
 // -- Practice Stats functions -------------------------------------------------
