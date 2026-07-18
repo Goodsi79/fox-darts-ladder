@@ -971,7 +971,10 @@ window.addEventListener('load', ()=>{
       // quick check against achievable totals
   if (possibleThreeDartTotals && val !== 0 && !possibleThreeDartTotals.has(val)) { showInlineMessage('Not an achievable total', 'error'); keypadState=''; return; }
       submitVisit();
-      mobileEntry.value = '';
+  mobileEntry.value = '';
+  // Dismiss soft keyboard on mobile by blurring the input. Timeout makes
+  // this more reliable across devices/browsers.
+  try { setTimeout(()=>{ mobileEntry.blur(); }, 50); } catch(e){}
       console.debug('mobileSubmitFromInput: done', val);
     } catch (err) {
       console.error('mobileSubmitFromInput error', err);
