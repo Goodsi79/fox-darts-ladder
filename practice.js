@@ -450,7 +450,10 @@ function renderHistory() {
   if (!container) return;
   container.innerHTML = '';
   if (!session || !session.throws.length) { container.textContent = 'No throws yet'; return; }
-  session.throws.slice().reverse().forEach((t, idx) => {
+  // show only the most recent N entries on the main UI to avoid any scrolling
+  const MAX_MAIN = 6;
+  const recent = session.throws.slice().reverse().slice(0, MAX_MAIN);
+  recent.forEach((t, idx) => {
     const row = document.createElement('div'); row.className = 'visit-row';
     const left = document.createElement('div'); left.className='visit-points';
     const right = document.createElement('div'); right.className='visit-remaining';
@@ -459,13 +462,39 @@ function renderHistory() {
     if (t.bust) { right.classList.add('visit-bust'); left.classList.add('visit-bust'); }
     row.appendChild(left); row.appendChild(right); container.appendChild(row);
   });
-  // Auto-scroll: newest entries are at the top (we reversed the list), so ensure scrollTop is 0
-  try {
-    container.style.scrollBehavior = 'smooth';
-    container.scrollTop = 0;
-    // clear smooth behavior after a tick to avoid interfering with other scroll actions
-    setTimeout(()=>{ try{ container.style.scrollBehavior=''; }catch(e){} }, 400);
-  } catch (e) { /* ignore */ }
+  // if there are more entries, show the 'Show full history' button
+  const moreBtn = document.getElementById('practice-show-full-history');
+  if (session.throws.length > MAX_MAIN && moreBtn) { moreBtn.style.display = 'inline-block'; } else if (moreBtn) { moreBtn.style.display='none'; }
+}
+
+// Full-history overlay: create on demand
+function ensureFullHistoryOverlay() {
+  let overlay = document.getElementById('practice-full-history');
+  if (overlay) return overlay;
+  overlay = document.createElement('div'); overlay.id='practice-full-history';
+  overlay.className='modal'; overlay.style.display='none';
+  const card = document.createElement('div'); card.className='card'; card.style.maxWidth='720px'; card.style.maxHeight='80vh'; card.style.overflow='auto';
+  const hdr = document.createElement('div'); hdr.className='card-header'; hdr.innerHTML='<div style="font-weight:800">Full History</div><div><button id="practice-full-history-close" class="btn-secondary">Close</button></div>';
+  const body = document.createElement('div'); body.style.padding='12px'; body.id='practice-full-history-body';
+  card.appendChild(hdr); card.appendChild(body); overlay.appendChild(card); document.body.appendChild(overlay);
+  document.getElementById('practice-full-history-close').addEventListener('click', ()=> overlay.style.display='none');
+  return overlay;
+}
+
+function showFullHistory() {
+  const overlay = ensureFullHistoryOverlay();
+  const body = document.getElementById('practice-full-history-body');
+  body.innerHTML = '';
+  if (!session || !session.throws.length) { body.textContent = 'No throws yet'; } else {
+    session.throws.slice().reverse().forEach(t => {
+      const r = document.createElement('div'); r.className='visit-row'; r.style.padding='8px 0';
+      const l = document.createElement('div'); l.className='visit-points'; l.textContent = `${t.score} pts`;
+      const rr = document.createElement('div'); rr.className='visit-remaining'; rr.textContent = t.bust ? 'BUST' : `Remaining ${t.remaining}`;
+      if (t.bust) { l.classList.add('visit-bust'); rr.classList.add('visit-bust'); }
+      r.appendChild(l); r.appendChild(rr); body.appendChild(r);
+    });
+  }
+  overlay.style.display='flex';
 }
 
 function flashLatestBust() {
@@ -697,6 +726,28 @@ window.addEventListener('load', ()=>{
   if (backBtn) backBtn.addEventListener('click', () => { window.location.href = 'scoretest.html'; });
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
+  const moreBtn = document.getElementById('practice-show-full-history');
+  if (moreBtn) moreBtn.addEventListener('click', (e)=>{ e.preventDefault(); showFullHistory(); });
+  // Mobile quick-entry wiring (compact input for small screens)
+  const mobileEntry = document.getElementById('practice-mobile-entry');
+  const mobileAdd = document.getElementById('practice-mobile-add');
+  const mobileEnterLast = document.getElementById('practice-mobile-enter-last');
+  function mobileSubmitFromInput() {
+    if (!mobileEntry) return;
+    const raw = mobileEntry.value || '';
+    const val = parseInt(raw.replace(/[^0-9]/g,''), 10);
+    if (isNaN(val)) { alert('Enter a numeric visit (0-180)'); return; }
+    if (val < 0 || val > 180) { alert('Visit must be between 0 and 180'); return; }
+    // set keypadState and reuse canonical submitVisit() so validations are identical
+    keypadState = String(val);
+    // quick check against achievable totals
+    if (possibleThreeDartTotals && val !== 0 && !possibleThreeDartTotals.has(val)) { alert('Not an achievable total'); keypadState=''; return; }
+    submitVisit();
+    mobileEntry.value = '';
+  }
+  if (mobileAdd) mobileAdd.addEventListener('click', (e)=>{ e.preventDefault(); mobileSubmitFromInput(); });
+  if (mobileEntry) mobileEntry.addEventListener('keydown', (ev)=>{ if (ev.key === 'Enter') { ev.preventDefault(); mobileSubmitFromInput(); } });
+  if (mobileEnterLast) mobileEnterLast.addEventListener('click', (e)=>{ e.preventDefault(); if (!session || !session.throws.length) return; const last = session.throws[session.throws.length-1]; if (!last) return; if (mobileEntry) mobileEntry.value = String(last.score || ''); });
 });
 
 // -- Practice Stats functions -------------------------------------------------

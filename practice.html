@@ -11,12 +11,17 @@
     :root{
       --bg: #05070a; --panel:#0f141d; --panel-soft:#151b26; --border:#1f2933; --text:#e5e7eb; --muted:#6b7280; --accent:#ff8a1f; --accent-soft:rgba(255,138,31,0.18); --radius:12px; --font: "Inter", system-ui, sans-serif;
     }
-    html,body{height:100%;margin:0;background:radial-gradient(circle at top,#141b2a 0,#05070a 55%);color:var(--text);font-family:var(--font);}
+  html,body{height:100%;margin:0;background:radial-gradient(circle at top,#141b2a 0,#05070a 55%);color:var(--text);font-family:var(--font);overflow:hidden}
     .container{max-width:980px;margin:18px auto;padding:0 16px;}
     header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
     h1{margin:0;font-size:1.25rem}
-    .card{background:rgba(15,23,42,0.95);border-radius:12px;padding:12px;border:1px solid rgba(55,65,81,0.9);box-shadow:0 18px 45px rgba(0,0,0,0.65)}
-    .card-header{display:flex;justify-content:space-between;align-items:center}
+  /* Make the card a column so we can keep the info and keypad visible without page-level scrolling */
+  .card{background:rgba(15,23,42,0.95);border-radius:12px;border:1px solid rgba(55,65,81,0.9);box-shadow:0 18px 45px rgba(0,0,0,0.65);display:flex;flex-direction:column}
+  .card-header{display:flex;justify-content:space-between;align-items:center}
+  .card-body{flex:1 1 auto;display:flex;flex-direction:column;overflow:visible}
+  .practice-info{flex:0 0 auto;padding:12px}
+  /* show only a small fixed history area on the main UI (no scrolling) */
+  #practice-history{flex:0 0 auto;max-height:220px;overflow:visible;padding:12px}
     .small{font-size:.8rem;color:var(--muted)}
     .btn-primary{background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;padding:.6rem 1rem;border-radius:999px;border:1px solid transparent;font-weight:700}
     .btn-secondary{background:rgba(15,23,42,0.9);color:var(--text);padding:.5rem .9rem;border-radius:999px;border:1px solid rgba(148,163,184,0.2)}
@@ -76,9 +81,11 @@
     /* reduce large score font on small screens */
     .score-big { font-size: 2rem; }
     .score-med { font-size: 1.2rem; }
-    /* keypad touch targets */
-    #keypad { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
-    #keypad button { padding: 1.1rem; min-height: 56px; font-size: 1.05rem; }
+  /* hide full keypad on small screens — use mobile quick entry instead */
+  #keypad { display:none }
+  #mobile-entry { display:flex }
+  /* keypad touch targets if visible */
+  #keypad button { padding: 1.1rem; min-height: 56px; font-size: 1.05rem; }
     /* responsive chart */
     #stats-averages-chart { width: 100% !important; height: auto !important; }
     /* modals fit on small screens */
@@ -97,31 +104,25 @@
      on small screens so input doesn't push them off-screen. Allow the
      main card body to scroll independently. */
   @media (max-width: 720px) {
-    /* height reserved for keypad + actions; adjust if you change keypad size */
-    :root { --mobile-keypad-height: 180px; }
+    /* mobile keypad flows with content instead of being fixed */
+    :root { --mobile-keypad-height: 160px; }
 
-    /* Reserve space at the bottom of the viewport so the fixed keypad doesn't cover content
-       and make the main card scrollable so users can reach any section. */
-    body { padding-bottom: var(--mobile-keypad-height); }
-    .card { padding-bottom: calc(var(--mobile-keypad-height) + 18px); max-height: calc(100vh - var(--mobile-keypad-height) - 20px); overflow:auto; -webkit-overflow-scrolling: touch; }
+    /* keep small bottom pad inside the card so content doesn't butt right up against the keypad */
+    .card { padding-bottom: 12px; }
 
-    /* Make the history area scrollable; limit its height relative to viewport so it doesn't grow under the keypad */
-    #practice-history { max-height: calc(100vh - var(--mobile-keypad-height) - 220px); overflow:auto; -webkit-overflow-scrolling:touch; }
+    /* keep history compact on main UI */
+    #practice-history { max-height: 220px; overflow:visible; }
 
-    /* Fix the keypad area to the bottom of the viewport */
+    /* keypad flows naturally inside the card on small screens */
     #keypad-area {
-      position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
-      z-index:1200;
+      position: static;
       background:linear-gradient(180deg, rgba(15,23,42,0.98), rgba(11,17,32,0.98));
       border-top:1px solid rgba(255,255,255,0.03);
-      padding:10px 12px 18px 12px;
-      box-shadow:0 -12px 30px rgba(0,0,0,0.6);
+      padding:10px 12px;
+      box-shadow:none;
     }
 
-    /* Ensure keypad layout and action row are usable when fixed */
+    /* Ensure keypad layout and action row are usable when not fixed */
     #keypad{ margin-top:0 }
     #keypad button{ min-height:56px }
     #keypad-area .btn-secondary, #keypad-area .btn-primary { min-width:88px }
@@ -162,7 +163,7 @@
         </div>
       </div>
 
-      <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+  <div class="practice-info" style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
         <div style="flex:1;min-width:220px;">
           <div class="small">Current Score</div>
           <div id="practice-remaining" class="score-big">501</div>
@@ -177,8 +178,16 @@
           <div class="small">First 9 avg: <strong id="practice-f9">—</strong></div>
         </div>
       </div>
+      <!-- Mobile quick entry (shows on small screens) -->
+      <div id="mobile-entry" style="display:none;padding:8px 12px;gap:8px;align-items:center;">
+        <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
+        <button id="practice-mobile-add" class="btn-primary" style="padding:.45rem .8rem">Add</button>
+        <button id="practice-mobile-enter-last" class="btn-secondary" style="padding:.45rem .6rem">Enter Last</button>
+      </div>
 
-      <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
+  <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
+  <div style="padding:0 12px;margin-top:6px"><button id="practice-show-full-history" class="btn-secondary" style="display:none">Show full history</button></div>
+      </div>
 
       <div id="keypad-area" style="margin-top:12px">
         <div id="keypad"></div>
