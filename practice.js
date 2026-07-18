@@ -972,9 +972,23 @@ window.addEventListener('load', ()=>{
   if (possibleThreeDartTotals && val !== 0 && !possibleThreeDartTotals.has(val)) { showInlineMessage('Not an achievable total', 'error'); keypadState=''; return; }
       submitVisit();
   mobileEntry.value = '';
-  // Dismiss soft keyboard on mobile by blurring the input. Timeout makes
-  // this more reliable across devices/browsers.
-  try { setTimeout(()=>{ mobileEntry.blur(); }, 50); } catch(e){}
+      // Dismiss soft keyboard on mobile: blur the input, then move focus to an
+      // offscreen helper node and blur that. Also briefly disable the input to
+      // avoid some browsers immediately re-opening the keyboard.
+      try {
+        mobileEntry.blur();
+        setTimeout(()=>{
+          try{
+            let helper = document.getElementById('_mobile_blur_helper');
+            if(!helper){ helper = document.createElement('button'); helper.id = '_mobile_blur_helper'; helper.tabIndex = -1; helper.style.position = 'absolute'; helper.style.left = '-9999px'; helper.style.top = '-9999px'; helper.style.width = '1px'; helper.style.height = '1px'; helper.style.opacity = '0'; document.body.appendChild(helper); }
+            helper.focus();
+            helper.blur();
+            // briefly disable the input so the keyboard doesn't reappear
+            mobileEntry.disabled = true;
+            setTimeout(()=>{ try{ mobileEntry.disabled = false; }catch(e){} }, 300);
+          }catch(e){ /* best-effort */ }
+        }, 100);
+      } catch(e){}
       console.debug('mobileSubmitFromInput: done', val);
     } catch (err) {
       console.error('mobileSubmitFromInput error', err);

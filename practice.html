@@ -180,10 +180,11 @@
     #mobile-suggested { width: 100%; text-align: center; order: 2; margin-top:6px }
   }
 
-    /* High contrast mode overrides */
-    .high-contrast { --bg: #000000; --panel: #000000; --panel-soft:#0b0b0b; --border:#ffffff; --text:#ffffff; --muted:#cfcfcf; --accent:#ffff00; --accent-soft:rgba(255,255,0,0.18); }
-    .hc-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:.25rem .5rem;border-radius:6px;color:var(--text);cursor:pointer}
-    .hc-toggle[aria-pressed="true"]{background:var(--accent);color:#111;font-weight:800}
+  /* High contrast mode overrides (do not change action button colors) */
+  .high-contrast { --bg: #000000; --panel: #000000; --panel-soft:#0b0b0b; --border:#ffffff; --text:#ffffff; --muted:#cfcfcf; }
+  .hc-toggle{background:transparent;border:1px solid rgba(255,255,255,0.06);padding:.25rem .5rem;border-radius:6px;color:var(--text);cursor:pointer}
+  /* use a fixed pressed color for the toggle so primary buttons inherit their normal styles */
+  .hc-toggle[aria-pressed="true"]{background:#ffd700;color:#111;font-weight:800}
 
   </style>
 </head>
