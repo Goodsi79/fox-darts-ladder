@@ -126,7 +126,19 @@
 
     /* action row should wrap so buttons don't overflow in portrait */
     .action-row { flex-wrap:wrap; }
-    .action-row button { flex: 1 1 auto; min-width:84px; }
+    /* normalize sizing so anchors and buttons match visually */
+    .action-row button, .action-row a.btn-secondary {
+      flex: 1 1 auto;
+      min-width:84px;
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.1;
+      padding: .5rem .9rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+    }
     /* provide safe-area inset so buttons aren't obscured by device UI (iOS home indicator) */
     #keypad-area { padding-bottom: calc(12px + env(safe-area-inset-bottom)); }
 
@@ -188,9 +200,8 @@
       </div>
   <!-- Mobile quick entry (shows on small screens) -->
   <div id="mobile-entry" style="padding:8px 12px;gap:8px;align-items:center;">
-        <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
-        <button id="practice-mobile-add" class="btn-primary" style="padding:.45rem .8rem">Add</button>
-        <button id="practice-mobile-enter-last" class="btn-secondary" style="padding:.45rem .6rem">Enter Last</button>
+  <input id="practice-mobile-entry" type="tel" inputmode="numeric" pattern="[0-9]*" placeholder="Enter visit (e.g. 60)" style="width:140px;padding:.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.25);color:#fff" />
+  <button id="practice-mobile-add" class="btn-primary" style="padding:.45rem .8rem">Add</button>
       </div>
 
   <div id="practice-history" style="margin-top:10px" class="small muted">No throws yet</div>
@@ -204,7 +215,7 @@
             <button id="practice-undo" class="btn-secondary">Undo</button>
             <button id="practice-end" class="btn-secondary">End Session</button>
             <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>
-            <button id="practice-back-btn" class="btn-secondary" style="margin-left:6px">Back to Ladder</button>
+            <a id="practice-back-btn" class="btn-secondary" href="scoretest.html" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit">Back to Ladder</a>
           </div>
       </div>
     

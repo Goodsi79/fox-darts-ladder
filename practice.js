@@ -731,7 +731,6 @@ window.addEventListener('load', ()=>{
   // Mobile quick-entry wiring (compact input for small screens)
   const mobileEntry = document.getElementById('practice-mobile-entry');
   const mobileAdd = document.getElementById('practice-mobile-add');
-  const mobileEnterLast = document.getElementById('practice-mobile-enter-last');
   function mobileSubmitFromInput(e) {
     if (e && typeof e.preventDefault === 'function') e.preventDefault();
     if (!mobileEntry) return;
@@ -762,7 +761,6 @@ window.addEventListener('load', ()=>{
       // do nothing on blur; keep value for user to press Add explicitly
     });
   }
-  if (mobileEnterLast) mobileEnterLast.addEventListener('click', (e)=>{ e.preventDefault(); if (!session || !session.throws.length) return; const last = session.throws[session.throws.length-1]; if (!last) return; if (mobileEntry) mobileEntry.value = String(last.score || ''); });
 });
 
 // -- Practice Stats functions -------------------------------------------------
