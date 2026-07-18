@@ -740,26 +740,55 @@ function aiTakeTurn(){
   if (!aiEnabled || aiRemaining === null || aiRemaining <= 0) return;
   // If AI can finish and double-out is required, attempt a proper finish
   const playerDoubleOut = !!session.doubleOut;
+  // compute a finishing total early so we can avoid accidentally picking it later
+  const finishTotal = playerDoubleOut ? findDoubleFinishTotal(aiRemaining) : null;
+  let didAttemptFinish = false;
   if (playerDoubleOut) {
-    const finishTotal = findDoubleFinishTotal(aiRemaining);
     if (finishTotal) {
-      // AI attempts to finish
-      aiRemaining = Math.max(0, aiRemaining - finishTotal);
-      session.throws.push({ score: finishTotal, remaining: aiRemaining, ai: true, bust: false, doubleConfirmed: true });
-      session.darts +=3;
-      // update UI and show summary if AI finished
-      try { updateUI(); renderHistory(); } catch(e){}
-      if (aiRemaining === 0) {
-        try { setTimeout(()=> showSummary('ai-checkout'), 250); } catch(e){ console.error('ai finish summary failed', e); }
+      // AI may attempt a finish depending on difficulty. We model two probabilities:
+      //  - attemptChance: whether AI chooses to go for the finish
+      //  - successChance: if it attempts, whether it actually succeeds
+      const finishProfiles = {
+        easy: { attempt: 0.4, success: 0.45 },
+        medium: { attempt: 0.75, success: 0.75 },
+        hard: { attempt: 0.98, success: 0.95 }
+      };
+      const profile = finishProfiles[aiDifficulty] || finishProfiles.medium;
+      const willAttempt = Math.random() < profile.attempt;
+      if (willAttempt) {
+        didAttemptFinish = true;
+        const willSucceed = Math.random() < profile.success;
+        if (willSucceed) {
+          // successful checkout
+          aiRemaining = Math.max(0, aiRemaining - finishTotal);
+          session.throws.push({ score: finishTotal, remaining: aiRemaining, ai: true, bust: false, doubleConfirmed: true });
+          session.darts +=3;
+          try { updateUI(); renderHistory(); } catch(e){}
+          if (aiRemaining === 0) { try { setTimeout(()=> showSummary('ai-checkout'), 250); } catch(e){} }
+          return;
+        } else {
+          // attempted but missed - record a partial visit rather than a perfect finish
+          // pick a miss score (a partial of the intended finish) so AI doesn't always bust
+          const missFactor = 0.2 + Math.random() * 0.5; // 20%..70% of finishTotal
+          const missScore = Math.max(0, Math.min(aiRemaining, Math.round(finishTotal * missFactor)));
+          aiRemaining = Math.max(0, aiRemaining - missScore);
+          session.throws.push({ score: missScore, remaining: aiRemaining, ai: true, bust: false });
+          session.darts +=3;
+          try { updateUI(); renderHistory(); } catch(e){}
+          return;
+        }
       }
-      return;
     }
   }
   // difficulty influences average score
   const ranges = { easy: [10,40], medium: [30,80], hard: [50,120] };
   const r = ranges[aiDifficulty] || ranges.medium;
   // choose a plausible three-dart total that doesn't bust unless finishing
-  const candidates = Array.from(possibleThreeDartTotals || []).filter(v=> v>=r[0] && v<=r[1]);
+  let candidates = Array.from(possibleThreeDartTotals || []).filter(v=> v>=r[0] && v<=r[1]);
+  // if there was a valid double finish and AI explicitly did NOT attempt it, avoid selecting it here
+  if (finishTotal && !didAttemptFinish) {
+    candidates = candidates.filter(v => v !== finishTotal);
+  }
   let pick = candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : Math.max(r[0], Math.min(r[1], Math.floor((r[0]+r[1])/2)));
   // if pick would bust, reduce to safe value
   if (aiRemaining - pick < 0) pick = Math.max(0, aiRemaining - Math.floor(aiRemaining/3));
