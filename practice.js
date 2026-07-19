@@ -500,7 +500,9 @@ function updateUI(){
   try {
     const checkoutEl = document.getElementById('practice-checkout');
   // request up to primary + 3 alternatives (4 total)
-  const suggestions = computeSuggestedCheckouts(session.remaining, session.doubleOut, 4);
+  const doubleCheckbox = document.getElementById('practice-double');
+  const liveDoubleOut = doubleCheckbox ? !!doubleCheckbox.checked : !!session.doubleOut;
+  const suggestions = computeSuggestedCheckouts(session.remaining, liveDoubleOut, 4);
     if (checkoutEl) {
       if (!suggestions || !suggestions.length) checkoutEl.textContent = 'Suggested checkout: —';
       else if (suggestions.length === 1) checkoutEl.textContent = 'Suggested checkout: ' + suggestions[0];
@@ -520,7 +522,9 @@ function updateUI(){
     if (mDarts) mDarts.textContent = `Darts: ${session.darts||0}`;
     if (mRem) mRem.textContent = `Remaining: ${session.remaining}`;
     if (mSug) {
-      const sug = computeSuggestedCheckouts(session.remaining, session.doubleOut, 4);
+  const doubleCheckbox = document.getElementById('practice-double');
+  const liveDoubleOut = doubleCheckbox ? !!doubleCheckbox.checked : !!session.doubleOut;
+  const sug = computeSuggestedCheckouts(session.remaining, liveDoubleOut, 4);
       if (!sug || !sug.length) mSug.textContent = 'Checkout: —';
       else if (sug.length === 1) mSug.textContent = `Checkout: ${sug[0]}`;
       else mSug.textContent = `Checkout: ` + sug.join(' | ');
@@ -636,25 +640,90 @@ function computeSuggestedCheckout(remaining, doubleOut) {
   }
 
   // try double + single (rare) and single+single (not checkout but helper)
-  for (const a of doubles.concat(singles)){
-    for (const b of singles.concat(trebles)){
-      if (a.val + b.val === remaining) return `${a.label}, ${b.label}`;
+  // Only allow finishes that end on a non-double if doubleOut is not required
+  if (!doubleOut) {
+    for (const a of doubles.concat(singles)){
+      for (const b of singles.concat(trebles)){
+        if (a.val + b.val === remaining) return `${a.label}, ${b.label}`;
+      }
     }
   }
 
   // 3-dart combos: try T20,T20,... common finishes: T20,T19,D12 etc. We'll try a simple brute-force over reasonable throws
-  const throws = [].concat(trebles, doubles, singles);
-  // limit search to first 2000 combinations roughly by using smaller sets
-  for (let i=0;i<throws.length;i++){
-    for (let j=0;j<throws.length;j++){
-      for (let k=0;k<throws.length;k++){
-        if (throws[i].val + throws[j].val + throws[k].val === remaining) return `${throws[i].label}, ${throws[j].label}, ${throws[k].label}`;
+  // 3-dart combos:
+  if (doubleOut) {
+    // enforce last throw is a double
+    const any = trebles.concat(doubles).concat(singles);
+    for (let i=0;i<any.length;i++){
+      for (let j=0;j<any.length;j++){
+        for (let k=0;k<doubles.length;k++){
+          if (any[i].val + any[j].val + doubles[k] === remaining) return `${any[i].label}, ${any[j].label}, ${doubles[k].label}`;
+        }
+      }
+    }
+  } else {
+    const throws = [].concat(trebles, doubles, singles);
+    for (let i=0;i<throws.length;i++){
+      for (let j=0;j<throws.length;j++){
+        for (let k=0;k<throws.length;k++){
+          if (throws[i].val + throws[j].val + throws[k].val === remaining) return `${throws[i].label}, ${throws[j].label}, ${throws[k].label}`;
+        }
       }
     }
   }
 
   return null;
 }
+
+// Build a full lookup of possible double-out checkout sequences for totals 2..170
+function buildCheckoutLookup() {
+  const singles = [];
+  const doubles = [];
+  const trebles = [];
+  for (let i=1;i<=20;i++){
+    singles.push({label:String(i), val:i});
+    doubles.push({label:'D'+i, val:2*i});
+    trebles.push({label:'T'+i, val:3*i});
+  }
+  singles.push({label:'25', val:25}); doubles.push({label:'DB', val:50});
+
+  const any = trebles.concat(singles); // first two throws candidates
+  const lookup = {};
+
+  function score(sugg) {
+    const toks = sugg.split(',').map(t=>t.trim());
+    let score = 1000 - toks.length * 100;
+    const first = toks[0] || '';
+    const last = toks[toks.length-1] || '';
+    if (first.startsWith('T20')) score += 60;
+    else if (first.startsWith('T19')) score += 40;
+    if (sugg.includes('T20') || sugg.includes('T19')) score += 8;
+    const preferred = {'D20':90,'D16':80,'DB':85,'D18':65,'D12':60,'D10':55};
+    Object.keys(preferred).forEach(k=>{ if (last.startsWith(k)) score += preferred[k]; });
+    if (sugg.includes('25')) score -= 5;
+    return score;
+  }
+
+  for (let total=2; total<=170; total++){
+    const set = new Set();
+    // 1-dart doubles
+    doubles.forEach(d=>{ if (d.val === total) set.add(d.label); });
+    // 2-dart: any single/treble + double
+    any.forEach(a=>{ doubles.forEach(d=>{ if (a.val + d.val === total) set.add(`${a.label}, ${d.label}`); }); });
+    // 3-dart: any + any + double
+    any.forEach(a=>{ any.forEach(b=>{ doubles.forEach(d=>{ if (a.val + b.val + d.val === total) set.add(`${a.label}, ${b.label}, ${d.label}`); }); }); });
+
+    const arr = Array.from(set);
+    arr.sort((x,y)=> score(y) - score(x));
+    lookup[total] = arr;
+  }
+  return lookup;
+}
+
+// build the lookup once and cache it. Prefer a static lookup injected via
+// `static-checkouts.js` (window.STATIC_CHECKOUT_LOOKUP) to avoid runtime
+// generation on page load. If not present, fall back to programmatic build.
+const CHECKOUT_LOOKUP = (typeof window !== 'undefined' && window.STATIC_CHECKOUT_LOOKUP) ? window.STATIC_CHECKOUT_LOOKUP : buildCheckoutLookup();
 
 // Compute multiple suggested checkout lines (primary + alternatives)
 function computeSuggestedCheckouts(remaining, doubleOut, maxSuggestions=3) {
@@ -665,6 +734,27 @@ function computeSuggestedCheckouts(remaining, doubleOut, maxSuggestions=3) {
 
   const suggestions = [];
   const pushIfUnique = (s) => { if (!suggestions.includes(s)) suggestions.push(s); };
+
+  // Use the precomputed lookup for totals within 2..170
+  if (CHECKOUT_LOOKUP && CHECKOUT_LOOKUP[remaining]) {
+    const nonDoubleSeeds = [];
+    const doubleSeeds = [];
+    for (const seq of CHECKOUT_LOOKUP[remaining]) {
+      const last = seq.split(',').map(t=>t.trim()).slice(-1)[0] || '';
+      const isDoubleEnding = last.startsWith('D') || last === 'DB';
+      if (doubleOut) {
+        if (!isDoubleEnding) continue; // drop non-double finishes when doubleOut required
+        doubleSeeds.push(seq);
+      } else {
+        // collect separately so we can prioritise non-double finishes
+        if (isDoubleEnding) doubleSeeds.push(seq);
+        else nonDoubleSeeds.push(seq);
+      }
+    }
+    // push non-doubles first when allowed, then doubles
+    for (const s of nonDoubleSeeds) pushIfUnique(s);
+    for (const s of doubleSeeds) pushIfUnique(s);
+  }
 
   // 1-dart (double) finish
   if (doubleOut) {
@@ -677,25 +767,52 @@ function computeSuggestedCheckouts(remaining, doubleOut, maxSuggestions=3) {
   for (const first of trebles.concat(singles)){
     for (const d of doubles){ if (first.val + d.val === remaining) pushIfUnique(`${first.label}, ${d.label}`); }
   }
-  // other 2-dart patterns (double + single, single+single)
-  for (const a of doubles.concat(singles)){
-    for (const b of singles.concat(trebles)){
-      if (a.val + b.val === remaining) pushIfUnique(`${a.label}, ${b.label}`);
-    }
-  }
-
-  // 3-dart combos: brute-force over reasonable throws
-  const throws = [].concat(trebles, doubles, singles);
-  for (let i=0;i<throws.length;i++){
-    for (let j=0;j<throws.length;j++){
-      for (let k=0;k<throws.length;k++){
-        if (throws[i].val + throws[j].val + throws[k].val === remaining) pushIfUnique(`${throws[i].label}, ${throws[j].label}, ${throws[k].label}`);
+  // other 2-dart patterns (double + single, single+single) only allowed when doubleOut is false
+  if (!doubleOut) {
+    for (const a of doubles.concat(singles)){
+      for (const b of singles.concat(trebles)){
+        if (a.val + b.val === remaining) pushIfUnique(`${a.label}, ${b.label}`);
       }
     }
   }
 
-  // sort by number of darts (shorter first) then keep first maxSuggestions
-  suggestions.sort((a,b)=> a.split(',').length - b.split(',').length);
+  // 3-dart combos: if doubleOut is required, enforce last throw is a double
+  if (doubleOut) {
+    const any = trebles.concat(doubles).concat(singles);
+    for (let i=0;i<any.length;i++){
+      for (let j=0;j<any.length;j++){
+        for (let k=0;k<doubles.length;k++){
+          if (any[i].val + any[j].val + doubles[k] === remaining) pushIfUnique(`${any[i].label}, ${any[j].label}, ${doubles[k].label}`);
+        }
+      }
+    }
+  } else {
+    const throws = [].concat(trebles, doubles, singles);
+    for (let i=0;i<throws.length;i++){
+      for (let j=0;j<throws.length;j++){
+        for (let k=0;k<throws.length;k++){
+          if (throws[i].val + throws[j].val + throws[k].val === remaining) pushIfUnique(`${throws[i].label}, ${throws[j].label}, ${throws[k].label}`);
+        }
+      }
+    }
+  }
+
+  // sorting: when doubleOut is false, prefer sequences that DO NOT end on a double
+  const endsWithDouble = (s) => {
+    const last = (s || '').split(',').map(t=>t.trim()).slice(-1)[0] || '';
+    return last.startsWith('D') || last === 'DB';
+  };
+  if (!doubleOut) {
+    suggestions.sort((a,b)=> {
+      const aPref = !endsWithDouble(a); // true if non-double ending
+      const bPref = !endsWithDouble(b);
+      if (aPref !== bPref) return aPref ? -1 : 1; // non-double endings first
+      const la = a.split(',').length, lb = b.split(',').length;
+      return la - lb; // shorter sequences first
+    });
+  } else {
+    suggestions.sort((a,b)=> a.split(',').length - b.split(',').length);
+  }
   return suggestions.slice(0, maxSuggestions);
 }
 
@@ -1359,3 +1476,20 @@ async function loadPlayerNameMap() {
 // Exports removed to allow running as a classic browser script (non-module)
 
 });
+
+// Ensure suggestions update instantly when the Double-out checkbox changes.
+(function attachDoubleToggleListener(){
+  function wire() {
+    try {
+      const el = document.getElementById('practice-double');
+      if (!el) return;
+      el.addEventListener('change', function () {
+        try { updateUI(); } catch (e) { console.warn('updateUI on double toggle failed', e); }
+      });
+    } catch (e) {
+      console.warn('attachDoubleToggleListener failed', e);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();

@@ -159,10 +159,6 @@
       box-shadow:none;
     }
 
-  /* utility spacing classes to replace inline styles */
-  .ml-sm { margin-left: 6px !important; }
-  .ml-md { margin-left: 8px !important; }
-
     /* action row should wrap so buttons don't overflow in portrait */
     .action-row { flex-wrap:wrap; }
     /* normalize sizing so anchors and buttons match visually */
@@ -222,13 +218,13 @@
               <option value="501" selected>501</option>
               <option value="custom">Custom</option>
             </select>
-            <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;" class="ml-sm" />
+            <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;margin-left:6px;" />
           </div>
 
           <div class="options-row" style="display:flex;gap:8px;align-items:center">
             <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
             <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play Gary AI</span></label>
-            <select id="practice-ai-difficulty" class="ai-diff ml-sm" aria-label="AI difficulty">
+            <select id="practice-ai-difficulty" class="ai-diff" aria-label="AI difficulty" style="margin-left:6px">
               <option value="easy">Easy</option>
               <option value="medium" selected>Medium</option>
               <option value="hard">Hard</option>
@@ -236,7 +232,7 @@
           </div>
 
           <div class="start-row" style="display:flex;gap:8px;align-items:center">
-            <button id="practice-start-btn" class="btn-primary ml-md">Start</button>
+            <button id="practice-start-btn" class="btn-primary" style="margin-left:8px">Start</button>
           </div>
         </div>
       </div>
@@ -293,8 +289,8 @@
         <div class="action-row" style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
             <button id="practice-undo" class="btn-secondary">Undo</button>
             <button id="practice-end" class="btn-secondary">End Session</button>
-            <button id="practice-stats-btn" class="btn-primary ml-sm">Practice Stats</button>
-            <button id="practice-back-btn" class="btn-secondary ml-sm" data-href="scoretest.html">Back to Ladder</button>
+            <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>
+            <button id="practice-back-btn" class="btn-secondary" data-href="scoretest.html" style="margin-left:6px">Back to Ladder</button>
           </div>
       </div>
     
@@ -389,6 +385,7 @@
     #practice-stats-btn { background: linear-gradient(90deg,var(--accent),#ff7a00); color:#111827; padding:.6rem 1rem; border-radius:999px; border:1px solid transparent; font-weight:700; }
     #practice-stats-btn:hover { filter:brightness(0.98); }
   </style>
+  <script src="static-checkouts.js"></script>
   <script src="practice.js"></script>
   
 </body>
