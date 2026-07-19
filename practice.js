@@ -1149,21 +1149,31 @@ window.addEventListener('load', ()=>{
   const backBtn = document.getElementById('practice-back-btn');
   if (backBtn) {
     // ensure this reliably navigates even if other handlers call preventDefault
+    let navigationLock = false;
     const go = (e) => {
       try {
+        if (navigationLock) return;
+        navigationLock = true;
         if (e && typeof e.preventDefault === 'function') e.preventDefault();
         // support both data-href (button) and href (anchor) for resilience
         const href = backBtn.getAttribute('data-href') || backBtn.getAttribute('href') || 'scoretest.html';
-        window.location.assign(href);
+        // use assign to push to history; fallback to replace if assign fails
+        try { window.location.assign(href); } catch (err) { window.location.href = href; }
       } catch (err) {
         console.error('back navigation failed', err);
-        window.location.href = 'scoretest.html';
+        try { window.location.href = 'scoretest.html'; } catch(e){}
+      } finally {
+        // release lock after a short delay to allow any duplicate events to be ignored
+        setTimeout(()=>{ navigationLock = false; }, 800);
       }
     };
-    backBtn.addEventListener('click', go);
-    backBtn.addEventListener('touchend', go, {passive:false});
-    // keyboard support: Enter/Space should activate the button when focused
-    backBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
+    // prefer pointerup for reliable activation across touch/mouse; pointerdown can trigger before click handlers
+    backBtn.addEventListener('pointerup', (e)=>{ try { if (e.button === 0) go(e); } catch(err){} }, {passive:false});
+    // also support click as a fallback
+    backBtn.addEventListener('click', (e)=>{ try { go(e); } catch(err){} });
+    // keyboard support: Enter/Space should activate the button when focused; ignore repeated keydown presses
+    backBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); } });
+    backBtn.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
   }
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
