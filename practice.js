@@ -272,6 +272,7 @@ function maybeInitFirebase() {
 let session = null;
 let possibleThreeDartTotals = null;
 // AI opponent state
+let aiEnabled = false;
 let aiDifficulty = 'medium';
 let aiRemaining = null;
 let keypadState = '';
