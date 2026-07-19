@@ -26,6 +26,9 @@
     .small{font-size:.8rem;color:var(--muted)}
     .btn-primary{background:linear-gradient(90deg,var(--accent),#ff7a00);color:#111827;padding:.6rem 1rem;border-radius:999px;border:1px solid transparent;font-weight:700}
     .btn-secondary{background:rgba(15,23,42,0.9);color:var(--text);padding:.5rem .9rem;border-radius:999px;border:1px solid rgba(148,163,184,0.2)}
+  /* visual pressed state for buttons (applied by JS on interaction) */
+  .btn-primary, .btn-secondary { transition: transform 120ms ease, opacity 120ms ease; }
+  .btn-pressed { transform: translateY(1px) scale(0.995); opacity: 0.94; }
     input[type=text], input[type=number], select{background:#0b1120;border-radius:999px;border:1px solid rgba(55,65,81,0.9);color:var(--text);padding:.45rem .7rem}
     .grid{display:grid;grid-template-columns:1fr 320px;gap:12px;align-items:start}
     @media(max-width:720px){.grid{grid-template-columns:1fr}}
@@ -156,6 +159,10 @@
       box-shadow:none;
     }
 
+  /* utility spacing classes to replace inline styles */
+  .ml-sm { margin-left: 6px !important; }
+  .ml-md { margin-left: 8px !important; }
+
     /* action row should wrap so buttons don't overflow in portrait */
     .action-row { flex-wrap:wrap; }
     /* normalize sizing so anchors and buttons match visually */
@@ -215,13 +222,13 @@
               <option value="501" selected>501</option>
               <option value="custom">Custom</option>
             </select>
-            <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;margin-left:6px;" />
+            <input id="practice-custom-start" type="number" placeholder="Custom" style="width:96px;display:none;" class="ml-sm" />
           </div>
 
           <div class="options-row" style="display:flex;gap:8px;align-items:center">
             <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-double" type="checkbox" /> <span class="small muted">Double-out</span></label>
             <label class="option" style="display:flex;align-items:center;gap:8px"><input id="practice-vs-ai" type="checkbox" /> <span class="small muted">Play Gary AI</span></label>
-            <select id="practice-ai-difficulty" class="ai-diff" aria-label="AI difficulty" style="margin-left:6px">
+            <select id="practice-ai-difficulty" class="ai-diff ml-sm" aria-label="AI difficulty">
               <option value="easy">Easy</option>
               <option value="medium" selected>Medium</option>
               <option value="hard">Hard</option>
@@ -229,7 +236,7 @@
           </div>
 
           <div class="start-row" style="display:flex;gap:8px;align-items:center">
-            <button id="practice-start-btn" class="btn-primary" style="margin-left:8px">Start</button>
+            <button id="practice-start-btn" class="btn-primary ml-md">Start</button>
           </div>
         </div>
       </div>
@@ -286,8 +293,8 @@
         <div class="action-row" style="display:flex;gap:.5rem;margin-top:.6rem;align-items:center">
             <button id="practice-undo" class="btn-secondary">Undo</button>
             <button id="practice-end" class="btn-secondary">End Session</button>
-            <button id="practice-stats-btn" class="btn-primary" style="margin-left:6px">Practice Stats</button>
-            <a id="practice-back-btn" class="btn-secondary" href="scoretest.html" style="margin-left:6px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:inherit">Back to Ladder</a>
+            <button id="practice-stats-btn" class="btn-primary ml-sm">Practice Stats</button>
+            <button id="practice-back-btn" class="btn-secondary ml-sm" data-href="scoretest.html">Back to Ladder</button>
           </div>
       </div>
     
@@ -328,7 +335,10 @@
           <div style="flex:1">
             <div id="stats-header" style="display:flex;justify-content:space-between;align-items:center">
               <div>
-                <div id="stats-player-name" style="font-weight:800;font-size:1.05rem">Select a player</div>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div id="stats-player-name" style="font-weight:800;font-size:1.05rem">Select a player</div>
+                  <button id="stats-reset-player" class="btn-secondary" title="Reset this player's practice stats" style="padding:.25rem .6rem;font-size:0.85rem">⚠️ Reset</button>
+                </div>
                 <div id="stats-player-sub" class="small muted">Lifetime practice stats</div>
               </div>
               <div style="display:flex;gap:8px;align-items:center">

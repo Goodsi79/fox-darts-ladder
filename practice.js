@@ -347,6 +347,38 @@ function startPracticeSession(){
   document.getElementById('practice-end').addEventListener('click', endSession);
   document.getElementById('practice-close').addEventListener('click', ()=>{document.getElementById('practice-modal').style.display='none'});
   document.getElementById('practice-save').addEventListener('click', savePracticeSessionToFirebase);
+  
+  // Attach tactile/visual feedback to important buttons so users see presses
+  function attachButtonFeedback(el) {
+    if (!el) return;
+    const doPress = (e) => {
+      try {
+        // Add a transient pressed visual state. Do NOT disable synchronously here
+        // because setting disabled before the click can prevent the click handler
+        // from firing on some platforms. We keep the visual cue only.
+        el.classList.add('btn-pressed');
+        el.setAttribute('aria-pressed', 'true');
+        setTimeout(()=>{
+          try { el.classList.remove('btn-pressed'); el.removeAttribute('aria-pressed'); } catch(e) {}
+        }, 160);
+      } catch(e){}
+    };
+    el.addEventListener('pointerdown', (e)=>{ if (e.button === 0) doPress(e); }, {passive:true});
+    el.addEventListener('mousedown', (e)=>{ if (e.button === 0) doPress(e); });
+    // keyboard activation
+    el.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' ') { doPress(e); } });
+    // touchend/click handled by existing handlers; the visual feedback above ensures user sees it
+  }
+
+  // Wire feedback to Start and Add buttons
+  try { attachButtonFeedback(document.getElementById('practice-start-btn')); } catch(e){}
+  try { attachButtonFeedback(document.getElementById('practice-mobile-add')); } catch(e){}
+  // Wire feedback to other action buttons for consistent UX
+  try { attachButtonFeedback(document.getElementById('practice-undo')); } catch(e){}
+  try { attachButtonFeedback(document.getElementById('practice-end')); } catch(e){}
+  try { attachButtonFeedback(document.getElementById('practice-save')); } catch(e){}
+  try { attachButtonFeedback(document.getElementById('practice-back-btn')); } catch(e){}
+  try { attachButtonFeedback(document.getElementById('practice-close')); } catch(e){}
   } catch (err) {
     console.error('startPracticeSession failed', err);
     setStatus('Initialization error');
@@ -993,14 +1025,27 @@ window.addEventListener('load', ()=>{
     try {
       document.getElementById('practice-stats-modal').style.display = 'flex';
       await loadAndRenderPracticePlayers();
+  try { wireStatsResetButton(); wireStatsResetTopButton(); } catch(e) { console.warn('wireStatsResetButton failed', e); }
     } catch (e) { console.error('open stats failed', e); }
   });
   const backBtn = document.getElementById('practice-back-btn');
   if (backBtn) {
     // ensure this reliably navigates even if other handlers call preventDefault
-    const go = (e) => { try { if (e && typeof e.preventDefault === 'function') e.preventDefault(); const href = backBtn.getAttribute('href') || 'scoretest.html'; window.location.assign(href); } catch(err){ console.error('back navigation failed', err); window.location.href = 'scoretest.html'; } };
+    const go = (e) => {
+      try {
+        if (e && typeof e.preventDefault === 'function') e.preventDefault();
+        // support both data-href (button) and href (anchor) for resilience
+        const href = backBtn.getAttribute('data-href') || backBtn.getAttribute('href') || 'scoretest.html';
+        window.location.assign(href);
+      } catch (err) {
+        console.error('back navigation failed', err);
+        window.location.href = 'scoretest.html';
+      }
+    };
     backBtn.addEventListener('click', go);
     backBtn.addEventListener('touchend', go, {passive:false});
+    // keyboard support: Enter/Space should activate the button when focused
+    backBtn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(e); } });
   }
   const statsClose = document.getElementById('practice-stats-close');
   if (statsClose) statsClose.addEventListener('click', ()=>{ document.getElementById('practice-stats-modal').style.display='none'; });
@@ -1071,177 +1116,6 @@ window.addEventListener('load', ()=>{
     });
   }
 
-  // Camera-assisted scoring wiring
-  const camBtn = document.getElementById('practice-camera-btn');
-  const camModal = document.getElementById('practice-camera-modal');
-  const camClose = document.getElementById('practice-camera-close');
-  const camVideo = document.getElementById('practice-camera-video');
-  const camCanvas = document.getElementById('practice-camera-canvas');
-  const camCapture = document.getElementById('practice-camera-capture');
-  const camRetake = document.getElementById('practice-camera-retake');
-  const camUse = document.getElementById('practice-camera-use');
-  const camCancel = document.getElementById('practice-camera-cancel');
-  const camValue = document.getElementById('practice-camera-value');
-  let camStream = null;
-  // crop overlay state
-  const cropOverlay = document.getElementById('practice-crop-overlay');
-  const camFrame = document.getElementById('practice-camera-frame');
-  let dragging = false, resizing = false, dragStart = null, startRect = null, resizeDir = null;
-
-  function getOverlayRect() {
-    if (!cropOverlay || !camFrame) return null;
-    const fRect = camFrame.getBoundingClientRect();
-    const oRect = cropOverlay.getBoundingClientRect();
-    // return normalized coordinates relative to video frame (0..1)
-    return {
-      left: (oRect.left - fRect.left) / fRect.width,
-      top: (oRect.top - fRect.top) / fRect.height,
-      width: oRect.width / fRect.width,
-      height: oRect.height / fRect.height
-    };
-  }
-
-  // simple pointer handlers for drag/resize
-  function onPointerDownOverlay(ev) {
-    try {
-      const t = ev.target;
-      if (t && t.classList && t.classList.contains('handle')) {
-        resizing = true; resizeDir = t.getAttribute('data-dir');
-      } else {
-        dragging = true;
-      }
-      dragStart = { x: ev.clientX, y: ev.clientY };
-      const r = cropOverlay.getBoundingClientRect(); startRect = { left: r.left, top: r.top, width: r.width, height: r.height };
-      document.addEventListener('pointermove', onPointerMoveOverlay);
-      document.addEventListener('pointerup', onPointerUpOverlay);
-      ev.preventDefault();
-    } catch(e){}
-  }
-  function onPointerMoveOverlay(ev) {
-    try {
-      if (!dragStart || !startRect) return;
-      const dx = ev.clientX - dragStart.x; const dy = ev.clientY - dragStart.y;
-      const frameRect = camFrame.getBoundingClientRect();
-      if (dragging) {
-        let nx = startRect.left + dx; let ny = startRect.top + dy;
-        // clamp within frame
-        nx = Math.max(frameRect.left, Math.min(frameRect.right - startRect.width, nx));
-        ny = Math.max(frameRect.top, Math.min(frameRect.bottom - startRect.height, ny));
-        cropOverlay.style.left = (nx - frameRect.left) + 'px'; cropOverlay.style.top = (ny - frameRect.top) + 'px';
-      } else if (resizing) {
-        let nw = startRect.width; let nh = startRect.height; let nl = startRect.left; let nt = startRect.top;
-        if (resizeDir.includes('e')) nw = Math.max(24, startRect.width + dx);
-        if (resizeDir.includes('s')) nh = Math.max(24, startRect.height + dy);
-        if (resizeDir.includes('w')) { nw = Math.max(24, startRect.width - dx); nl = startRect.left + dx; }
-        if (resizeDir.includes('n')) { nh = Math.max(24, startRect.height - dy); nt = startRect.top + dy; }
-        // clamp to frame
-        if (nl < frameRect.left) { nw -= (frameRect.left - nl); nl = frameRect.left; }
-        if (nt < frameRect.top) { nh -= (frameRect.top - nt); nt = frameRect.top; }
-        if (nl + nw > frameRect.right) nw = frameRect.right - nl;
-        if (nt + nh > frameRect.bottom) nh = frameRect.bottom - nt;
-        cropOverlay.style.left = (nl - frameRect.left) + 'px'; cropOverlay.style.top = (nt - frameRect.top) + 'px';
-        cropOverlay.style.width = nw + 'px'; cropOverlay.style.height = nh + 'px';
-      }
-    } catch(e){}
-  }
-  function onPointerUpOverlay(ev) {
-    dragging = false; resizing = false; dragStart = null; startRect = null; resizeDir = null;
-    document.removeEventListener('pointermove', onPointerMoveOverlay);
-    document.removeEventListener('pointerup', onPointerUpOverlay);
-  }
-  if (cropOverlay) {
-    cropOverlay.addEventListener('pointerdown', onPointerDownOverlay);
-    const handles = cropOverlay.querySelectorAll('.handle'); handles.forEach(h=>h.addEventListener('pointerdown', onPointerDownOverlay));
-  }
-
-  async function startCamera() {
-    try {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return showInlineMessage('Camera not available', 'error');
-      camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
-      if (camVideo) { camVideo.srcObject = camStream; camVideo.play().catch(()=>{}); }
-    } catch (e) { console.warn('startCamera failed', e); showInlineMessage('Camera permission denied or unavailable', 'error'); }
-  }
-
-  function stopCamera() {
-    try {
-      if (camStream && camStream.getTracks) { camStream.getTracks().forEach(t=>t.stop()); camStream = null; }
-      if (camVideo) { camVideo.pause(); camVideo.srcObject = null; }
-    } catch (e) { console.warn('stopCamera failed', e); }
-  }
-
-  if (camBtn) camBtn.addEventListener('click', (e)=>{
-    try { if (camModal) camModal.style.display = 'flex'; startCamera(); } catch(e){}
-  });
-  if (camClose) camClose.addEventListener('click', ()=>{ if (camModal) camModal.style.display='none'; stopCamera(); });
-  if (camCancel) camCancel.addEventListener('click', ()=>{ if (camModal) camModal.style.display='none'; stopCamera(); });
-
-  if (camCapture) camCapture.addEventListener('click', ()=>{
-    try {
-  if (!camVideo || !camCanvas || !camFrame) return;
-  // determine crop rect in video pixel coordinates
-  const vw = camVideo.videoWidth || camVideo.clientWidth; const vh = camVideo.videoHeight || camVideo.clientHeight;
-  const fRect = camFrame.getBoundingClientRect(); const vRect = camVideo.getBoundingClientRect();
-  // overlay normalized rect
-  const overlay = getOverlayRect();
-  // create temporary canvas sized to cropped area
-  const cropW = Math.max(2, Math.round((overlay && overlay.width ? overlay.width : 1) * vw));
-  const cropH = Math.max(2, Math.round((overlay && overlay.height ? overlay.height : 1) * vh));
-  const cropX = Math.max(0, Math.round((overlay && overlay.left ? overlay.left : 0) * vw));
-  const cropY = Math.max(0, Math.round((overlay && overlay.top ? overlay.top : 0) * vh));
-  camCanvas.width = cropW; camCanvas.height = cropH;
-  const ctx = camCanvas.getContext('2d');
-  // draw the video frame to an offscreen temp canvas then draw the cropped portion
-  const tmp = document.createElement('canvas'); tmp.width = vw; tmp.height = vh; const tctx = tmp.getContext('2d'); tctx.drawImage(camVideo, 0, 0, tmp.width, tmp.height);
-  ctx.clearRect(0,0,camCanvas.width,camCanvas.height); ctx.drawImage(tmp, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-      camCanvas.style.display = 'block'; camVideo.style.display = 'none'; camCapture.style.display = 'none'; camRetake.style.display = 'inline-block';
-      // run OCR (if available) on the captured image to suggest a numeric total
-      try {
-        if (typeof Tesseract !== 'undefined' && Tesseract.recognize) {
-          showInlineMessage('Running OCR...', 'info', 2500);
-          const dataUrl = camCanvas.toDataURL('image/png');
-          Tesseract.recognize(dataUrl, 'eng', { logger: m => { /* optional progress logging */ } })
-            .then(({ data }) => {
-              const txt = (data && data.text) ? data.text : '';
-              // extract the first 1-3 digit number found
-              const m = txt.match(/\d{1,3}/g);
-              if (m && m.length) {
-                // pick the largest plausible number <= 180
-                const nums = m.map(s=>parseInt(s,10)).filter(n=>!isNaN(n) && n>=0 && n<=180);
-                if (nums && nums.length) {
-                  const candidate = Math.max(...nums);
-                  if (camValue) camValue.value = candidate;
-                  if (mobileEntry) mobileEntry.value = String(candidate);
-                  keypadState = String(candidate);
-                  showInlineMessage('OCR suggested: ' + candidate, 'success', 3000);
-                } else {
-                  showInlineMessage('No plausible numeric total found by OCR', 'muted', 3000);
-                }
-              } else {
-                showInlineMessage('No text detected', 'muted', 3000);
-              }
-            }).catch(err=>{ console.warn('Tesseract failed', err); showInlineMessage('OCR failed', 'error', 2000); });
-        }
-      } catch(e){ console.warn('OCR attempt failed', e); }
-    } catch (e) { console.warn('capture failed', e); }
-  });
-  if (camRetake) camRetake.addEventListener('click', ()=>{
-    try { if (camCanvas) camCanvas.style.display='none'; if (camVideo) camVideo.style.display='block'; camCapture.style.display='inline-block'; camRetake.style.display='none'; } catch(e){}
-  });
-
-  if (camUse) camUse.addEventListener('click', ()=>{
-    try {
-      const raw = camValue && camValue.value ? String(camValue.value).replace(/[^0-9]/g,'') : '';
-      const val = raw ? parseInt(raw,10) : null;
-      if (val === null || isNaN(val) || val < 0 || val > 180) { showInlineMessage('Enter a numeric visit (0-180) before using', 'error'); return; }
-      // set mobile entry and keypadState but don't auto-submit
-      if (mobileEntry) { mobileEntry.value = String(val); }
-      keypadState = String(val);
-      // close modal and stop camera
-      if (camModal) camModal.style.display='none'; stopCamera();
-      showInlineMessage('Captured value set as visit. Press Add to submit.', 'success', 2500);
-    } catch (e) { console.error('use captured failed', e); }
-  });
-});
 
 // -- Practice Stats functions -------------------------------------------------
 async function loadAllPracticeSessions() {
@@ -1313,6 +1187,8 @@ function renderPlayerList(statsMap) {
 }
 
 function showPlayerStats(pid, stats) {
+  // remember currently displayed player id for the reset button
+  showPlayerStats._currentPlayer = pid;
   // populate header and summary cards
   const nameMap = renderPlayerList.nameMap || {};
   const profile = nameMap[pid] || {};
@@ -1344,6 +1220,51 @@ function showPlayerStats(pid, stats) {
 
   // draw chart
   drawAveragesChart(stats.series || []);
+}
+
+// Wire reset button (per-player practice stats)
+function wireStatsResetButton() {
+  const btn = document.getElementById('stats-reset-player');
+  if (!btn) return;
+  btn.addEventListener('click', async (e) => {
+    try {
+      const pid = showPlayerStats._currentPlayer;
+      if (!pid) { showInlineMessage('Select a player first', 'error'); return; }
+      const confirmed = confirm(`Reset practice stats for ${pid}? This will permanently remove all saved practice sessions for this player.`);
+      if (!confirmed) return;
+      if (!dbGlobal) { showInlineMessage('No database available', 'error'); return; }
+      showInlineMessage('Removing practice sessions...', 'info');
+      // load all sessions and remove those matching playerId
+      const snap = await dbGlobal.ref('practiceSessions').once('value');
+      const val = snap.val() || {};
+      const keys = Object.keys(val).filter(k => val[k] && (val[k].playerId === pid || val[k].playerId === String(pid)));
+      if (!keys.length) {
+        showInlineMessage('No sessions found for this player', 'muted');
+        return;
+      }
+      // remove each key
+      await Promise.all(keys.map(k => dbGlobal.ref('practiceSessions/' + k).remove()));
+      showInlineMessage('Player practice sessions removed', 'success', 2500);
+      // refresh stats UI
+      try { await loadAndRenderPracticePlayers(); } catch(e){}
+      // re-show the player stats (may be empty now)
+      try { const statsMap = computePlayerStats(loadAndRenderPracticePlayers._allSessions || []); if (statsMap && statsMap[pid]) showPlayerStats(pid, statsMap[pid]); else { document.getElementById('stats-player-total').textContent = '—'; document.getElementById('stats-recent-list').textContent = 'No sessions'; drawAveragesChart([]); } } catch(e){}
+    } catch (err) { console.error('Reset player stats failed', err); showInlineMessage('Reset failed', 'error'); }
+  });
+}
+
+// Bind the top-level reset button to perform the same action (if present)
+function wireStatsResetTopButton() {
+  const top = document.getElementById('stats-reset-player-top');
+  if (!top) return;
+  top.addEventListener('click', (e)=>{
+    try {
+      // delegate to the same wired handler by programmatically clicking the inline button
+      const inline = document.getElementById('stats-reset-player');
+      if (inline) inline.click();
+      else showInlineMessage('No player selected', 'error');
+    } catch(e) { console.warn('Top reset failed', e); }
+  });
 }
 
 function drawAveragesChart(series) {
@@ -1436,3 +1357,5 @@ async function loadPlayerNameMap() {
 
 
 // Exports removed to allow running as a classic browser script (non-module)
+
+});
