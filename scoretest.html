@@ -1728,23 +1728,50 @@ function submitMatch() {
    BACKUP / RESTORE
    ----------------------------------------------------------- */
 function exportAll() {
-  const data = { ladder, history: historyCache };
   try {
     document.getElementById('admin-msg').textContent = 'Preparing export...';
   } catch(e) {}
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
 
-  const ts = new Date().toISOString().replace(/[:.]/g, '-');
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `fox-darts-ladder-backup-${ts}.json`;
-  a.click();
-  try {
-    document.getElementById('admin-msg').textContent = 'Export started.';
-  } catch(e) {}
-  // Revoke after a short delay to ensure download starts
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // If Firebase DB is available, export the entire DB root. Otherwise fall back to local ladder/history.
+  if (typeof db !== 'undefined' && db && db.ref) {
+    db.ref().once('value').then(snap => {
+      const data = snap.val() || {};
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fox-darts-db-export-${ts}.json`;
+      a.click();
+      try { document.getElementById('admin-msg').textContent = 'Export started.'; } catch(e) {}
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }).catch(err => {
+      console.error('exportAll: failed to read DB, falling back', err);
+      // fallback to previous behavior
+      const data = { ladder, history: historyCache };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const ts = new Date().toISOString().replace(/[:.]/g, '-');
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `fox-darts-ladder-backup-${ts}.json`;
+      a.click();
+      try { document.getElementById('admin-msg').textContent = 'Export fallback started.'; } catch(e) {}
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  } else {
+    // No DB available: export what we have locally
+    const data = { ladder, history: historyCache };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const ts = new Date().toISOString().replace(/[:.]/g, '-');
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fox-darts-ladder-backup-${ts}.json`;
+    a.click();
+    try { document.getElementById('admin-msg').textContent = 'Export started.'; } catch(e) {}
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
 }
 
 function importAll(e) {
@@ -1757,39 +1784,71 @@ function importAll(e) {
       const data = JSON.parse(evt.target.result);
 
       // Accept alternate shapes for convenience
-      const maybeLadder = data.ladder ?? data.players ?? data.teams ?? [];
-      const maybeHistory = data.history ?? data.matches ?? data.games ?? {};
-
-      // Basic validation: ladder should be an array, history should be an object or array
-      if (!Array.isArray(maybeLadder) || !(Array.isArray(maybeHistory) || typeof maybeHistory === 'object')) {
-        document.getElementById("admin-msg").textContent = "Invalid backup format. Expect { ladder: [], history: {} }.";
+      // If the uploaded JSON represents the entire DB (object), allow full import.
+      // Validate top-level shape is an object.
+      if (!data || typeof data !== 'object') {
+        document.getElementById("admin-msg").textContent = "Invalid JSON file.";
         return;
       }
 
-      // lightweight ladder validation: ensure each entry has a name
-      const ladderValid = Array.isArray(maybeLadder) && maybeLadder.every(p => p && typeof p.name === 'string');
-      const historyValid = Array.isArray(maybeHistory) || (maybeHistory && typeof maybeHistory === 'object');
-      if (!ladderValid || !historyValid) {
-        document.getElementById("admin-msg").textContent = "Import failed: invalid ladder or history entries.";
-        return;
+      // If Firebase DB is available, write the top-level keys back to the DB.
+      if (typeof db !== 'undefined' && db && db.ref) {
+        // Confirm destructive action with user
+        if (!confirm('Import will overwrite data in the remote database. Continue?')) {
+          try { e.target.value = ''; } catch(e) {}
+          document.getElementById("admin-msg").textContent = 'Import canceled.';
+          return;
+        }
+
+        document.getElementById("admin-msg").textContent = "Importing to remote DB...";
+        // If data is an object, write each top-level key individually (safer than replacing root in some environments).
+        const keys = Object.keys(data);
+        // If the file contains a single key named like the DB root, we can set the root directly for completeness.
+        const writePromises = [];
+        try {
+          // If there are many keys, set them individually to preserve structure
+          keys.forEach(k => {
+            writePromises.push(db.ref(k).set(data[k]));
+          });
+        } catch (err) {
+          console.error('importAll: preparing writes failed', err);
+          document.getElementById("admin-msg").textContent = `Import failed: ${err && err.message ? err.message : 'write preparation error'}`;
+          try { e.target.value = ''; } catch(e) {}
+          return;
+        }
+
+        Promise.all(writePromises).then(() => {
+          // Attempt to refresh local state from DB where possible
+          try { renderLadder(); } catch(e) {}
+          try { renderSelects(); } catch(e) {}
+          document.getElementById("admin-msg").textContent = "Import successful.";
+        }).catch(err => {
+          console.error('Import failed', err);
+          document.getElementById("admin-msg").textContent = `Import failed: ${err && err.message ? err.message : 'unknown error'}`;
+        }).finally(()=>{ try { e.target.value = ''; } catch(e) {} });
+      } else {
+        // No DB: best-effort compatibility with previous format (ladder/history)
+        const maybeLadder = data.ladder ?? data.players ?? data.teams ?? [];
+        const maybeHistory = data.history ?? data.matches ?? data.games ?? {};
+        if (!Array.isArray(maybeLadder) || !(Array.isArray(maybeHistory) || typeof maybeHistory === 'object')) {
+          document.getElementById("admin-msg").textContent = "Invalid backup format. Expect { ladder: [], history: {} } or full DB object.";
+          try { e.target.value = ''; } catch(e) {}
+          return;
+        }
+        const ladderValid = Array.isArray(maybeLadder) && maybeLadder.every(p => p && typeof p.name === 'string');
+        const historyValid = Array.isArray(maybeHistory) || (maybeHistory && typeof maybeHistory === 'object');
+        if (!ladderValid || !historyValid) {
+          document.getElementById("admin-msg").textContent = "Import failed: invalid ladder or history entries.";
+          try { e.target.value = ''; } catch(e) {}
+          return;
+        }
+        ladder = maybeLadder;
+        historyCache = Array.isArray(maybeHistory) ? Object.fromEntries(maybeHistory.map((m, i) => [i, m])) : maybeHistory;
+        try { renderLadder(); } catch(e) {}
+        try { renderSelects(); } catch(e) {}
+        document.getElementById("admin-msg").textContent = "Import applied locally (no remote DB).";
+        try { e.target.value = ''; } catch(e) {}
       }
-
-      ladder = maybeLadder;
-      historyCache = Array.isArray(maybeHistory) ? Object.fromEntries(maybeHistory.map((m, i) => [i, m])) : maybeHistory;
-
-      // write to Firebase and surface errors to the admin UI
-      document.getElementById("admin-msg").textContent = "Importing...";
-      Promise.all([
-        db.ref("ladder").set(ladder),
-        db.ref("history").set(historyCache)
-      ]).then(() => {
-        renderLadder();
-        renderSelects();
-        document.getElementById("admin-msg").textContent = "Import successful.";
-      }).catch(err => {
-        console.error('Import failed', err);
-        document.getElementById("admin-msg").textContent = `Import failed: ${err && err.message ? err.message : 'unknown error'}`;
-      });
     } catch (err) {
       console.error(err);
       document.getElementById("admin-msg").textContent = "Invalid JSON file.";
@@ -1833,9 +1892,55 @@ function resetHistoryOnly() {
   }
 }
 
-function resetAll() {
+async function resetAll() {
   if (!confirm("Reset ladder AND history? This will remove all ladder entries, match history, and local scoring state.")) return;
   try {
+    try { document.getElementById('admin-msg').textContent = 'Creating backup before reset...'; } catch(e) {}
+
+    // Create a JSON backup automatically before destructive reset.
+    try {
+      let snapshot = null;
+      if (typeof db !== 'undefined' && db && db.ref) {
+        // try to read the entire DB root
+        try {
+          const snap = await db.ref().once('value');
+          snapshot = snap.val() || {};
+        } catch (err) {
+          console.warn('resetAll: failed to read full DB for backup', err);
+          snapshot = null;
+        }
+      }
+
+      // Fallback: construct a local snapshot from in-memory + localStorage
+      if (!snapshot) {
+        const local = {};
+        try { local.ladder = ladder; } catch(e) { local.ladder = null; }
+        try { local.history = historyCache; } catch(e) { local.history = null; }
+        try { local.scoringState = scoringState || null; } catch(e) { local.scoringState = null; }
+        try { local.fox_practice_name = localStorage.getItem('fox_practice_name'); } catch(e) { local.fox_practice_name = null; }
+        snapshot = { __local_snapshot: true, timestamp: Date.now(), data: local };
+      }
+
+      // Offer the backup download to the user
+      try {
+        const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const ts = new Date().toISOString().replace(/[:.]/g, '-');
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `fox-darts-pre-reset-backup-${ts}.json`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        try { document.getElementById('admin-msg').textContent = 'Backup downloaded. Proceeding to reset...'; } catch(e) {}
+      } catch (err) {
+        console.warn('resetAll: backup download failed', err);
+        try { document.getElementById('admin-msg').textContent = 'Backup failed; proceeding with reset.'; } catch(e) {}
+      }
+    } catch (err) {
+      console.warn('resetAll: backup step failed', err);
+      try { document.getElementById('admin-msg').textContent = 'Backup failed; proceeding with reset.'; } catch(e) {}
+    }
+
     // clear in-memory
     ladder = [];
     historyCache = {};
@@ -1843,15 +1948,19 @@ function resetAll() {
     try {
       scoringState = null;
       // known storage keys used by the app (conservative clear)
-      const keys = ['fox_ladder', 'fox_history_cache', 'fox_scoring_state', 'fox_admin_export_temp'];
+      const keys = ['fox_ladder', 'fox_history_cache', 'fox_scoring_state', 'fox_admin_export_temp', 'fox_practice_name'];
       keys.forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
     } catch(e) {}
 
     // clear Firebase if available
     try {
       if (typeof db !== 'undefined' && db && db.ref) {
+        // clear the main app paths
         db.ref("ladder").set([]);
         db.ref("history").set({});
+        // clear practice-related data if present
+        try { db.ref('practiceSessions').set({}); } catch(e) {}
+        try { db.ref('practice_test_players').set({}); } catch(e) {}
       }
     } catch(e) { console.warn('Could not clear remote DB', e); }
 
